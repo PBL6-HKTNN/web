@@ -12,9 +12,12 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as UsersRouteRouteImport } from './routes/users/route'
+import { Route as LecturingToolRouteRouteImport } from './routes/lecturing-tool/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as UsersIndexRouteImport } from './routes/users/index'
+import { Route as LecturingToolIndexRouteImport } from './routes/lecturing-tool/index'
 import { Route as UsersUserIdRouteImport } from './routes/users/$userId'
+import { Route as LecturingToolCourseIndexRouteImport } from './routes/lecturing-tool/course/index'
 
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
@@ -31,6 +34,11 @@ const UsersRouteRoute = UsersRouteRouteImport.update({
   path: '/users',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LecturingToolRouteRoute = LecturingToolRouteRouteImport.update({
+  id: '/lecturing-tool',
+  path: '/lecturing-tool',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -41,59 +49,92 @@ const UsersIndexRoute = UsersIndexRouteImport.update({
   path: '/',
   getParentRoute: () => UsersRouteRoute,
 } as any)
+const LecturingToolIndexRoute = LecturingToolIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => LecturingToolRouteRoute,
+} as any)
 const UsersUserIdRoute = UsersUserIdRouteImport.update({
   id: '/$userId',
   path: '/$userId',
   getParentRoute: () => UsersRouteRoute,
 } as any)
+const LecturingToolCourseIndexRoute =
+  LecturingToolCourseIndexRouteImport.update({
+    id: '/course/',
+    path: '/course/',
+    getParentRoute: () => LecturingToolRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/lecturing-tool': typeof LecturingToolRouteRouteWithChildren
   '/users': typeof UsersRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/users/$userId': typeof UsersUserIdRoute
+  '/lecturing-tool/': typeof LecturingToolIndexRoute
   '/users/': typeof UsersIndexRoute
+  '/lecturing-tool/course': typeof LecturingToolCourseIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/users/$userId': typeof UsersUserIdRoute
+  '/lecturing-tool': typeof LecturingToolIndexRoute
   '/users': typeof UsersIndexRoute
+  '/lecturing-tool/course': typeof LecturingToolCourseIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/lecturing-tool': typeof LecturingToolRouteRouteWithChildren
   '/users': typeof UsersRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/users/$userId': typeof UsersUserIdRoute
+  '/lecturing-tool/': typeof LecturingToolIndexRoute
   '/users/': typeof UsersIndexRoute
+  '/lecturing-tool/course/': typeof LecturingToolCourseIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/lecturing-tool'
     | '/users'
     | '/about'
     | '/contact'
     | '/users/$userId'
+    | '/lecturing-tool/'
     | '/users/'
+    | '/lecturing-tool/course'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/contact' | '/users/$userId' | '/users'
+  to:
+    | '/'
+    | '/about'
+    | '/contact'
+    | '/users/$userId'
+    | '/lecturing-tool'
+    | '/users'
+    | '/lecturing-tool/course'
   id:
     | '__root__'
     | '/'
+    | '/lecturing-tool'
     | '/users'
     | '/about'
     | '/contact'
     | '/users/$userId'
+    | '/lecturing-tool/'
     | '/users/'
+    | '/lecturing-tool/course/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LecturingToolRouteRoute: typeof LecturingToolRouteRouteWithChildren
   UsersRouteRoute: typeof UsersRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
   ContactRoute: typeof ContactRoute
@@ -122,6 +163,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UsersRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/lecturing-tool': {
+      id: '/lecturing-tool'
+      path: '/lecturing-tool'
+      fullPath: '/lecturing-tool'
+      preLoaderRoute: typeof LecturingToolRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -136,6 +184,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UsersIndexRouteImport
       parentRoute: typeof UsersRouteRoute
     }
+    '/lecturing-tool/': {
+      id: '/lecturing-tool/'
+      path: '/'
+      fullPath: '/lecturing-tool/'
+      preLoaderRoute: typeof LecturingToolIndexRouteImport
+      parentRoute: typeof LecturingToolRouteRoute
+    }
     '/users/$userId': {
       id: '/users/$userId'
       path: '/$userId'
@@ -143,8 +198,28 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UsersUserIdRouteImport
       parentRoute: typeof UsersRouteRoute
     }
+    '/lecturing-tool/course/': {
+      id: '/lecturing-tool/course/'
+      path: '/course'
+      fullPath: '/lecturing-tool/course'
+      preLoaderRoute: typeof LecturingToolCourseIndexRouteImport
+      parentRoute: typeof LecturingToolRouteRoute
+    }
   }
 }
+
+interface LecturingToolRouteRouteChildren {
+  LecturingToolIndexRoute: typeof LecturingToolIndexRoute
+  LecturingToolCourseIndexRoute: typeof LecturingToolCourseIndexRoute
+}
+
+const LecturingToolRouteRouteChildren: LecturingToolRouteRouteChildren = {
+  LecturingToolIndexRoute: LecturingToolIndexRoute,
+  LecturingToolCourseIndexRoute: LecturingToolCourseIndexRoute,
+}
+
+const LecturingToolRouteRouteWithChildren =
+  LecturingToolRouteRoute._addFileChildren(LecturingToolRouteRouteChildren)
 
 interface UsersRouteRouteChildren {
   UsersUserIdRoute: typeof UsersUserIdRoute
@@ -162,6 +237,7 @@ const UsersRouteRouteWithChildren = UsersRouteRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LecturingToolRouteRoute: LecturingToolRouteRouteWithChildren,
   UsersRouteRoute: UsersRouteRouteWithChildren,
   AboutRoute: AboutRoute,
   ContactRoute: ContactRoute,
