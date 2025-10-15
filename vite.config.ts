@@ -23,6 +23,8 @@ export default defineConfig({
       "@types": path.resolve(__dirname, "./src/types"),
       "@routes": path.resolve(__dirname, "./src/routes"),
       "@conf": path.resolve(__dirname, "./src/conf"),
+      '@contexts': path.resolve(__dirname, './src/contexts'),
+      '@services': path.resolve(__dirname, './src/services'),
     },
   },
 });
