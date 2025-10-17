@@ -45,7 +45,7 @@ export function ProfileContent({
             type="file"
             accept="image/*"
             onChange={handleAvatarChange}
-            className="text-sm w-50% border border-gray-300 rounded-lg px-3 py-2 focus:outline-indigo-500"
+            className="text-sm w-1/2 border border-gray-300 rounded-lg px-3 py-2 focus:outline-indigo-500"
           />
         )}
       </div>
@@ -54,11 +54,7 @@ export function ProfileContent({
       <div className="space-y-5 w-full">
         {[
           { label: 'Full Name', name: 'name', value: formData?.name ?? user.name },
-          { label: 'Birth Date', name: 'birthDate', value: formData?.birthDate ?? user.birthDate, type: 'date' },
           { label: 'Headline', name: 'bio', value: formData?.bio ?? user.bio },
-          { label: 'Biography', name: 'motto', value: formData?.motto ?? user.motto, textArea: true },
-          { label: 'Email', name: 'contact.email', value: formData?.contact.email ?? user.contact.email },
-          { label: 'Phone Number', name: 'contact.phone', value: formData?.contact.phone ?? user.contact.phone },
         ].map((row) => (
           <FormRow
             key={row.name}
@@ -67,8 +63,6 @@ export function ProfileContent({
             value={row.value || ''}
             onChange={handleChange}
             isEditing={isEditing}
-            textArea={row.textArea}
-            type={row.type as any}
           />
         ))}
       </div>

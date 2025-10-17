@@ -3,12 +3,7 @@ export interface User {
   name: string;
   bio: string;
   avatar: string; 
-  contact: {
-    email: string;
-    phone: string;
-  };
-  birthDate?: string; 
-  motto?: string; 
+  email: string;
 };
 
 export type UserTab =
