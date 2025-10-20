@@ -5,7 +5,7 @@ export const Route = createFileRoute('/users')({
 })
 
 function RouteComponent() {
-  return <div>Hello "/users"!
+  return <div> Layout Hello "/users"!
     <Outlet />
   </div>
 }

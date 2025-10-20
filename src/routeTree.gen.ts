@@ -13,11 +13,17 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as UsersRouteRouteImport } from './routes/users/route'
 import { Route as LecturingToolRouteRouteImport } from './routes/lecturing-tool/route'
+import { Route as AuthRouteRouteImport } from './routes/auth/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as UsersIndexRouteImport } from './routes/users/index'
 import { Route as LecturingToolIndexRouteImport } from './routes/lecturing-tool/index'
 import { Route as UsersUserIdRouteImport } from './routes/users/$userId'
+import { Route as AuthMainLayoutRouteRouteImport } from './routes/auth/_mainLayout/route'
 import { Route as LecturingToolCourseIndexRouteImport } from './routes/lecturing-tool/course/index'
+import { Route as AuthVerifyIndexRouteImport } from './routes/auth/verify/index'
+import { Route as AuthForgotPasswordIndexRouteImport } from './routes/auth/forgot-password/index'
+import { Route as AuthMainLayoutRegisterIndexRouteImport } from './routes/auth/_mainLayout/register/index'
+import { Route as AuthMainLayoutLoginIndexRouteImport } from './routes/auth/_mainLayout/login/index'
 
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
@@ -37,6 +43,11 @@ const UsersRouteRoute = UsersRouteRouteImport.update({
 const LecturingToolRouteRoute = LecturingToolRouteRouteImport.update({
   id: '/lecturing-tool',
   path: '/lecturing-tool',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRouteRoute = AuthRouteRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -59,15 +70,42 @@ const UsersUserIdRoute = UsersUserIdRouteImport.update({
   path: '/$userId',
   getParentRoute: () => UsersRouteRoute,
 } as any)
+const AuthMainLayoutRouteRoute = AuthMainLayoutRouteRouteImport.update({
+  id: '/_mainLayout',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
 const LecturingToolCourseIndexRoute =
   LecturingToolCourseIndexRouteImport.update({
     id: '/course/',
     path: '/course/',
     getParentRoute: () => LecturingToolRouteRoute,
   } as any)
+const AuthVerifyIndexRoute = AuthVerifyIndexRouteImport.update({
+  id: '/verify/',
+  path: '/verify/',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+const AuthForgotPasswordIndexRoute = AuthForgotPasswordIndexRouteImport.update({
+  id: '/forgot-password/',
+  path: '/forgot-password/',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+const AuthMainLayoutRegisterIndexRoute =
+  AuthMainLayoutRegisterIndexRouteImport.update({
+    id: '/register/',
+    path: '/register/',
+    getParentRoute: () => AuthMainLayoutRouteRoute,
+  } as any)
+const AuthMainLayoutLoginIndexRoute =
+  AuthMainLayoutLoginIndexRouteImport.update({
+    id: '/login/',
+    path: '/login/',
+    getParentRoute: () => AuthMainLayoutRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthMainLayoutRouteRouteWithChildren
   '/lecturing-tool': typeof LecturingToolRouteRouteWithChildren
   '/users': typeof UsersRouteRouteWithChildren
   '/about': typeof AboutRoute
@@ -75,33 +113,49 @@ export interface FileRoutesByFullPath {
   '/users/$userId': typeof UsersUserIdRoute
   '/lecturing-tool/': typeof LecturingToolIndexRoute
   '/users/': typeof UsersIndexRoute
+  '/auth/forgot-password': typeof AuthForgotPasswordIndexRoute
+  '/auth/verify': typeof AuthVerifyIndexRoute
   '/lecturing-tool/course': typeof LecturingToolCourseIndexRoute
+  '/auth/login': typeof AuthMainLayoutLoginIndexRoute
+  '/auth/register': typeof AuthMainLayoutRegisterIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthMainLayoutRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/users/$userId': typeof UsersUserIdRoute
   '/lecturing-tool': typeof LecturingToolIndexRoute
   '/users': typeof UsersIndexRoute
+  '/auth/forgot-password': typeof AuthForgotPasswordIndexRoute
+  '/auth/verify': typeof AuthVerifyIndexRoute
   '/lecturing-tool/course': typeof LecturingToolCourseIndexRoute
+  '/auth/login': typeof AuthMainLayoutLoginIndexRoute
+  '/auth/register': typeof AuthMainLayoutRegisterIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/auth': typeof AuthRouteRouteWithChildren
   '/lecturing-tool': typeof LecturingToolRouteRouteWithChildren
   '/users': typeof UsersRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
+  '/auth/_mainLayout': typeof AuthMainLayoutRouteRouteWithChildren
   '/users/$userId': typeof UsersUserIdRoute
   '/lecturing-tool/': typeof LecturingToolIndexRoute
   '/users/': typeof UsersIndexRoute
+  '/auth/forgot-password/': typeof AuthForgotPasswordIndexRoute
+  '/auth/verify/': typeof AuthVerifyIndexRoute
   '/lecturing-tool/course/': typeof LecturingToolCourseIndexRoute
+  '/auth/_mainLayout/login/': typeof AuthMainLayoutLoginIndexRoute
+  '/auth/_mainLayout/register/': typeof AuthMainLayoutRegisterIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/auth'
     | '/lecturing-tool'
     | '/users'
     | '/about'
@@ -109,31 +163,47 @@ export interface FileRouteTypes {
     | '/users/$userId'
     | '/lecturing-tool/'
     | '/users/'
+    | '/auth/forgot-password'
+    | '/auth/verify'
     | '/lecturing-tool/course'
+    | '/auth/login'
+    | '/auth/register'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/auth'
     | '/about'
     | '/contact'
     | '/users/$userId'
     | '/lecturing-tool'
     | '/users'
+    | '/auth/forgot-password'
+    | '/auth/verify'
     | '/lecturing-tool/course'
+    | '/auth/login'
+    | '/auth/register'
   id:
     | '__root__'
     | '/'
+    | '/auth'
     | '/lecturing-tool'
     | '/users'
     | '/about'
     | '/contact'
+    | '/auth/_mainLayout'
     | '/users/$userId'
     | '/lecturing-tool/'
     | '/users/'
+    | '/auth/forgot-password/'
+    | '/auth/verify/'
     | '/lecturing-tool/course/'
+    | '/auth/_mainLayout/login/'
+    | '/auth/_mainLayout/register/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthRouteRoute: typeof AuthRouteRouteWithChildren
   LecturingToolRouteRoute: typeof LecturingToolRouteRouteWithChildren
   UsersRouteRoute: typeof UsersRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
@@ -170,6 +240,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LecturingToolRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -198,6 +275,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UsersUserIdRouteImport
       parentRoute: typeof UsersRouteRoute
     }
+    '/auth/_mainLayout': {
+      id: '/auth/_mainLayout'
+      path: ''
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthMainLayoutRouteRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
     '/lecturing-tool/course/': {
       id: '/lecturing-tool/course/'
       path: '/course'
@@ -205,8 +289,65 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LecturingToolCourseIndexRouteImport
       parentRoute: typeof LecturingToolRouteRoute
     }
+    '/auth/verify/': {
+      id: '/auth/verify/'
+      path: '/verify'
+      fullPath: '/auth/verify'
+      preLoaderRoute: typeof AuthVerifyIndexRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/auth/forgot-password/': {
+      id: '/auth/forgot-password/'
+      path: '/forgot-password'
+      fullPath: '/auth/forgot-password'
+      preLoaderRoute: typeof AuthForgotPasswordIndexRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/auth/_mainLayout/register/': {
+      id: '/auth/_mainLayout/register/'
+      path: '/register'
+      fullPath: '/auth/register'
+      preLoaderRoute: typeof AuthMainLayoutRegisterIndexRouteImport
+      parentRoute: typeof AuthMainLayoutRouteRoute
+    }
+    '/auth/_mainLayout/login/': {
+      id: '/auth/_mainLayout/login/'
+      path: '/login'
+      fullPath: '/auth/login'
+      preLoaderRoute: typeof AuthMainLayoutLoginIndexRouteImport
+      parentRoute: typeof AuthMainLayoutRouteRoute
+    }
   }
 }
+
+interface AuthMainLayoutRouteRouteChildren {
+  AuthMainLayoutLoginIndexRoute: typeof AuthMainLayoutLoginIndexRoute
+  AuthMainLayoutRegisterIndexRoute: typeof AuthMainLayoutRegisterIndexRoute
+}
+
+const AuthMainLayoutRouteRouteChildren: AuthMainLayoutRouteRouteChildren = {
+  AuthMainLayoutLoginIndexRoute: AuthMainLayoutLoginIndexRoute,
+  AuthMainLayoutRegisterIndexRoute: AuthMainLayoutRegisterIndexRoute,
+}
+
+const AuthMainLayoutRouteRouteWithChildren =
+  AuthMainLayoutRouteRoute._addFileChildren(AuthMainLayoutRouteRouteChildren)
+
+interface AuthRouteRouteChildren {
+  AuthMainLayoutRouteRoute: typeof AuthMainLayoutRouteRouteWithChildren
+  AuthForgotPasswordIndexRoute: typeof AuthForgotPasswordIndexRoute
+  AuthVerifyIndexRoute: typeof AuthVerifyIndexRoute
+}
+
+const AuthRouteRouteChildren: AuthRouteRouteChildren = {
+  AuthMainLayoutRouteRoute: AuthMainLayoutRouteRouteWithChildren,
+  AuthForgotPasswordIndexRoute: AuthForgotPasswordIndexRoute,
+  AuthVerifyIndexRoute: AuthVerifyIndexRoute,
+}
+
+const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
+  AuthRouteRouteChildren,
+)
 
 interface LecturingToolRouteRouteChildren {
   LecturingToolIndexRoute: typeof LecturingToolIndexRoute
@@ -237,6 +378,7 @@ const UsersRouteRouteWithChildren = UsersRouteRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthRouteRoute: AuthRouteRouteWithChildren,
   LecturingToolRouteRoute: LecturingToolRouteRouteWithChildren,
   UsersRouteRoute: UsersRouteRouteWithChildren,
   AboutRoute: AboutRoute,
