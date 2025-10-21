@@ -16,7 +16,7 @@ import {
   Twitter,
   Mail,
 } from 'lucide-react'
-import { ThemeChanger } from '@/components/shared/theme-changer'
+import { NavBar } from '@/components/layout'
 
 export const Route = createFileRoute('/')({
   component: Home,
@@ -25,32 +25,7 @@ export const Route = createFileRoute('/')({
 function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
-      {/* Navigation */}
-      <nav className="border-b bg-white/80 backdrop-blur-sm dark:bg-slate-900/80 dark:border-slate-800 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-2">
-              <Code className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
-              <span className="text-2xl font-bold text-gray-900 dark:text-white">CodeMy</span>
-            </div>
-            <div className="hidden md:flex items-center space-x-8">
-              <Link to="/about" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors">
-                About
-              </Link>
-              <Link to="/contact" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors">
-                Contact
-              </Link>
-              <Button variant="outline" size="sm" className="dark:border-slate-700 dark:text-slate-300">
-                Sign In
-              </Button>
-              <Button size="sm">
-                Get Started
-              </Button>
-              <ThemeChanger />
-            </div>
-          </div>
-        </div>
-      </nav>
+      <NavBar />
 
       {/* Hero Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8">
