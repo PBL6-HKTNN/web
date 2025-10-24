@@ -22,8 +22,10 @@ import { Route as AuthMainLayoutRouteRouteImport } from './routes/auth/_mainLayo
 import { Route as LecturingToolCourseIndexRouteImport } from './routes/lecturing-tool/course/index'
 import { Route as AuthVerifyIndexRouteImport } from './routes/auth/verify/index'
 import { Route as AuthForgotPasswordIndexRouteImport } from './routes/auth/forgot-password/index'
+import { Route as LecturingToolCourseCourseIdIndexRouteImport } from './routes/lecturing-tool/course/$courseId/index'
 import { Route as AuthMainLayoutRegisterIndexRouteImport } from './routes/auth/_mainLayout/register/index'
 import { Route as AuthMainLayoutLoginIndexRouteImport } from './routes/auth/_mainLayout/login/index'
+import { Route as LecturingToolCourseCourseIdEditingIndexRouteImport } from './routes/lecturing-tool/course/$courseId/editing/index'
 
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
@@ -90,6 +92,12 @@ const AuthForgotPasswordIndexRoute = AuthForgotPasswordIndexRouteImport.update({
   path: '/forgot-password/',
   getParentRoute: () => AuthRouteRoute,
 } as any)
+const LecturingToolCourseCourseIdIndexRoute =
+  LecturingToolCourseCourseIdIndexRouteImport.update({
+    id: '/course/$courseId/',
+    path: '/course/$courseId/',
+    getParentRoute: () => LecturingToolRouteRoute,
+  } as any)
 const AuthMainLayoutRegisterIndexRoute =
   AuthMainLayoutRegisterIndexRouteImport.update({
     id: '/register/',
@@ -101,6 +109,12 @@ const AuthMainLayoutLoginIndexRoute =
     id: '/login/',
     path: '/login/',
     getParentRoute: () => AuthMainLayoutRouteRoute,
+  } as any)
+const LecturingToolCourseCourseIdEditingIndexRoute =
+  LecturingToolCourseCourseIdEditingIndexRouteImport.update({
+    id: '/course/$courseId/editing/',
+    path: '/course/$courseId/editing/',
+    getParentRoute: () => LecturingToolRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -118,6 +132,8 @@ export interface FileRoutesByFullPath {
   '/lecturing-tool/course': typeof LecturingToolCourseIndexRoute
   '/auth/login': typeof AuthMainLayoutLoginIndexRoute
   '/auth/register': typeof AuthMainLayoutRegisterIndexRoute
+  '/lecturing-tool/course/$courseId': typeof LecturingToolCourseCourseIdIndexRoute
+  '/lecturing-tool/course/$courseId/editing': typeof LecturingToolCourseCourseIdEditingIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -132,6 +148,8 @@ export interface FileRoutesByTo {
   '/lecturing-tool/course': typeof LecturingToolCourseIndexRoute
   '/auth/login': typeof AuthMainLayoutLoginIndexRoute
   '/auth/register': typeof AuthMainLayoutRegisterIndexRoute
+  '/lecturing-tool/course/$courseId': typeof LecturingToolCourseCourseIdIndexRoute
+  '/lecturing-tool/course/$courseId/editing': typeof LecturingToolCourseCourseIdEditingIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -150,6 +168,8 @@ export interface FileRoutesById {
   '/lecturing-tool/course/': typeof LecturingToolCourseIndexRoute
   '/auth/_mainLayout/login/': typeof AuthMainLayoutLoginIndexRoute
   '/auth/_mainLayout/register/': typeof AuthMainLayoutRegisterIndexRoute
+  '/lecturing-tool/course/$courseId/': typeof LecturingToolCourseCourseIdIndexRoute
+  '/lecturing-tool/course/$courseId/editing/': typeof LecturingToolCourseCourseIdEditingIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -168,6 +188,8 @@ export interface FileRouteTypes {
     | '/lecturing-tool/course'
     | '/auth/login'
     | '/auth/register'
+    | '/lecturing-tool/course/$courseId'
+    | '/lecturing-tool/course/$courseId/editing'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -182,6 +204,8 @@ export interface FileRouteTypes {
     | '/lecturing-tool/course'
     | '/auth/login'
     | '/auth/register'
+    | '/lecturing-tool/course/$courseId'
+    | '/lecturing-tool/course/$courseId/editing'
   id:
     | '__root__'
     | '/'
@@ -199,6 +223,8 @@ export interface FileRouteTypes {
     | '/lecturing-tool/course/'
     | '/auth/_mainLayout/login/'
     | '/auth/_mainLayout/register/'
+    | '/lecturing-tool/course/$courseId/'
+    | '/lecturing-tool/course/$courseId/editing/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -303,6 +329,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthForgotPasswordIndexRouteImport
       parentRoute: typeof AuthRouteRoute
     }
+    '/lecturing-tool/course/$courseId/': {
+      id: '/lecturing-tool/course/$courseId/'
+      path: '/course/$courseId'
+      fullPath: '/lecturing-tool/course/$courseId'
+      preLoaderRoute: typeof LecturingToolCourseCourseIdIndexRouteImport
+      parentRoute: typeof LecturingToolRouteRoute
+    }
     '/auth/_mainLayout/register/': {
       id: '/auth/_mainLayout/register/'
       path: '/register'
@@ -316,6 +349,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth/login'
       preLoaderRoute: typeof AuthMainLayoutLoginIndexRouteImport
       parentRoute: typeof AuthMainLayoutRouteRoute
+    }
+    '/lecturing-tool/course/$courseId/editing/': {
+      id: '/lecturing-tool/course/$courseId/editing/'
+      path: '/course/$courseId/editing'
+      fullPath: '/lecturing-tool/course/$courseId/editing'
+      preLoaderRoute: typeof LecturingToolCourseCourseIdEditingIndexRouteImport
+      parentRoute: typeof LecturingToolRouteRoute
     }
   }
 }
@@ -352,11 +392,16 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
 interface LecturingToolRouteRouteChildren {
   LecturingToolIndexRoute: typeof LecturingToolIndexRoute
   LecturingToolCourseIndexRoute: typeof LecturingToolCourseIndexRoute
+  LecturingToolCourseCourseIdIndexRoute: typeof LecturingToolCourseCourseIdIndexRoute
+  LecturingToolCourseCourseIdEditingIndexRoute: typeof LecturingToolCourseCourseIdEditingIndexRoute
 }
 
 const LecturingToolRouteRouteChildren: LecturingToolRouteRouteChildren = {
   LecturingToolIndexRoute: LecturingToolIndexRoute,
   LecturingToolCourseIndexRoute: LecturingToolCourseIndexRoute,
+  LecturingToolCourseCourseIdIndexRoute: LecturingToolCourseCourseIdIndexRoute,
+  LecturingToolCourseCourseIdEditingIndexRoute:
+    LecturingToolCourseCourseIdEditingIndexRoute,
 }
 
 const LecturingToolRouteRouteWithChildren =

@@ -1,0 +1,141 @@
+/* Custom Markdown Editor Styles for shadcn/ui theme */
+
+/* Override @uiw/react-md-editor default styles to match shadcn/ui theme */
+.wmde-markdown {
+  background-color: var(--color-card) !important;
+  color: var(--color-foreground) !important;
+}
+
+.wmde-markdown pre {
+  background-color: var(--color-muted) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 6px !important;
+}
+
+.wmde-markdown code {
+  background-color: (var(--color-muted)) !important;
+  color: (var(--color-muted-foreground)) !important;
+  border-radius: 4px !important;
+  padding: 2px 4px !important;
+}
+
+.wmde-markdown pre code {
+  background-color: transparent !important;
+  color: inherit !important;
+  padding: 0 !important;
+}
+
+.wmde-markdown blockquote {
+  border-left: 4px solid var(--color-border) !important;
+  padding-left: 16px !important;
+  color: var(--color-muted-foreground) !important;
+  margin: 16px 0 !important;
+}
+
+.wmde-markdown table {
+  border-collapse: collapse !important;
+  width: 100% !important;
+  margin: 16px 0 !important;
+}
+
+.wmde-markdown table th,
+.wmde-markdown table td {
+  border: 1px solid var(--color-border) !important;
+  padding: 8px 12px !important;
+}
+
+.wmde-markdown table th {
+  background-color: var(--color-border) !important;
+  font-weight: 600 !important;
+}
+
+.wmde-markdown hr {
+  border-color: var(--color-border) !important;
+  margin: 24px 0 !important;
+}
+
+/* Editor container styles */
+.w-md-editor {
+  border: 1px solid var(--color-border) !important;
+  border-radius: 6px !important;
+  background-color: var(--color-card) !important;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.w-md-editor .w-md-editor-text {
+  /* color: var(--color-foreground) !important;
+  background-color: var(--color-background) !important; */
+  overflow-y: auto !important;
+  flex: 1 !important;
+  resize: none !important;
+}
+
+.w-md-editor .w-md-editor-text:focus {
+  outline: none !important;
+  border-color: var(--color-ring) !important;
+  box-shadow: 0 0 0 1px var(--color-ring) !important;
+}
+
+.w-md-editor .w-md-editor-text::placeholder {
+  color: var(--color-muted-foreground) !important;
+}
+
+/* Ensure proper scrolling in edit mode */
+.w-md-editor .w-md-editor-text-pre {
+  overflow-y: auto !important;
+  max-height: 100% !important;
+}
+
+/* Preview container scrolling */
+.w-md-editor .w-md-editor-preview {
+  overflow-y: auto !important;
+  max-height: 100% !important;
+}
+
+/* Toolbar styles */
+.w-md-editor .w-md-editor-toolbar {
+  border-bottom: 1px solid var(--color-border) !important;
+  background-color: var(--color-card) !important;
+  /* border-start-start-radius: 6px !important; */
+  padding: 8px !important;
+  position: sticky !important;
+  top: -24px !important;
+  z-index: 10 !important;
+}
+
+.w-md-editor .w-md-editor-toolbar button {
+  color: (var(--color-foreground)) !important;
+  border-radius: 4px !important;
+  padding: 4px 8px !important;
+  margin: 0 2px !important;
+  transition: all 0.2s ease !important;
+}
+
+.w-md-editor .w-md-editor-toolbar button:hover {
+  background-color: (var(--color-accent)) !important;
+  color: (var(--color-accent-foreground)) !important;
+}
+
+.w-md-editor .w-md-editor-toolbar button.active {
+  background-color: (var(--color-accent)) !important;
+  color: (var(--color-accent-foreground)) !important;
+}
+
+/* Dark mode adjustments */
+/* @media (prefers-color-scheme: dark) {
+  .wmde-markdown {
+    background-color: hsl(var(--color-background)) !important;
+    color: hsl(var(--color-foreground)) !important;
+  }
+
+  .wmde-markdown pre {
+    background-color: hsl(var(--color-muted)) !important;
+  }
+
+  .wmde-markdown code {
+    background-color: hsl(var(--color-muted)) !important;
+    color: hsl(var(--color-muted-foreground)) !important;
+  }
+} */
