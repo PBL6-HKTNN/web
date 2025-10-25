@@ -44,6 +44,9 @@ export function NavBar() {
           </div>
 
           <div className="hidden md:flex items-center space-x-8">
+          <Link to="/course" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors">
+              Courses
+            </Link>
             <Link to="/about" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors">
               About
             </Link>
