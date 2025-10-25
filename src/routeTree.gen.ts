@@ -13,11 +13,14 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as UsersRouteRouteImport } from './routes/users/route'
 import { Route as LecturingToolRouteRouteImport } from './routes/lecturing-tool/route'
+import { Route as CourseRouteRouteImport } from './routes/course/route'
 import { Route as AuthRouteRouteImport } from './routes/auth/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as UsersIndexRouteImport } from './routes/users/index'
 import { Route as LecturingToolIndexRouteImport } from './routes/lecturing-tool/index'
+import { Route as CourseIndexRouteImport } from './routes/course/index'
 import { Route as UsersUserIdRouteImport } from './routes/users/$userId'
+import { Route as CourseCourseIdRouteImport } from './routes/course/$courseId'
 import { Route as AuthMainLayoutRouteRouteImport } from './routes/auth/_mainLayout/route'
 import { Route as LecturingToolCourseIndexRouteImport } from './routes/lecturing-tool/course/index'
 import { Route as AuthVerifyIndexRouteImport } from './routes/auth/verify/index'
@@ -45,6 +48,11 @@ const LecturingToolRouteRoute = LecturingToolRouteRouteImport.update({
   path: '/lecturing-tool',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CourseRouteRoute = CourseRouteRouteImport.update({
+  id: '/course',
+  path: '/course',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRouteRoute = AuthRouteRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -65,10 +73,20 @@ const LecturingToolIndexRoute = LecturingToolIndexRouteImport.update({
   path: '/',
   getParentRoute: () => LecturingToolRouteRoute,
 } as any)
+const CourseIndexRoute = CourseIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => CourseRouteRoute,
+} as any)
 const UsersUserIdRoute = UsersUserIdRouteImport.update({
   id: '/$userId',
   path: '/$userId',
   getParentRoute: () => UsersRouteRoute,
+} as any)
+const CourseCourseIdRoute = CourseCourseIdRouteImport.update({
+  id: '/$courseId',
+  path: '/$courseId',
+  getParentRoute: () => CourseRouteRoute,
 } as any)
 const AuthMainLayoutRouteRoute = AuthMainLayoutRouteRouteImport.update({
   id: '/_mainLayout',
@@ -106,11 +124,14 @@ const AuthMainLayoutLoginIndexRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthMainLayoutRouteRouteWithChildren
+  '/course': typeof CourseRouteRouteWithChildren
   '/lecturing-tool': typeof LecturingToolRouteRouteWithChildren
   '/users': typeof UsersRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
+  '/course/$courseId': typeof CourseCourseIdRoute
   '/users/$userId': typeof UsersUserIdRoute
+  '/course/': typeof CourseIndexRoute
   '/lecturing-tool/': typeof LecturingToolIndexRoute
   '/users/': typeof UsersIndexRoute
   '/auth/forgot-password': typeof AuthForgotPasswordIndexRoute
@@ -124,7 +145,9 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthMainLayoutRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
+  '/course/$courseId': typeof CourseCourseIdRoute
   '/users/$userId': typeof UsersUserIdRoute
+  '/course': typeof CourseIndexRoute
   '/lecturing-tool': typeof LecturingToolIndexRoute
   '/users': typeof UsersIndexRoute
   '/auth/forgot-password': typeof AuthForgotPasswordIndexRoute
@@ -137,12 +160,15 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
+  '/course': typeof CourseRouteRouteWithChildren
   '/lecturing-tool': typeof LecturingToolRouteRouteWithChildren
   '/users': typeof UsersRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/auth/_mainLayout': typeof AuthMainLayoutRouteRouteWithChildren
+  '/course/$courseId': typeof CourseCourseIdRoute
   '/users/$userId': typeof UsersUserIdRoute
+  '/course/': typeof CourseIndexRoute
   '/lecturing-tool/': typeof LecturingToolIndexRoute
   '/users/': typeof UsersIndexRoute
   '/auth/forgot-password/': typeof AuthForgotPasswordIndexRoute
@@ -156,11 +182,14 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/course'
     | '/lecturing-tool'
     | '/users'
     | '/about'
     | '/contact'
+    | '/course/$courseId'
     | '/users/$userId'
+    | '/course/'
     | '/lecturing-tool/'
     | '/users/'
     | '/auth/forgot-password'
@@ -174,7 +203,9 @@ export interface FileRouteTypes {
     | '/auth'
     | '/about'
     | '/contact'
+    | '/course/$courseId'
     | '/users/$userId'
+    | '/course'
     | '/lecturing-tool'
     | '/users'
     | '/auth/forgot-password'
@@ -186,12 +217,15 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/auth'
+    | '/course'
     | '/lecturing-tool'
     | '/users'
     | '/about'
     | '/contact'
     | '/auth/_mainLayout'
+    | '/course/$courseId'
     | '/users/$userId'
+    | '/course/'
     | '/lecturing-tool/'
     | '/users/'
     | '/auth/forgot-password/'
@@ -204,6 +238,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
+  CourseRouteRoute: typeof CourseRouteRouteWithChildren
   LecturingToolRouteRoute: typeof LecturingToolRouteRouteWithChildren
   UsersRouteRoute: typeof UsersRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
@@ -240,6 +275,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LecturingToolRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/course': {
+      id: '/course'
+      path: '/course'
+      fullPath: '/course'
+      preLoaderRoute: typeof CourseRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -268,12 +310,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LecturingToolIndexRouteImport
       parentRoute: typeof LecturingToolRouteRoute
     }
+    '/course/': {
+      id: '/course/'
+      path: '/'
+      fullPath: '/course/'
+      preLoaderRoute: typeof CourseIndexRouteImport
+      parentRoute: typeof CourseRouteRoute
+    }
     '/users/$userId': {
       id: '/users/$userId'
       path: '/$userId'
       fullPath: '/users/$userId'
       preLoaderRoute: typeof UsersUserIdRouteImport
       parentRoute: typeof UsersRouteRoute
+    }
+    '/course/$courseId': {
+      id: '/course/$courseId'
+      path: '/$courseId'
+      fullPath: '/course/$courseId'
+      preLoaderRoute: typeof CourseCourseIdRouteImport
+      parentRoute: typeof CourseRouteRoute
     }
     '/auth/_mainLayout': {
       id: '/auth/_mainLayout'
@@ -349,6 +405,20 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
   AuthRouteRouteChildren,
 )
 
+interface CourseRouteRouteChildren {
+  CourseCourseIdRoute: typeof CourseCourseIdRoute
+  CourseIndexRoute: typeof CourseIndexRoute
+}
+
+const CourseRouteRouteChildren: CourseRouteRouteChildren = {
+  CourseCourseIdRoute: CourseCourseIdRoute,
+  CourseIndexRoute: CourseIndexRoute,
+}
+
+const CourseRouteRouteWithChildren = CourseRouteRoute._addFileChildren(
+  CourseRouteRouteChildren,
+)
+
 interface LecturingToolRouteRouteChildren {
   LecturingToolIndexRoute: typeof LecturingToolIndexRoute
   LecturingToolCourseIndexRoute: typeof LecturingToolCourseIndexRoute
@@ -379,6 +449,7 @@ const UsersRouteRouteWithChildren = UsersRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRouteRoute: AuthRouteRouteWithChildren,
+  CourseRouteRoute: CourseRouteRouteWithChildren,
   LecturingToolRouteRoute: LecturingToolRouteRouteWithChildren,
   UsersRouteRoute: UsersRouteRouteWithChildren,
   AboutRoute: AboutRoute,

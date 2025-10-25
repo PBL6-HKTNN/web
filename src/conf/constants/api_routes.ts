@@ -6,9 +6,14 @@ const API_ROUTES = {
         register: '/Auth/register',
         verifyEmail: '/Auth/verify-email',
         googleLogin: '/Auth/google-login',
-        requestResetPassword: '/Auth/token-reset-password', 
-        resetPassword: '/Auth/reset-password', 
+        requestResetPassword: '/Auth/token-reset-password',
+        resetPassword: '/Auth/reset-password',
         logout: '/Auth/logout',
+    },
+    COURSE: {
+        getCourses: '/Course',
+        getCategories: '/Course/categories',
+        getCourseById: '/Course/{id}',
     }
 }
 
