@@ -17,7 +17,7 @@ export default function ToolLayout({ items, children }: ToolLayoutProps) {
             <MenuSidebar items={items} />
             <main className="container flex min-h-screen">
                 <SidebarTrigger />
-                <div className="p-4">
+                <div className="flex flex-1 p-4">
                     {children}
                 </div>
             </main>
