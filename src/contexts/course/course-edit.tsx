@@ -132,6 +132,13 @@ interface CourseEditContextType {
   reset: () => void;
   submitPendingChanges: () => Promise<void>;
   clearPendingChanges: () => void;
+
+  // Delete modal state
+  isDeleteModalOpen: boolean;
+  deleteTarget: { type: 'module' | 'lesson'; moduleId: string; lessonId?: string } | null;
+  openDeleteModal: (type: 'module' | 'lesson', moduleId: string, lessonId?: string) => void;
+  closeDeleteModal: () => void;
+  confirmDelete: () => void;
 }
 
 const CourseEditContext = createContext<CourseEditContextType | undefined>(undefined);
@@ -161,6 +168,10 @@ export function CourseEditProvider({
   const [pendingAdditions, setPendingAdditions] = useState<PendingAddition[]>([]);
   const [pendingEdits, setPendingEdits] = useState<PendingEdit[]>([]);
   const [pendingDeletions, setPendingDeletions] = useState<PendingDeletion[]>([]);
+
+  // Delete modal state
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{ type: 'module' | 'lesson'; moduleId: string; lessonId?: string } | null>(null);
 
   // Utility functions
   const generateId = () => `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -734,6 +745,33 @@ export function CourseEditProvider({
     reset(newCourseEdit);
   }, [reset]);
 
+  // Delete modal functions
+  const openDeleteModal = useCallback((type: 'module' | 'lesson', moduleId: string, lessonId?: string) => {
+    setDeleteTarget({ type, moduleId, lessonId });
+    setIsDeleteModalOpen(true);
+  }, []);
+
+  const closeDeleteModal = useCallback(() => {
+    setIsDeleteModalOpen(false);
+    setDeleteTarget(null);
+  }, []);
+
+  const confirmDelete = useCallback(() => {
+    if (!deleteTarget) return;
+
+    if (deleteTarget.type === 'module') {
+      deleteModule(deleteTarget.moduleId);
+      setSelectedModule(null);
+      setSelectMode(null);
+    } else if (deleteTarget.type === 'lesson' && deleteTarget.lessonId) {
+      deleteLesson(deleteTarget.moduleId, deleteTarget.lessonId);
+      setSelectedLesson(null);
+      setSelectMode('module');
+    }
+
+    closeDeleteModal();
+  }, [deleteTarget, deleteModule, deleteLesson, setSelectedModule, setSelectedLesson, setSelectMode, closeDeleteModal]);
+
   const value: CourseEditContextType = {
     form,
     isDirty,
@@ -771,6 +809,11 @@ export function CourseEditProvider({
     reset: resetForm,
     submitPendingChanges,
     clearPendingChanges,
+    isDeleteModalOpen,
+    deleteTarget,
+    openDeleteModal,
+    closeDeleteModal,
+    confirmDelete,
   };
 
   return (

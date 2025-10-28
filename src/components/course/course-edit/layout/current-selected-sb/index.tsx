@@ -3,9 +3,10 @@
 import { useCourseEdit } from "@/contexts/course/course-edit";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
-import { BookOpen, FileText, Clock, Eye, EyeOff, HelpCircle } from "lucide-react";
+import { BookOpen, FileText, Clock, Eye, EyeOff, HelpCircle, Trash2 } from "lucide-react";
 import type { LessonType } from "@/types/db/course/lesson";
 
 export function CurrentSelectedSidebar({ isLoading = false }: { isLoading?: boolean }) {
@@ -13,6 +14,7 @@ export function CurrentSelectedSidebar({ isLoading = false }: { isLoading?: bool
     selectMode,
     getSelectedModule,
     getSelectedLesson,
+    openDeleteModal,
   } = useCourseEdit();
 
   const selectedModule = getSelectedModule();
@@ -88,10 +90,20 @@ export function CurrentSelectedSidebar({ isLoading = false }: { isLoading?: bool
     return (
       <div className="h-full flex flex-col">
         <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-medium flex items-center gap-2">
-            <BookOpen className="h-4 w-4" />
-            Module Details
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-sm font-medium flex items-center gap-2">
+              <BookOpen className="h-4 w-4" />
+              Module Details
+            </CardTitle>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => selectedModule?.id && openDeleteModal('module', selectedModule.id)}
+              className="h-7 px-2 text-destructive hover:text-destructive"
+            >
+              <Trash2 className="h-3 w-3" />
+            </Button>
+          </div>
         </CardHeader>
 
         <CardContent className="flex-1 space-y-4">
@@ -145,10 +157,20 @@ export function CurrentSelectedSidebar({ isLoading = false }: { isLoading?: bool
     return (
       <div className="h-full flex flex-col">
         <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-medium flex items-center gap-2">
-            <FileText className="h-4 w-4" />
-            Lesson Details
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-sm font-medium flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              Lesson Details
+            </CardTitle>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => selectedLesson?.id && selectedModule?.id && openDeleteModal('lesson', selectedModule.id, selectedLesson.id)}
+              className="h-7 px-2 text-destructive hover:text-destructive"
+            >
+              <Trash2 className="h-3 w-3" />
+            </Button>
+          </div>
         </CardHeader>
 
         <CardContent className="flex-1 space-y-4">
@@ -245,6 +267,125 @@ export function CurrentSelectedSidebar({ isLoading = false }: { isLoading?: bool
           ) : null}
         </CardContent>
       </div>
+    );
+  }
+
+  if (selectMode === "lesson" && selectedLesson) {
+    return (
+      <>
+        <div className="h-full flex flex-col">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm font-medium flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                Lesson Details
+              </CardTitle>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => selectedLesson?.id && selectedModule?.id && openDeleteModal('lesson', selectedModule.id, selectedLesson.id)}
+                className="h-7 px-2 text-destructive hover:text-destructive"
+              >
+                <Trash2 className="h-3 w-3" />
+              </Button>
+            </div>
+          </CardHeader>
+
+          <CardContent className="flex-1 space-y-4">
+            <div>
+              <h3 className="font-medium text-sm mb-1">Title</h3>
+              <p className="text-sm text-muted-foreground">{selectedLesson.title}</p>
+            </div>
+
+            <Separator />
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <h3 className="font-medium text-sm mb-1">Type</h3>
+                <Badge variant={getLessonTypeBadge(selectedLesson.lessonType).variant} className="text-xs">
+                  {getLessonTypeBadge(selectedLesson.lessonType).label}
+                </Badge>
+              </div>
+              <div>
+                <h3 className="font-medium text-sm mb-1">Duration</h3>
+                <div className="flex items-center gap-1">
+                  <Clock className="h-3 w-3 text-muted-foreground" />
+                  <span className="text-xs text-muted-foreground">
+                    {formatDuration(selectedLesson.duration)}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="font-medium text-sm mb-1">Preview</h3>
+              <div className="flex items-center gap-2">
+                {selectedLesson.isPreviewable ? (
+                  <>
+                    <Eye className="h-3 w-3 text-green-600" />
+                    <span className="text-xs text-green-600">Available</span>
+                  </>
+                ) : (
+                  <>
+                    <EyeOff className="h-3 w-3 text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground">Not available</span>
+                  </>
+                )}
+              </div>
+            </div>
+
+            <Separator />
+
+            {selectedLesson.lessonType === "quiz" && selectedLesson.quiz ? (
+              <div>
+                <h3 className="font-medium text-sm mb-2">Quiz Information</h3>
+                <div className="space-y-2">
+                  <div>
+                    <span className="text-xs text-muted-foreground">Questions: </span>
+                    <span className="text-xs font-medium">
+                      {selectedLesson.quiz.quizQuestions.length}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-xs text-muted-foreground">Total Points: </span>
+                    <span className="text-xs font-medium">
+                      {selectedLesson.quiz.quizQuestions.reduce((total, q) => total + (q.marks || 0), 0)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ) : selectedLesson.lessonType === "video" ? (
+              <div>
+                <h3 className="font-medium text-sm mb-2">Video Information</h3>
+                <div className="space-y-2">
+                  <div>
+                    <span className="text-xs text-muted-foreground">Video URL: </span>
+                    {selectedLesson.contentUrl ? (
+                      <div className="mt-1">
+                        <p className="text-xs font-medium break-all bg-muted/50 p-2 rounded">
+                          {selectedLesson.contentUrl}
+                        </p>
+                      </div>
+                    ) : (
+                      <span className="text-xs text-muted-foreground italic">No video URL set</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ) : selectedLesson.lessonType === "markdown" ? (
+              <div>
+                <h3 className="font-medium text-sm mb-2">Content Preview</h3>
+                <div className="bg-muted/50 p-2 rounded">
+                  <p className="text-xs text-muted-foreground line-clamp-3">
+                    {selectedLesson.rawContent?.substring(0, 150) || "No content"}
+                    {selectedLesson.rawContent && selectedLesson.rawContent.length > 150 ? "..." : ""}
+                  </p>
+                </div>
+              </div>
+            ) : null}
+          </CardContent>
+        </div>
+      </>
     );
   }
 
