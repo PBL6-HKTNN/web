@@ -6,6 +6,7 @@ export type Module = Base & {
   duration: number;
   numLessons: number;
   order: number;
+  courseId: string;
   lessons: Lesson[];
 };
 
