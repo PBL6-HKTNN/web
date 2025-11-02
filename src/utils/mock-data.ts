@@ -842,6 +842,110 @@ export const mockCourses = [
   },
 ];
 
+// Mock enrolled courses (courses user is currently taking)
+export const mockEnrolledCourses = [
+  {
+    id: "enrolled-1",
+    userId: "user-1",
+    courseId: "course-1",
+    enrollmentDate: "2024-01-15",
+    lastAccessedDate: "2024-10-25",
+    progressPercentage: 75,
+    completedLectures: 15,
+    totalLectures: 20,
+    status: "in_progress",
+    certificateEarned: false,
+    createdBy: "system",
+    updatedAt: "2024-10-25",
+    updatedBy: "system",
+    isDeleted: false,
+    deletedAt: null,
+    deletedBy: null,
+    course: mockCourses[0], // React course
+  },
+  {
+    id: "enrolled-2",
+    userId: "user-1",
+    courseId: "course-2",
+    enrollmentDate: "2024-02-20",
+    lastAccessedDate: "2024-10-20",
+    progressPercentage: 100,
+    completedLectures: 25,
+    totalLectures: 25,
+    status: "completed",
+    certificateEarned: true,
+    certificateUrl: "https://example.com/certificates/python-cert-123",
+    createdBy: "system",
+    updatedAt: "2024-10-20",
+    updatedBy: "system",
+    isDeleted: false,
+    deletedAt: null,
+    deletedBy: null,
+    course: mockCourses[1], // Python course
+  },
+  {
+    id: "enrolled-3",
+    userId: "user-1",
+    courseId: "course-3",
+    enrollmentDate: "2024-09-10",
+    lastAccessedDate: "2024-10-28",
+    progressPercentage: 45,
+    completedLectures: 9,
+    totalLectures: 20,
+    status: "in_progress",
+    certificateEarned: false,
+    createdBy: "system",
+    updatedAt: "2024-10-28",
+    updatedBy: "system",
+    isDeleted: false,
+    deletedAt: null,
+    deletedBy: null,
+    course: mockCourses[2], // iOS course
+  },
+];
+
+// Mock wishlist items (courses user wants to take later)
+export const mockWishlistItems = [
+  {
+    id: "wishlist-1",
+    userId: "user-1",
+    courseId: "course-4",
+    addedDate: "2024-08-15",
+    createdBy: "system",
+    updatedAt: "2024-08-15",
+    updatedBy: "system",
+    isDeleted: false,
+    deletedAt: null,
+    deletedBy: null,
+    course: mockCourses[3], // UI/UX course
+  },
+  {
+    id: "wishlist-2",
+    userId: "user-1",
+    courseId: "course-7",
+    addedDate: "2024-09-01",
+    createdBy: "system",
+    updatedAt: "2024-09-01",
+    updatedBy: "system",
+    isDeleted: false,
+    deletedAt: null,
+    deletedBy: null,
+    course: mockCourses[6], // Advanced JavaScript course
+  },
+  {
+    id: "wishlist-3",
+    userId: "user-1",
+    courseId: "course-9",
+    addedDate: "2024-10-10",
+    createdBy: "system",
+    updatedAt: "2024-10-10",
+    updatedBy: "system",
+    isDeleted: false,
+    deletedAt: null,
+    deletedBy: null,
+    course: mockCourses[8], // Machine Learning course
+  },
+];
 export const mockCourse: Course = {
   id: "course-learn-1",
   title: "Complete Web Development Bootcamp",
