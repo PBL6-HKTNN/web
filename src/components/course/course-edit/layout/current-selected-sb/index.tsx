@@ -90,7 +90,7 @@ export function CurrentSelectedSidebar({ isLoading = false }: { isLoading?: bool
     return (
       <div className="h-full flex flex-col">
         <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
+          <div className="mt-4 flex items-center justify-between">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <BookOpen className="h-4 w-4" />
               Module Details
@@ -157,7 +157,7 @@ export function CurrentSelectedSidebar({ isLoading = false }: { isLoading?: bool
     return (
       <div className="h-full flex flex-col">
         <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
+          <div className="mt-4 flex items-center justify-between">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <FileText className="h-4 w-4" />
               Lesson Details
@@ -392,7 +392,7 @@ export function CurrentSelectedSidebar({ isLoading = false }: { isLoading?: bool
   return (
     <div className="h-full flex flex-col">
       <CardHeader className="pb-3">
-        <CardTitle className="text-sm font-medium">Selection Details</CardTitle>
+        <CardTitle className="mt-4 text-sm font-medium">Selection Details</CardTitle>
       </CardHeader>
 
       <CardContent className="flex-1 flex items-center justify-center">

@@ -1,12 +1,13 @@
 import { createFileRoute, Outlet } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/course')({
+export const Route = createFileRoute(
+  '/learn/$courseId/$moduleId/$lessonId',
+)({
   component: RouteComponent,
 })
 
-// Pathless layout route - wraps child routes
 function RouteComponent() {
   return <>
-  <Outlet />
+    <Outlet />
   </>
 }
