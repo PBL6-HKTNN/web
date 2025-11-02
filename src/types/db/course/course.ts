@@ -82,7 +82,28 @@ export type CourseReview = Base & {
     avatar?: string;
   };
 }
+// Enrolled course with progress tracking
+export type EnrolledCourse = Base & {
+  userId: string;
+  courseId: string;
+  enrollmentDate: string;
+  lastAccessedDate?: string;
+  progressPercentage: number; // 0-100
+  completedLectures: number;
+  totalLectures: number;
+  status: 'in_progress' | 'completed' | 'paused';
+  certificateEarned?: boolean;
+  certificateUrl?: string;
+  course?: Course; // Populated course data
+}
 
+// Wishlist item
+export type WishlistItem = Base & {
+  userId: string;
+  courseId: string;
+  addedDate: string;
+  course?: Course; // Populated course data
+}
 // API Request/Response types
 export type GetCoursesRequest = {
   search?: string;
@@ -106,4 +127,13 @@ export type GetCoursesResponse = {
 
 export type GetCategoriesResponse = {
   categories: Category[];
+}
+export type GetEnrolledCoursesResponse = {
+  enrolledCourses: EnrolledCourse[];
+  totalCount: number;
+}
+
+export type GetWishlistResponse = {
+  wishlistItems: WishlistItem[];
+  totalCount: number;
 }
