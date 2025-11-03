@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Code, LogOut, User } from 'lucide-react'
+import { Book, Code, LogOut, User } from 'lucide-react'
 import { useAuthState, useLogout } from '@/hooks/queries/auth-hooks'
 import { ThemeChanger } from '@/components/shared/theme-changer'
 
@@ -34,7 +34,7 @@ export function NavBar() {
 
   return (
     <nav className="border-b bg-white/80 backdrop-blur-sm dark:bg-slate-900/80 dark:border-slate-800 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto sm:px-6">
         <div className="flex justify-between items-center py-4">
           <div className="flex items-center space-x-2">
             <Link to="/" className="flex items-center space-x-2">
@@ -77,6 +77,14 @@ export function NavBar() {
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
+                    
+                    <DropdownMenuItem asChild>
+                      <Link to="/your-courses" className="flex items-center">
+                        <Book className="mr-2 h-4 w-4" />
+                        Your Courses
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
                     <DropdownMenuItem
                       onClick={handleLogout}
                       className="flex items-center text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400"
@@ -85,6 +93,8 @@ export function NavBar() {
                       <LogOut className="mr-2 h-4 w-4" />
                       {logoutMutation.isPending ? 'Logging out...' : 'Logout'}
                     </DropdownMenuItem>
+                    
+                    
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>

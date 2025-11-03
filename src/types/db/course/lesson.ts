@@ -11,6 +11,7 @@ export type LessonType = (typeof LessonType)[keyof typeof LessonType];
 
 export type Lesson = Base & {
   title: string;
+  moduleId: string;
   rawContent: string;
   contentUrl: string;
   duration: number;

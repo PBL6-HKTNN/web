@@ -14,6 +14,14 @@ const API_ROUTES = {
         getCourses: '/Course',
         getCategories: '/Course/categories',
         getCourseById: '/Course/{id}',
+    },
+    USER_COURSES: {
+        getEnrolledCourses: '/UserCourses/enrolled',
+        getWishlist: '/UserCourses/wishlist',
+        enrollCourse: '/UserCourses/enroll/{courseId}',
+        addToWishlist: '/UserCourses/wishlist/{courseId}',
+        removeFromWishlist: '/UserCourses/wishlist/{courseId}',
+        updateProgress: '/UserCourses/progress/{courseId}',
     }
 }
 

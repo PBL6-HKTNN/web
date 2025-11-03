@@ -1,9 +1,15 @@
 "use client";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Card } from "@/components/ui/card";
 import { ContentTreeSidebar } from "./content-tree-sb";
 import { CurrentSelectedSidebar } from "./current-selected-sb";
+import { useCourseEdit } from "@/contexts/course/course-edit";
+import { ConfirmDeleteModal } from "../modals/confirm-del";
+import {
+  ResizablePanelGroup,
+  ResizablePanel,
+  ResizableHandle,
+} from "@/components/ui/resizable";
 
 interface CourseEditLayoutProps {
   open: boolean;
@@ -13,6 +19,25 @@ interface CourseEditLayoutProps {
 }
 
 export function CourseEditLayout({ open, onOpenChange, children, isLoading = false }: CourseEditLayoutProps) {
+  const { isDeleteModalOpen, deleteTarget, closeDeleteModal, confirmDelete } = useCourseEdit();
+
+  const getDeleteModalContent = () => {
+    if (!deleteTarget) return { title: '', description: '' };
+
+    if (deleteTarget.type === 'module') {
+      return {
+        title: 'Delete Module',
+        description: 'Are you sure you want to delete this module? This action cannot be undone and will also delete all lessons within this module.',
+      };
+    } else {
+      return {
+        title: 'Delete Lesson',
+        description: 'Are you sure you want to delete this lesson? This action cannot be undone.',
+      };
+    }
+  };
+
+  const modalContent = getDeleteModalContent();
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[1600px] !container h-[90vh] p-0 gap-0 flex flex-col">
@@ -20,27 +45,41 @@ export function CourseEditLayout({ open, onOpenChange, children, isLoading = fal
           <DialogTitle>Edit Course Content</DialogTitle>
         </DialogHeader>
 
-        <div className="grid grid-cols-5 h-full overflow-hidden">
+        <ResizablePanelGroup direction="horizontal" className="flex-1">
           {/* Left Sidebar - Content Tree */}
-          <Card className="col-span-1 border-r border-t-0 border-l-0 border-b-0 rounded-none flex flex-col">
-            <div className="flex-1 overflow-hidden">
+          <ResizablePanel defaultSize={20} minSize={15} maxSize={30}>
+            <div className="h-full border-r flex flex-col bg-background">
               <ContentTreeSidebar isLoading={isLoading} />
             </div>
-          </Card>
+          </ResizablePanel>
+
+          <ResizableHandle />
 
           {/* Main Content Area */}
-          <div className="col-span-3 overflow-hidden p-4">
-            {children}
-          </div>
+          <ResizablePanel defaultSize={60} minSize={40}>
+            <div className="h-full overflow-auto p-4 bg-background">
+              {children}
+            </div>
+          </ResizablePanel>
+
+          <ResizableHandle />
 
           {/* Right Sidebar - Current Selected Info */}
-          <Card className="col-span-1 border-l border-t-0 border-r-0 border-b-0 rounded-none flex flex-col">
-            <div className="flex-1 overflow-hidden">
+          <ResizablePanel defaultSize={20} minSize={15} maxSize={30}>
+            <div className="h-full border-l flex flex-col bg-background">
               <CurrentSelectedSidebar isLoading={isLoading} />
             </div>
-          </Card>
-        </div>
+          </ResizablePanel>
+        </ResizablePanelGroup>
       </DialogContent>
+
+      <ConfirmDeleteModal
+        isOpen={isDeleteModalOpen}
+        onClose={closeDeleteModal}
+        onConfirm={confirmDelete}
+        title={modalContent.title}
+        description={modalContent.description}
+      />
     </Dialog>
   );
 }

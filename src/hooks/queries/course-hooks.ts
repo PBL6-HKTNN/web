@@ -1,12 +1,26 @@
-import { useQuery } from '@tanstack/react-query';
-import { getCourses, getCourseById, getCategories } from '@/services';
-import { mockCourses, mockCategories } from '@/utils/mock-data';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  getCourses,
+  getCourseById,
+  getCategories,
+  getEnrolledCourses,
+  getWishlist,
+  enrollCourse,
+  addToWishlist,
+  removeFromWishlist,
+  updateProgress
+} from '@/services';
+import { mockCourses, mockCategories, mockEnrolledCourses, mockWishlistItems } from '@/utils/mock-data';
 import type {
   Course,
   GetCoursesRequest,
   GetCoursesResponse,
   GetCategoriesResponse,
-  Category
+  Category,
+  EnrolledCourse,
+  WishlistItem,
+  GetEnrolledCoursesResponse,
+  GetWishlistResponse
 } from '@/types/db/course/course';
 
 // Flag to enable/disable mock data (set to true when backend is not available)
@@ -126,5 +140,72 @@ export const useCategories = () => {
       ? () => Promise.resolve({ categories: mockCategories as unknown as Category[] })
       : getCategories,
     staleTime: 30 * 60 * 1000, // 30 minutes - categories don't change often
+  });
+};
+
+
+
+// User courses hooks
+export const useEnrolledCourses = () => {
+  return useQuery<GetEnrolledCoursesResponse, Error>({
+    queryKey: ['enrolled-courses'],
+    queryFn: USE_MOCK_DATA
+      ? () => Promise.resolve({ enrolledCourses: mockEnrolledCourses as unknown as EnrolledCourse[], totalCount: mockEnrolledCourses.length })
+      : getEnrolledCourses,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+};
+
+export const useWishlist = () => {
+  return useQuery<GetWishlistResponse, Error>({
+    queryKey: ['wishlist'],
+    queryFn: USE_MOCK_DATA
+      ? () => Promise.resolve({ wishlistItems: mockWishlistItems as unknown as WishlistItem[], totalCount: mockWishlistItems.length })
+      : getWishlist,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+};
+
+export const useEnrollCourse = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<EnrolledCourse, Error, string>({
+    mutationFn: enrollCourse,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['enrolled-courses'] });
+    },
+  });
+};
+
+export const useAddToWishlist = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<WishlistItem, Error, string>({
+    mutationFn: addToWishlist,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['wishlist'] });
+    },
+  });
+};
+
+export const useRemoveFromWishlist = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<void, Error, string>({
+    mutationFn: removeFromWishlist,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['wishlist'] });
+    },
+  });
+};
+
+export const useUpdateProgress = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<EnrolledCourse, Error, { courseId: string; progressData: { progressPercentage: number; completedLectures: number } }>({
+    mutationFn: ({ courseId, progressData }) => updateProgress(courseId, progressData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['enrolled-courses'] });
+    },
   });
 };
