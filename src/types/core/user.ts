@@ -1,0 +1,18 @@
+export interface User {
+  id: string;
+  name: string;
+  bio: string;
+  avatar: string; 
+  email: string;
+};
+
+export type UserTab =
+  | 'Profile'
+  | 'Photos'
+  | 'Account Security'
+  | 'Subscription'
+  | 'Payment Methods'
+  | 'Privacy'
+  | 'Notification Preferences'
+  | 'API Access'
+  | 'Close Account';
