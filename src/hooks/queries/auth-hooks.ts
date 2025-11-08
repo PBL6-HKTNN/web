@@ -1,5 +1,5 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { authService } from '@/services';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { authService } from "@/services";
 import type {
   LoginReq,
   RegisterReq,
@@ -9,17 +9,17 @@ import type {
   RequestResetPasswordReq,
   ResetPasswordReq,
   AuthRes,
-  AuthState
-} from '@/types/core/auth';
-import type { User } from '@/types/db/user';
-import Persistence from '@/utils/persistence';
+  AuthState,
+} from "@/types/core/auth";
+import type { User } from "@/types/db/user";
+import Persistence from "@/utils/persistence";
 
 // Auth persistence keys
-const AUTH_TOKEN_KEY = 'auth_token';
-const AUTH_USER_KEY = 'auth_user';
+const AUTH_TOKEN_KEY = "auth_token";
+const AUTH_USER_KEY = "auth_user";
 
 // Helper function to save auth data to persistence
-const saveAuthData = (authData: AuthRes['data']) => {
+const saveAuthData = (authData: AuthRes["data"]) => {
   if (authData) {
     Persistence.setItem(AUTH_TOKEN_KEY, authData.token);
     Persistence.setItem(AUTH_USER_KEY, authData.user);
@@ -51,15 +51,15 @@ export const useLogin = () => {
     mutationFn: authService.login,
     onSuccess: (response) => {
       if (response.isSuccess && response.data) {
-        if(response.data.token && response.data.user) {
+        if (response.data.token && response.data.user) {
           saveAuthData(response.data);
-          queryClient.invalidateQueries({ queryKey: ['auth'] });
-          console.log('Login successful:', response.data.user.email);
+          queryClient.invalidateQueries({ queryKey: ["auth"] });
+          console.log("Login successful:", response.data.user.email);
         }
       }
     },
     onError: (error) => {
-      console.error('Login failed:', error);
+      console.error("Login failed:", error);
     },
   });
 };
@@ -72,12 +72,12 @@ export const useRegister = () => {
     onSuccess: (response) => {
       if (response.isSuccess && response.data) {
         saveAuthData(response.data);
-        queryClient.invalidateQueries({ queryKey: ['auth'] });
-        console.log('Registration successful:', response.data.user.email);
+        queryClient.invalidateQueries({ queryKey: ["auth"] });
+        console.log("Registration successful:", response.data.user.email);
       }
     },
     onError: (error) => {
-      console.error('Registration failed:', error);
+      console.error("Registration failed:", error);
     },
   });
 };
@@ -91,11 +91,11 @@ export const useRegisterNoAuth = () => {
     mutationFn: authService.register,
     onSuccess: (response) => {
       if (response.isSuccess) {
-        console.log('Registration initiated, email verification required');
+        console.log("Registration initiated, email verification required");
       }
     },
     onError: (error) => {
-      console.error('Registration failed:', error);
+      console.error("Registration failed:", error);
     },
   });
 };
@@ -108,15 +108,15 @@ export const useLogout = () => {
     onSuccess: (response) => {
       if (response.isSuccess) {
         clearAuthData();
-        queryClient.invalidateQueries({ queryKey: ['auth'] });
-        console.log('Logout successful');
+        queryClient.invalidateQueries({ queryKey: ["auth"] });
+        console.log("Logout successful");
       }
     },
     onError: (error) => {
-      console.error('Logout failed:', error);
+      console.error("Logout failed:", error);
       // Clear auth data anyway on logout error to be safe
       clearAuthData();
-      queryClient.invalidateQueries({ queryKey: ['auth'] });
+      queryClient.invalidateQueries({ queryKey: ["auth"] });
     },
   });
 };
@@ -129,12 +129,12 @@ export const useGoogleLogin = () => {
     onSuccess: (response) => {
       if (response.isSuccess && response.data) {
         saveAuthData(response.data);
-        queryClient.invalidateQueries({ queryKey: ['auth'] });
-        console.log('Google login successful:', response.data.user.email);
+        queryClient.invalidateQueries({ queryKey: ["auth"] });
+        console.log("Google login successful:", response.data.user.email);
       }
     },
     onError: (error) => {
-      console.error('Google login failed:', error);
+      console.error("Google login failed:", error);
     },
   });
 };
@@ -166,11 +166,13 @@ export const useVerifyEmail = () => {
     mutationFn: authService.verifyEmail,
     onSuccess: (response) => {
       if (response.isSuccess) {
-        console.log('Email verification successful, user needs to login manually');
+        console.log(
+          "Email verification successful, user needs to login manually"
+        );
       }
     },
     onError: (error) => {
-      console.error('Email verification failed:', error);
+      console.error("Email verification failed:", error);
     },
   });
 };
@@ -180,11 +182,11 @@ export const useRequestResetPassword = () => {
     mutationFn: authService.requestResetPassword,
     onSuccess: (response) => {
       if (response.isSuccess) {
-        console.log('Reset password request successful');
+        console.log("Reset password request successful");
       }
     },
     onError: (error) => {
-      console.error('Reset password request failed:', error);
+      console.error("Reset password request failed:", error);
     },
   });
 };
@@ -194,11 +196,13 @@ export const useResetPassword = () => {
     mutationFn: authService.resetPassword,
     onSuccess: (response) => {
       if (response.isSuccess) {
-        console.log('Password reset successful, user needs to login with new password');
+        console.log(
+          "Password reset successful, user needs to login with new password"
+        );
       }
     },
     onError: (error) => {
-      console.error('Password reset failed:', error);
+      console.error("Password reset failed:", error);
     },
   });
 };

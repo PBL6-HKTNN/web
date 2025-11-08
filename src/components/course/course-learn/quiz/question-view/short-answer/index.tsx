@@ -17,7 +17,7 @@ export default function ShortAnswerQuestion({
   disabled = false,
 }: ShortAnswerQuestionProps) {
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    onAnswerChange({ textAnswer: e.target.value })
+    onAnswerChange({ answerText: e.target.value })
   }
 
   return (
@@ -28,7 +28,7 @@ export default function ShortAnswerQuestion({
       <Textarea
         id="short-answer"
         placeholder="Type your answer here..."
-        value={answer?.textAnswer || ''}
+        value={answer?.answerText || ''}
         onChange={handleChange}
         disabled={disabled}
         rows={4}

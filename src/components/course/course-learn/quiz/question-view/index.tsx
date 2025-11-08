@@ -1,7 +1,7 @@
 import ChoicesQuestion from "./choices"
 import TrueFalseQuestion from "./true-false"
 import ShortAnswerQuestion from "./short-answer"
-import type { QuizQuestion } from "@/types/db/course/quiz-question"
+import { type QuizQuestion, QuestionType } from "@/types/db/course/quiz-question"
 import type { UserAnswer } from "@/contexts/course/course-quiz-learning"
 
 type QuestionViewProps = {
@@ -18,9 +18,9 @@ export default function QuestionView({
   disabled = false,
 }: QuestionViewProps) {
   const renderQuestion = () => {
-    switch (question.type) {
-      case 'multiple_choice':
-      case 'single_choice':
+    switch (question.questionType) {
+      case QuestionType.MULTIPLE_CHOICE:
+      case QuestionType.SINGLE_CHOICE:
         return (
           <ChoicesQuestion
             question={question}
@@ -29,7 +29,7 @@ export default function QuestionView({
             disabled={disabled}
           />
         )
-      case 'true_false':
+      case QuestionType.TRUE_FALSE:
         return (
           <TrueFalseQuestion
             question={question}
@@ -38,7 +38,7 @@ export default function QuestionView({
             disabled={disabled}
           />
         )
-      case 'short_answer':
+      case QuestionType.SHORT_ANSWER:
         return (
           <ShortAnswerQuestion
             question={question}
@@ -62,7 +62,7 @@ export default function QuestionView({
         <h3 className="text-lg font-semibold leading-relaxed">
           {question.questionText}
         </h3>
-        {question.type === 'multiple_choice' && (
+        {question.questionType === QuestionType.MULTIPLE_CHOICE && (
           <p className="text-sm text-muted-foreground">
             Select all that apply
           </p>

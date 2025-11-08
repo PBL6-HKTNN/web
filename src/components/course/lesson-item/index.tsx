@@ -8,7 +8,7 @@ import { timeDurationFormat } from "@/utils/time-utils"
 
 interface LessonItemProps {
   title: string
-  duration?: number
+  duration?: string | number
   isSelected: boolean
   onSelected: () => void
   progress?: number // 0-1 range
@@ -17,17 +17,17 @@ interface LessonItemProps {
 }
 
 const lessonTypeConfig = {
-  video: {
-    icon: Play,
-    label: "Video",
-    color: "text-blue-600 dark:text-blue-400",
-  },
-  markdown: {
+  0: { // MARKDOWN
     icon: FileText,
     label: "Reading",
     color: "text-green-600 dark:text-green-400",
   },
-  quiz: {
+  1: { // VIDEO
+    icon: Play,
+    label: "Video",
+    color: "text-blue-600 dark:text-blue-400",
+  },
+  2: { // QUIZ
     icon: HelpCircle,
     label: "Quiz",
     color: "text-purple-600 dark:text-purple-400",
@@ -46,6 +46,9 @@ export function LessonItem({
   const config = lessonTypeConfig[type]
   const Icon = config.icon
   const isCompleted = progress === 1
+
+  // Convert duration to number if it's a string (assuming it's in seconds)
+  const durationNum = typeof duration === 'string' ? parseInt(duration) : duration
 
  
 
@@ -78,10 +81,10 @@ export function LessonItem({
           <Badge variant="secondary" className="text-xs px-1 py-0 h-4">
             {config.label}
           </Badge>
-          {duration && (
+          {durationNum && (
             <span className="flex items-center gap-0.5 text-muted-foreground text-xs">
               <Clock className="size-2.5" />
-              {timeDurationFormat(duration)}
+              {timeDurationFormat(durationNum)}
             </span>
           )}
         </ItemDescription>

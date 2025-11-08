@@ -1,16 +1,16 @@
 import MarkdownContent from "./markdown"
 import VideoContent from "./video"
 import QuizContent from "./quiz"
-import type { Lesson } from "@/types/db/course/lesson"
+import  { type Lesson, LessonType } from "@/types/db/course/lesson"
 
 type ContentRenderProps = {
   lesson: Lesson
 }
 
 const contentMapper = {
-  markdown: MarkdownContent,
-  video: VideoContent,
-  quiz: QuizContent,
+  [LessonType.MARKDOWN]: MarkdownContent,
+  [LessonType.VIDEO]: VideoContent,
+  [LessonType.QUIZ]: QuizContent,
 } as const
 
 export default function ContentRender({ lesson }: ContentRenderProps) {

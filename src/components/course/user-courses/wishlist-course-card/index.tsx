@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "@tanstack/react-router";
 import type { WishlistItem } from "@/types/db/course/course";
+import type { Course } from "@/types/db/course";
 
 interface WishlistCourseCardProps {
   wishlistItem: WishlistItem;
@@ -57,12 +58,12 @@ export function WishlistCourseCard({
               </h3>
 
               <div className="flex items-center gap-3 mb-2 text-sm text-muted-foreground">
-                <span>by {(course as any).instructor?.name || 'Unknown'}</span>
+                <span>by {(course as unknown as Course).instructorId || 'Unknown'}</span>
                 <div className="flex items-center gap-1">
                   <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
                   <span>{course.averageRating}</span>
                 </div>
-                <span>({formatNumber((course as any).numReviews || 0)})</span>
+                <span>({formatNumber((course as unknown as Course).numberOfReviews || 0)})</span>
               </div>
 
               <div className="flex items-center gap-4 text-sm text-muted-foreground">
@@ -70,7 +71,7 @@ export function WishlistCourseCard({
                   <Clock className="w-3 h-3" />
                   <span>{formatDuration(course.duration)}</span>
                 </div>
-                <span>{formatNumber((course as any).totalStudents || 0)} students</span>
+                <span>{formatNumber((course as unknown as Course).averageRating || 0)} students</span>
                 <Badge variant="secondary" className="text-xs">
                   {course.level}
                 </Badge>

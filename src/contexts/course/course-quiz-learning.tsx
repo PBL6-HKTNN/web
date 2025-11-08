@@ -1,23 +1,26 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import type { ReactNode } from 'react';
-import type { Quiz } from '@/types/db/course/quiz';
+import type { Quiz, QuizSubmissionReq } from '@/types/db/course/quiz';
 import type { QuizQuestion } from '@/types/db/course/quiz-question';
+import type { UUID } from '@/types';
+import { useSubmitQuiz } from '@/hooks/queries/course/quiz-hooks';
+import { useToast } from '@/hooks/use-toast';
 
 export type UserAnswer = {
-  questionId: string;
-  selectedAnswerIds?: string[]; // For multiple choice / single choice
-  textAnswer?: string; // For short answer
+  questionId: UUID;
+  selectedAnswerIds?: UUID[]; // For multiple choice / single choice
+  answerText?: string; // For short answer
 };
 
 export type QuizResult = {
-  quizId: string;
+  quizId: UUID;
   totalQuestions: number;
   correctAnswers: number;
   score: number;
   maxScore: number;
   percentage: number;
   passed: boolean;
-  answers: UserAnswer[];
+  userAnswers: UserAnswer[];
   timeTaken?: number; // in seconds
 };
 
@@ -28,18 +31,19 @@ interface CourseQuizLearningContextType {
   userAnswers: UserAnswer[];
   isSubmitted: boolean;
   quizResult: QuizResult | null;
+  quizAttemptId: UUID | null;
   
   // Quiz actions
-  startQuiz: (quiz: Quiz) => void;
-  setAnswer: (questionId: string, answer: Omit<UserAnswer, 'questionId'>) => void;
+  startQuiz: (quiz: Quiz, attemptId: UUID) => void;
+  setAnswer: (questionId: UUID, answer: Omit<UserAnswer, 'questionId'>) => void;
   nextQuestion: () => void;
   previousQuestion: () => void;
-  submitQuiz: () => void;
+  submitQuiz: () => Promise<void>;
   resetQuiz: () => void;
   
   // Helper functions
   getCurrentQuestion: () => QuizQuestion | null;
-  getAnswerForQuestion: (questionId: string) => UserAnswer | undefined;
+  getAnswerForQuestion: (questionId: UUID) => UserAnswer | undefined;
   canGoNext: () => boolean;
   canGoPrevious: () => boolean;
 }
@@ -56,16 +60,21 @@ export const CourseQuizLearningProvider: React.FC<CourseQuizLearningProviderProp
   const [userAnswers, setUserAnswers] = useState<UserAnswer[]>([]);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
+  const [quizAttemptId, setQuizAttemptId] = useState<UUID | null>(null);
 
-  const startQuiz = useCallback((quiz: Quiz) => {
+  const submitQuizMutation = useSubmitQuiz();
+  const { error } = useToast()
+  const startQuiz = useCallback((quiz: Quiz, attemptId: UUID) => {
+    console.log('Starting quiz:', quiz.id, 'with attempt ID:', attemptId);
     setCurrentQuiz(quiz);
+    setQuizAttemptId(attemptId);
     setCurrentQuestionIndex(0);
     setUserAnswers([]);
     setIsSubmitted(false);
     setQuizResult(null);
   }, []);
 
-  const setAnswer = useCallback((questionId: string, answer: Omit<UserAnswer, 'questionId'>) => {
+  const setAnswer = useCallback((questionId: UUID, answer: Omit<UserAnswer, 'questionId'>) => {
     setUserAnswers(prev => {
       const existingIndex = prev.findIndex(a => a.questionId === questionId);
       const newAnswer: UserAnswer = { questionId, ...answer };
@@ -81,7 +90,7 @@ export const CourseQuizLearningProvider: React.FC<CourseQuizLearningProviderProp
   }, []);
 
   const nextQuestion = useCallback(() => {
-    if (currentQuiz && currentQuestionIndex < currentQuiz.quizQuestions.length - 1) {
+    if (currentQuiz && currentQuestionIndex < (currentQuiz.questions?.length || 0) - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
     }
   }, [currentQuiz, currentQuestionIndex]);
@@ -92,76 +101,51 @@ export const CourseQuizLearningProvider: React.FC<CourseQuizLearningProviderProp
     }
   }, [currentQuestionIndex]);
 
-  const calculateScore = useCallback((quiz: Quiz, answers: UserAnswer[]): QuizResult => {
-    let correctAnswers = 0;
-    let score = 0;
+  const submitQuiz = useCallback(async () => {
+    if (!currentQuiz || !quizAttemptId) return;
 
-    quiz.quizQuestions.forEach(question => {
-      const userAnswer = answers.find(a => a.questionId === question.id);
+    try {
+      // Format answers for API submission according to QuizSubmissionReq
+      const formattedAnswers = userAnswers.map(answer => ({
+        questionId: answer.questionId,
+        answerText: answer.answerText || "",
+        selectedAnswerIds: answer.selectedAnswerIds || []
+      }));
+
+      const submissionData: QuizSubmissionReq = {
+          quizAttemptId,
+          answers: formattedAnswers
+      };
+
+      const result = await submitQuizMutation.mutateAsync(submissionData);
       
-      if (!userAnswer) return;
-
-      // Check answer based on question type
-      if (question.type === 'multiple_choice' || question.type === 'single_choice') {
-        const correctAnswerIds = question.answers
-          .filter(a => a.isCorrect)
-          .map(a => a.id)
-          .sort();
+      if (result.data) {
+        const attemptResult = result.data;
         
-        const userAnswerIds = (userAnswer.selectedAnswerIds || []).sort();
+        // Create QuizResult from API response
+        const quizResult: QuizResult = {
+          quizId: currentQuiz.id,
+          totalQuestions: currentQuiz.questions?.length || 0,
+          correctAnswers: 0, // This would need to be calculated from the result
+          score: attemptResult.score,
+          maxScore: currentQuiz.totalMarks,
+          percentage: (attemptResult.score / currentQuiz.totalMarks) * 100,
+          passed: attemptResult.passed,
+          userAnswers: userAnswers,
+        };
         
-        if (JSON.stringify(correctAnswerIds) === JSON.stringify(userAnswerIds)) {
-          correctAnswers++;
-          score += question.marks;
-        }
-      } else if (question.type === 'true_false') {
-        const correctAnswer = question.answers.find(a => a.isCorrect);
-        const userSelectedId = userAnswer.selectedAnswerIds?.[0];
-        
-        if (correctAnswer && userSelectedId === correctAnswer.id) {
-          correctAnswers++;
-          score += question.marks;
-        }
-      } else if (question.type === 'short_answer') {
-        // For short answer, we'll do case-insensitive comparison with any correct answer
-        const correctAnswerTexts = question.answers
-          .filter(a => a.isCorrect)
-          .map(a => a.text.toLowerCase().trim());
-        
-        const userText = (userAnswer.textAnswer || '').toLowerCase().trim();
-        
-        if (correctAnswerTexts.some(correct => correct === userText)) {
-          correctAnswers++;
-          score += question.marks;
-        }
+        setQuizResult(quizResult);
+        setIsSubmitted(true);
       }
-    });
-
-    const percentage = (score / quiz.totalMarks) * 100;
-    const passed = score >= quiz.passingScore;
-
-    return {
-      quizId: quiz.id,
-      totalQuestions: quiz.quizQuestions.length,
-      correctAnswers,
-      score,
-      maxScore: quiz.totalMarks,
-      percentage,
-      passed,
-      answers,
-    };
-  }, []);
-
-  const submitQuiz = useCallback(() => {
-    if (!currentQuiz) return;
-
-    const result = calculateScore(currentQuiz, userAnswers);
-    setQuizResult(result);
-    setIsSubmitted(true);
-  }, [currentQuiz, userAnswers, calculateScore]);
+    } catch (err) {
+      // Handle error - maybe show toast notification
+      error(err instanceof Error ? err.message : "Failed to submit quiz");
+    }
+  }, [currentQuiz, userAnswers, quizAttemptId, submitQuizMutation, error]);
 
   const resetQuiz = useCallback(() => {
     setCurrentQuiz(null);
+    setQuizAttemptId(null);
     setCurrentQuestionIndex(0);
     setUserAnswers([]);
     setIsSubmitted(false);
@@ -169,18 +153,18 @@ export const CourseQuizLearningProvider: React.FC<CourseQuizLearningProviderProp
   }, []);
 
   const getCurrentQuestion = useCallback((): QuizQuestion | null => {
-    if (!currentQuiz || currentQuestionIndex >= currentQuiz.quizQuestions.length) {
+    if (!currentQuiz || currentQuestionIndex >= (currentQuiz.questions?.length || 0)) {
       return null;
     }
-    return currentQuiz.quizQuestions[currentQuestionIndex];
+    return currentQuiz.questions?.[currentQuestionIndex] || null;
   }, [currentQuiz, currentQuestionIndex]);
 
-  const getAnswerForQuestion = useCallback((questionId: string): UserAnswer | undefined => {
+  const getAnswerForQuestion = useCallback((questionId: UUID): UserAnswer | undefined => {
     return userAnswers.find(a => a.questionId === questionId);
   }, [userAnswers]);
 
   const canGoNext = useCallback(() => {
-    return currentQuiz !== null && currentQuestionIndex < currentQuiz.quizQuestions.length - 1;
+    return currentQuiz !== null && currentQuestionIndex < (currentQuiz.questions?.length || 0) - 1;
   }, [currentQuiz, currentQuestionIndex]);
 
   const canGoPrevious = useCallback(() => {
@@ -193,6 +177,7 @@ export const CourseQuizLearningProvider: React.FC<CourseQuizLearningProviderProp
     userAnswers,
     isSubmitted,
     quizResult,
+    quizAttemptId,
     startQuiz,
     setAnswer,
     nextQuestion,

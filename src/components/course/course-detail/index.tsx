@@ -1,21 +1,21 @@
 
-import { Star, Clock, Users, Award, CheckCircle, Play, BookOpen, Video, FileText, HelpCircle, Trophy } from "lucide-react";
+import { Star, Clock, Users, Play, BookOpen, Video, FileText, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { useCourseById } from "@/hooks/queries";
-import type { CurriculumSection, CourseReview } from "@/types/db/course/course";
+import { useCourseDetail } from "./hook";
+import ModuleAccordion from "@/components/course/module-accordion";
+import { renderLevelLabel } from "@/utils/render-utils";
 
 interface CourseDetailProps {
   courseId: string;
 }
 
 export function CourseDetail({ courseId }: CourseDetailProps) {
-  const { data: course, isLoading, error } = useCourseById(courseId);
+  const { course, modules, isLoading, error } = useCourseDetail(courseId);
   // const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
 
   if (isLoading) {
@@ -55,15 +55,6 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
     );
   }
 
-  const formatDuration = (minutes: number) => {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    if (hours > 0) {
-      return `${hours}h ${mins}m`;
-    }
-    return `${mins}m`;
-  };
-
   const formatPrice = (price: number) => {
     if (price === 0) return "Free";
     return `$${price}`;
@@ -73,15 +64,6 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
     if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
     if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
     return num.toString();
-  };
-
-  const getLectureIcon = (type: string) => {
-    switch (type) {
-      case 'video': return <Video className="w-4 h-4" />;
-      case 'quiz': return <HelpCircle className="w-4 h-4" />;
-      case 'assignment': return <FileText className="w-4 h-4" />;
-      default: return <BookOpen className="w-4 h-4" />;
-    }
   };
 
   // const toggleSection = (sectionId: string) => {
@@ -100,14 +82,14 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
       {/* Header with Video/Thumbnail */}
       <div className="relative bg-black">
         <div className="aspect-video max-w-4xl mx-auto relative">
-          {course.trailerVideo ? (
+          {course.thumbnail ? (
             <video
               className="w-full h-full object-cover"
               poster={course.thumbnail}
               controls
               preload="metadata"
             >
-              <source src={course.trailerVideo} type="video/mp4" />
+              <source src={course.thumbnail} type="video/mp4" />
             </video>
           ) : (
             <div className="w-full h-full bg-gray-800 flex items-center justify-center">
@@ -132,9 +114,9 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
                 {course.title}
               </h1>
-              {course.subtitle && (
+              {course.description && (
                 <p className="text-xl text-gray-600 dark:text-gray-400 mb-4">
-                  {course.subtitle}
+                  {course.description}
                 </p>
               )}
 
@@ -149,17 +131,17 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
                 </div>
                 <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
                   <Users className="w-4 h-4" />
-                  <span>{formatNumber(course.totalStudents || 0)} students</span>
+                  {/* <span>{formatNumber(course.totalStudents || 0)} students</span> */}
                 </div>
                 <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
                   <Clock className="w-4 h-4" />
-                  <span>{formatDuration(course.duration)} of content</span>
+                  <span>{(course.duration)} of content</span>
                 </div>
-                <Badge variant="secondary">{course.level}</Badge>
+                <Badge variant="secondary">{renderLevelLabel(course.level)}</Badge>
                 <Badge variant="secondary">{course.language}</Badge>
-                {course.lastUpdated && (
+                {course.updatedAt && (
                   <span className="text-gray-600 dark:text-gray-400">
-                    Last updated {course.lastUpdated}
+                    Last updated {course.updatedAt.toLocaleString()}
                   </span>
                 )}
               </div>
@@ -167,17 +149,17 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
               {/* Instructor */}
               <div className="flex items-center gap-3">
                 <Avatar className="w-12 h-12">
-                  <AvatarImage src={course.instructor?.profilePicture} />
+                  <AvatarImage src={course.instructorId} />
                   <AvatarFallback>
-                    {course.instructor?.name?.substring(0, 2).toUpperCase()}
+                    {course.instructorId}
                   </AvatarFallback>
                 </Avatar>
                 <div>
                   <p className="font-medium text-gray-900 dark:text-white">
-                    Created by {course.instructor?.name}
+                    Created by {course.instructorId}
                   </p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {course.instructor?.coursesCount} courses • {formatNumber(course.instructor?.studentsCount || 0)} students
+                    {course.instructorId} courses
                   </p>
                 </div>
               </div>
@@ -206,7 +188,7 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
                 </Card>
 
                 {/* What you'll learn */}
-                {course.whatYouWillLearn && course.whatYouWillLearn.length > 0 && (
+                {/* {course.whatYouWillLearn && course.whatYouWillLearn.length > 0 && (
                   <Card>
                     <CardHeader>
                       <CardTitle>What you'll learn</CardTitle>
@@ -222,10 +204,10 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
                       </div>
                     </CardContent>
                   </Card>
-                )}
+                )} */}
 
                 {/* Requirements */}
-                {course.requirements && course.requirements.length > 0 && (
+                {/* {course.requirements && course.requirements.length > 0 && (
                   <Card>
                     <CardHeader>
                       <CardTitle>Requirements</CardTitle>
@@ -238,10 +220,10 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
                       </ul>
                     </CardContent>
                   </Card>
-                )}
+                )} */}
 
                 {/* Target Audience */}
-                {course.targetAudience && course.targetAudience.length > 0 && (
+                {/* {course.targetAudience && course.targetAudience.length > 0 && (
                   <Card>
                     <CardHeader>
                       <CardTitle>Who this course is for</CardTitle>
@@ -254,7 +236,7 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
                       </ul>
                     </CardContent>
                   </Card>
-                )}
+                )} */}
               </TabsContent>
 
               <TabsContent value="curriculum" className="mt-6">
@@ -265,50 +247,40 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
                       Course content
                     </CardTitle>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {course.curriculum?.length || 0} sections • {course.curriculum?.reduce((total, section) => total + section.lectures.length, 0) || 0} lectures
+                      {modules.length} modules • {modules.reduce((total, module) => total + (module.lessons?.length || 0), 0)} lessons
                     </p>
                   </CardHeader>
                   <CardContent>
-                    <Accordion type="multiple" className="w-full">
-                      {course.curriculum?.map((section: CurriculumSection) => (
-                        <AccordionItem key={section.id} value={section.id}>
-                          <AccordionTrigger className="hover:no-underline">
-                            <div className="flex items-center justify-between w-full text-left">
-                              <div>
-                                <h3 className="font-medium">{section.title}</h3>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">
-                                  {section.lectures.length} lectures • {formatDuration(section.duration)}
-                                </p>
-                              </div>
-                            </div>
-                          </AccordionTrigger>
-                          <AccordionContent>
-                            <div className="space-y-2 pt-2">
-                              {section.lectures.map((lecture) => (
-                                <div key={lecture.id} className="flex items-center justify-between py-2 px-4 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800">
-                                  <div className="flex items-center gap-3">
-                                    {getLectureIcon(lecture.type)}
-                                    <span className="text-sm">{lecture.title}</span>
-                                    {lecture.preview && (
-                                      <Badge variant="outline" className="text-xs">Preview</Badge>
-                                    )}
-                                  </div>
-                                  <span className="text-sm text-gray-600 dark:text-gray-400">
-                                    {formatDuration(lecture.duration)}
-                                  </span>
-                                </div>
-                              ))}
-                            </div>
-                          </AccordionContent>
-                        </AccordionItem>
-                      ))}
-                    </Accordion>
+                    {isLoading ? (
+                      <div className="space-y-4">
+                        <div className="animate-pulse">
+                          <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded mb-4"></div>
+                          <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded mb-4"></div>
+                          <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                        </div>
+                      </div>
+                    ) : modules.length === 0 ? (
+                      <div className="text-center py-8 text-muted-foreground">
+                        <BookOpen className="size-12 mx-auto mb-4 opacity-50" />
+                        <p>No modules found for this course.</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {modules.map((module) => (
+                          <ModuleAccordion
+                            key={module.id}
+                            data={module}
+                            defaultExpanded={false}
+                          />
+                        ))}
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>
 
               <TabsContent value="instructor" className="mt-6">
-                <Card>
+                {/* <Card>
                   <CardHeader>
                     <CardTitle>Your instructor</CardTitle>
                   </CardHeader>
@@ -341,7 +313,7 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
                       </div>
                     </div>
                   </CardContent>
-                </Card>
+                </Card> */}
               </TabsContent>
 
               <TabsContent value="reviews" className="mt-6">
@@ -359,7 +331,7 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-6">
+                    {/* <div className="space-y-6">
                       {course.reviews?.map((review: CourseReview) => (
                         <div key={review.id} className="border-b border-gray-200 dark:border-gray-700 pb-6 last:border-0">
                           <div className="flex items-start gap-3">
@@ -386,7 +358,7 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
                           </div>
                         </div>
                       ))}
-                    </div>
+                    </div> */}
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -425,18 +397,12 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center gap-2">
                       <Video className="w-4 h-4 text-gray-600" />
-                      <span>{formatDuration(course.duration)} on-demand video</span>
+                      <span>{(course.duration)} on-demand video</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <FileText className="w-4 h-4 text-gray-600" />
                       <span>Downloadable resources</span>
                     </div>
-                    {course.certificate && (
-                      <div className="flex items-center gap-2">
-                        <Award className="w-4 h-4 text-gray-600" />
-                        <span>Certificate of completion</span>
-                      </div>
-                    )}
                     <div className="flex items-center gap-2">
                       <Trophy className="w-4 h-4 text-gray-600" />
                       <span>Full lifetime access</span>

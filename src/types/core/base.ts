@@ -1,5 +1,5 @@
 export type Base = {
-  id: string;
+  id: UUID;
   createdAt?: string | Date;
   createdBy?: string;
   updatedAt?: string | Date | null;
@@ -8,3 +8,5 @@ export type Base = {
   deletedAt?: string | Date | null;
   deletedBy?: string | null;
 };
+
+export type UUID = string;

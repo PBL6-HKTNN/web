@@ -1,14 +1,13 @@
-import { createFileRoute, useNavigate, useParams } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
+import { createFileRoute } from '@tanstack/react-router'
+import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { AlertCircle, ChevronLeft, ChevronRight, CheckCircle } from 'lucide-react'
-import { useCourseQuizLearning } from '@/contexts/course/course-quiz-learning'
-import { useCourseLearn } from '@/contexts/course/course-learn'
 import QuestionView from '@/components/course/course-learn/quiz/question-view'
+import { useQuizDoingPage } from './-hook'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,53 +23,66 @@ export const Route = createFileRoute(
   '/learn/$courseId/$moduleId/$lessonId/quiz/',
 )({
   component: RouteComponent,
+  validateSearch: (search: Record<string, unknown>): { quizId?: string } => {
+    return {
+      quizId: search.quizId as string,
+    }
+  },
 })
 
 function RouteComponent() {
-  const { courseId, moduleId, lessonId } = useParams({
-    from: '/learn/$courseId/$moduleId/$lessonId/quiz/',
-  })
-  const navigate = useNavigate()
-  const { getLessonContent } = useCourseLearn()
   const {
+    // Data
     currentQuiz,
+    currentQuestion,
+    currentAnswer,
     currentQuestionIndex,
-    startQuiz,
-    setAnswer,
-    nextQuestion,
-    previousQuestion,
-    submitQuiz,
-    getCurrentQuestion,
-    getAnswerForQuestion,
+    progress,
+    
+    // States
+    isLoading,
+    hasError,
+    
+    // Handlers
+    handleSubmitQuiz,
+    handleAnswerChange,
+    handlePreviousQuestion,
+    handleNextQuestion,
+    handleBackToLesson,
+    
+    // Quiz navigation
     canGoNext,
     canGoPrevious,
-  } = useCourseQuizLearning()
+    
+    // Helper functions
+    getAnswerForQuestion,
+  } = useQuizDoingPage()
 
   const [showSubmitDialog, setShowSubmitDialog] = useState(false)
 
-  // Load quiz data
-  useEffect(() => {
-    const lesson = getLessonContent(courseId, moduleId, lessonId)
-    if (lesson?.quiz) {
-      startQuiz(lesson.quiz)
-    }
-  }, [courseId, moduleId, lessonId, getLessonContent, startQuiz])
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading quiz...</p>
+        </div>
+      </div>
+    )
+  }
 
-  const currentQuestion = getCurrentQuestion()
-  const currentAnswer = currentQuestion
-    ? getAnswerForQuestion(currentQuestion.id)
-    : undefined
-
-  if (!currentQuiz || !currentQuestion) {
+  // Error state
+  if (hasError || !currentQuiz) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <AlertCircle className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
           <h3 className="text-lg font-semibold mb-2">Quiz Not Found</h3>
           <p className="text-muted-foreground mb-4">
-            Unable to load quiz data
+            Unable to load quiz data or invalid quiz parameters
           </p>
-          <Button onClick={() => navigate({ to: '..', replace: true })}>
+          <Button onClick={handleBackToLesson}>
             Back to Lesson
           </Button>
         </div>
@@ -78,20 +90,34 @@ function RouteComponent() {
     )
   }
 
-  const progress = ((currentQuestionIndex + 1) / currentQuiz.quizQuestions.length) * 100
-
-  const handleSubmit = () => {
-    submitQuiz()
-    navigate({
-      to: '/learn/$courseId/$moduleId/$lessonId/quiz/result',
-      params: { courseId, moduleId, lessonId },
-    })
+  // Check if quiz has no questions
+  if (currentQuiz && (!currentQuiz.questions || currentQuiz.questions.length === 0)) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <AlertCircle className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+          <h3 className="text-lg font-semibold mb-2">Quiz Has No Questions</h3>
+          <p className="text-muted-foreground mb-4">
+            This quiz doesn't have any questions yet. Please contact your instructor.
+          </p>
+          <Button onClick={handleBackToLesson}>
+            Back to Lesson
+          </Button>
+        </div>
+      </div>
+    )
   }
 
-  const handleAnswerChange = (answer: Omit<typeof currentAnswer, 'questionId'>) => {
-    if (currentQuestion) {
-      setAnswer(currentQuestion.id, answer)
-    }
+  // Loading quiz questions
+  if (!currentQuestion) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading quiz questions...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -101,10 +127,10 @@ function RouteComponent() {
         <CardHeader>
           <div className="flex items-center justify-between mb-2">
             <Badge variant="secondary">
-              Question {currentQuestionIndex + 1} of {currentQuiz.quizQuestions.length}
+              Question {currentQuestionIndex + 1} of {currentQuiz.questions?.length || 0}
             </Badge>
             <Badge variant="outline">
-              {currentQuestion.marks} {currentQuestion.marks === 1 ? 'mark' : 'marks'}
+              {Math.round(progress)}% Complete
             </Badge>
           </div>
           <CardTitle className="text-2xl">{currentQuiz.title}</CardTitle>
@@ -117,7 +143,7 @@ function RouteComponent() {
           <div className="flex justify-between text-sm text-muted-foreground">
             <span>{Math.round(progress)}% Complete</span>
             <span>
-              Passing Score: {currentQuiz.passingScore} / {currentQuiz.totalMarks}
+              Passing Score: {currentQuiz.passingMarks} / {currentQuiz.totalMarks}
             </span>
           </div>
         </CardContent>
@@ -126,11 +152,13 @@ function RouteComponent() {
       {/* Question Card */}
       <Card className="mb-6">
         <CardContent className="pt-6">
-          <QuestionView
-            question={currentQuestion}
-            answer={currentAnswer}
-            onAnswerChange={handleAnswerChange}
-          />
+          {currentQuestion && (
+            <QuestionView
+              question={currentQuestion}
+              answer={currentAnswer}
+              onAnswerChange={handleAnswerChange}
+            />
+          )}
         </CardContent>
       </Card>
 
@@ -140,7 +168,7 @@ function RouteComponent() {
           <div className="flex items-center justify-between gap-4">
             <Button
               variant="outline"
-              onClick={previousQuestion}
+              onClick={handlePreviousQuestion}
               disabled={!canGoPrevious()}
             >
               <ChevronLeft className="w-4 h-4 mr-2" />
@@ -159,7 +187,7 @@ function RouteComponent() {
             </div>
 
             {canGoNext() ? (
-              <Button onClick={nextQuestion}>
+              <Button onClick={handleNextQuestion}>
                 Next
                 <ChevronRight className="w-4 h-4 ml-2" />
               </Button>
@@ -187,20 +215,20 @@ function RouteComponent() {
           <div className="py-4">
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Total Questions:</span>
-              <span className="font-semibold">{currentQuiz.quizQuestions.length}</span>
+              <span className="font-semibold">{currentQuiz.questions?.length || 0}</span>
             </div>
             <div className="flex items-center justify-between text-sm mt-2">
               <span className="text-muted-foreground">Questions Answered:</span>
               <span className="font-semibold">
-                {currentQuiz.quizQuestions.filter((q) =>
-                  getAnswerForQuestion(q.id)
-                ).length}
+                {currentQuiz.questions?.filter((q) =>
+                  getAnswerForQuestion(q.questionId!)
+                ).length || 0}
               </span>
             </div>
           </div>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleSubmit}>
+            <AlertDialogAction onClick={handleSubmitQuiz}>
               Submit Quiz
             </AlertDialogAction>
           </AlertDialogFooter>

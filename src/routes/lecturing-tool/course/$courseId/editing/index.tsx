@@ -1,13 +1,17 @@
-import { useState } from "react";
-import { CourseEditProvider } from "@/contexts/course/course-edit";
-import { CourseGeneralInfoEdit } from "@/components/course/course-edit/general-info";
+import { CreateModuleDialog } from "@/components/course/course-edit/modals/create-module";
+import { CreateLessonDialog } from "@/components/course/course-edit/modals/create-lesson";
+import { useCourseEdit } from "@/contexts/course/use-course-edit";
+import { CourseForm } from "@/components/course/course-edit/general-info";
 import { CourseEditLayout } from "@/components/course/course-edit/layout";
 import { ContentRender } from "@/components/course/course-edit/content-render";
 import { Button } from "@/components/ui/button";
 import { Edit } from "lucide-react";
 import { authGuard } from '@/utils'
 import { createFileRoute } from '@tanstack/react-router'
-import type { CourseGeneralInfoFormData } from "@/components/course/course-edit/general-info/hooks";
+import { getAuthState } from "@/hooks";
+import { useCourseEditing } from "./-hook";
+import type { UUID } from "@/types";
+
 
 export const Route = createFileRoute(
   '/lecturing-tool/course/$courseId/editing/',
@@ -18,16 +22,24 @@ export const Route = createFileRoute(
 
 function RouteComponent() {
   const { courseId } = Route.useParams()
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // Mock loading state for future API integration - can be toggled for testing
+  const {
+    isEditModalOpen,
+    setIsEditModalOpen,
+    isLoading,
+    setIsLoading,
+  } = useCourseEditing();
 
-  const handleGeneralInfoSubmit = (data: CourseGeneralInfoFormData) => {
-    console.log("General info submitted for course", courseId, ":", data);
-    // TODO: Implement API call to save course general info
-  };
+  const {
+    isCreateModuleOpen,
+    closeCreateModule,
+    isCreateLessonOpen,
+    closeCreateLesson,
+    selectedModuleId,
+  } = useCourseEdit();
+  const { user } = getAuthState();
 
   return (
-    <CourseEditProvider>
+    <>
       <div className="container mx-auto py-8 space-y-8">
         {/* Page Header */}
         <div className="flex items-center justify-between">
@@ -47,15 +59,12 @@ function RouteComponent() {
         </div>
 
         {/* Course General Information */}
-        <CourseGeneralInfoEdit
-          initialData={{
-            title: "Sample Course Title",
-            description: "This is a sample course description.",
-            thumbnail: null,
-          }}
-          onSubmit={handleGeneralInfoSubmit}
+        <CourseForm
+          courseId={courseId}
+          instructorId={user?.id as UUID}
+          onSuccess={(savedCourseId) => console.log("Course saved:", savedCourseId)}
+          onError={(error) => console.error("Error saving course:", error)}
         />
-
         {/* Course Content Edit Modal */}
         <CourseEditLayout
           open={isEditModalOpen}
@@ -65,6 +74,22 @@ function RouteComponent() {
           <ContentRender />
         </CourseEditLayout>
       </div>
-    </CourseEditProvider>
+
+      {/* Create Module Dialog */}
+      <CreateModuleDialog
+        isOpen={isCreateModuleOpen}
+        onClose={closeCreateModule}
+        courseId={courseId}
+      />
+
+      {/* Create Lesson Dialog */}
+      {selectedModuleId && (
+        <CreateLessonDialog
+          isOpen={isCreateLessonOpen}
+          onClose={closeCreateLesson}
+          moduleId={selectedModuleId}
+        />
+      )}
+    </>
   );
 }
