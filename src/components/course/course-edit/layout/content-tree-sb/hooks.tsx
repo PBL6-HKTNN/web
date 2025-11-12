@@ -1,20 +1,25 @@
 "use client";
 
 import { useState } from "react";
-import { useCourseEdit } from "@/contexts/course/course-edit";
+import { useCourseEdit } from "@/contexts/course/use-course-edit";
+import { useGetCourseContentById } from "@/hooks/queries/course/course-hooks";
+import { useGetLessonsByModule } from "@/hooks/queries/course/module-hooks";
 
 export function useContentTreeSidebar() {
   const {
-    form,
-    addModule,
-    addLesson,
+    courseId,
     setSelectedModule,
     setSelectedLesson,
+    openCreateModule,
+    openCreateLesson,
+    openDeleteModal,
   } = useCourseEdit();
 
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set());
 
-  const modules = form.watch("modules");
+  // Fetch modules for this course
+  const { data: modulesData, isLoading: isLoadingModules } = useGetCourseContentById(courseId);
+  const modules = modulesData?.data?.module || [];
 
   const toggleModuleExpansion = (moduleId: string) => {
     const newExpanded = new Set(expandedModules);
@@ -31,43 +36,43 @@ export function useContentTreeSidebar() {
   };
 
   const handleLessonSelect = (moduleId: string, lessonId: string) => {
-    setSelectedModule(moduleId);
-    setSelectedLesson(lessonId);
+    setSelectedLesson(moduleId, lessonId);
   };
 
   const handleAddModule = () => {
-    const newModule = {
-      title: `Module ${modules.length + 1}`,
-      order: modules.length + 1,
-      lessons: [],
-    };
-    addModule(newModule);
+    openCreateModule();
   };
 
   const handleAddLesson = (moduleId: string) => {
-    const module = modules.find(m => m.id === moduleId);
-    if (!module) return;
+    openCreateLesson(moduleId);
+  };
 
-    const newLesson = {
-      title: `Lesson ${module.lessons.length + 1}`,
-      rawContent: `# ${`Lesson ${module.lessons.length + 1}`}\n\nStart writing your lesson content here...`,
-      contentUrl: "",
-      duration: 900,
-      orderIndex: module.lessons.length + 1,
-      isPreviewable: false,
-      lessonType: null,
-      quiz: null,
-    };
-    addLesson(moduleId, newLesson);
+  const handleDeleteModule = (moduleId: string, moduleTitle: string) => {
+    openDeleteModal('module', moduleId, moduleTitle);
+  };
+
+  const handleDeleteLesson = (lessonId: string, lessonTitle: string) => {
+    openDeleteModal('lesson', lessonId, lessonTitle);
   };
 
   return {
     modules,
     expandedModules,
+    isLoadingModules,
     toggleModuleExpansion,
     handleModuleSelect,
     handleLessonSelect,
     handleAddModule,
     handleAddLesson,
+    handleDeleteModule,
+    handleDeleteLesson,
+  };
+}
+
+export function useModuleLessons(moduleId: string) {
+  const { data: lessonsData, isLoading } = useGetLessonsByModule(moduleId);
+  return {
+    lessons: lessonsData?.data || [],
+    isLoading,
   };
 }

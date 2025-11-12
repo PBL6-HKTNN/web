@@ -20,7 +20,11 @@ export default function TrueFalseQuestion({
   const selectedId = answer?.selectedAnswerIds?.[0] || ''
 
   const handleChange = (answerId: string) => {
-    onAnswerChange({ selectedAnswerIds: [answerId] })
+    const selectedAnswer = question.answers.find(ans => ans.answerId === answerId)
+    onAnswerChange({ 
+      selectedAnswerIds: [answerId],
+      answerText: selectedAnswer?.answerText || ''
+    })
   }
 
   return (
@@ -32,19 +36,19 @@ export default function TrueFalseQuestion({
       <div className="space-y-3">
         {question.answers.map((ans) => (
           <Card
-            key={ans.id}
+            key={ans.answerId}
             className={`cursor-pointer transition-colors ${
-              selectedId === ans.id ? 'border-primary bg-primary/5' : ''
+              selectedId === ans.answerId ? 'border-primary bg-primary/5' : ''
             }`}
           >
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
-                <RadioGroupItem value={ans.id} id={ans.id} />
+                <RadioGroupItem value={ans.answerId!} id={ans.answerId} />
                 <Label
-                  htmlFor={ans.id}
+                  htmlFor={ans.answerId}
                   className="flex-1 cursor-pointer text-lg font-medium"
                 >
-                  {ans.text}
+                  {ans.answerText}
                 </Label>
               </div>
             </CardContent>

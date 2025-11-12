@@ -1,23 +1,33 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Clock, Target, Trophy, Play } from "lucide-react"
+import { Clock, Target, Trophy, Play, Loader2 } from "lucide-react"
 import type { Lesson } from "@/types/db/course/lesson"
+import { useQuizContent } from "./hook"
 
 type QuizContentProps = {
   lesson: Lesson
 }
 
 export default function QuizContent({ lesson }: QuizContentProps) {
-  if (!lesson.quiz) {
+  const { quiz, isLoading, error, handleStartQuiz } = useQuizContent(lesson)
+
+  if (isLoading) {
+    return (
+      <div className="text-center py-8">
+        <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
+        <p className="text-muted-foreground">Loading quiz data...</p>
+      </div>
+    )
+  }
+
+  if (error || !quiz) {
     return (
       <div className="text-center py-8">
         <p className="text-muted-foreground">Quiz content is not available for this lesson.</p>
       </div>
     )
   }
-
-  const quiz = lesson.quiz
 
   return (
     <div className="space-y-6">
@@ -43,13 +53,13 @@ export default function QuizContent({ lesson }: QuizContentProps) {
             </div>
             <div className="flex items-center gap-2">
               <Target className="size-4 text-muted-foreground" />
-              <span className="text-sm">Passing Score: {quiz.passingScore}</span>
+              <span className="text-sm">Passing Score: {quiz.passingMarks}</span>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
             <Badge variant="secondary">
-              {quiz.quizQuestions?.length || 0} Questions
+              {quiz.questions?.length || 0} Questions
             </Badge>
           </div>
         </CardContent>
@@ -76,12 +86,13 @@ export default function QuizContent({ lesson }: QuizContentProps) {
             <Button
               size="lg"
               className="px-8 py-3 text-lg"
+              onClick={handleStartQuiz}
             >
               <Play className="size-5 mr-2" />
               Start Quiz
             </Button>
             <p className="text-sm text-muted-foreground mt-2">
-              Make sure you're ready before starting. You can only attempt the quiz once.
+              Make sure you're ready before starting. Click to begin your quiz attempt.
             </p>
           </div>
         </CardContent>

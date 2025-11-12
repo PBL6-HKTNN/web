@@ -10,7 +10,7 @@ import { timeDurationFormat } from "@/utils/time-utils"
 type ModuleAccordionProps = {
   data: Module
   selectedLessonId?: string
-  onLessonSelect?: (lessonId: string) => void
+  onLessonSelect?: (moduleId: string, lessonId: string) => void
   defaultExpanded?: boolean
 }
 
@@ -22,9 +22,12 @@ export default function ModuleAccordion({
 }: ModuleAccordionProps) {
   const [isOpen, setIsOpen] = useState(defaultExpanded)
 
-  const handleLessonSelect = (lessonId: string) => {
-    onLessonSelect?.(lessonId)
+  const handleLessonSelect = (moduleId: string, lessonId: string) => {
+    onLessonSelect?.(moduleId, lessonId)
   }
+
+  // Use lessons directly from module data
+  const displayLessons = data.lessons || []
 
   return (
     <div className="w-full border border-border rounded-none shadow-none">
@@ -40,7 +43,7 @@ export default function ModuleAccordion({
                     <div className="flex items-center gap-3 text-sm text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <BookOpen className="size-3" />
-                        {data.numLessons} lessons
+                        {data.numberOfLessons} lessons
                       </span>
                       <span className="flex items-center gap-1">
                         <Clock className="size-3" />
@@ -68,22 +71,28 @@ export default function ModuleAccordion({
 
         <CollapsibleContent>
           <div className="px-3 py-2">
-            <div className="space-y-1">
-              {data.lessons
-                .sort((a, b) => a.orderIndex - b.orderIndex)
-                .map((lesson) => (
-                  <LessonItem
-                    key={lesson.id}
-                    title={lesson.title}
-                    duration={lesson.duration}
-                    isSelected={selectedLessonId === lesson.id}
-                    onSelected={() => handleLessonSelect(lesson.id)}
-                    progress={0.5} // Mock progress - in real app this would come from user progress data
-                    indexNum={lesson.orderIndex}
-                    type={lesson.lessonType}
-                  />
-                ))}
-            </div>
+            {displayLessons.length === 0 ? (
+              <div className="text-center py-4 text-muted-foreground text-sm">
+                No lessons in this module
+              </div>
+            ) : (
+              <div className="space-y-1">
+                {displayLessons
+                  .sort((a, b) => a.orderIndex - b.orderIndex)
+                  .map((lesson) => (
+                    <LessonItem
+                      key={lesson.id}
+                      title={lesson.title}
+                      duration={parseInt(lesson.duration) || 0} // Convert duration string to number
+                      isSelected={selectedLessonId === lesson.id}
+                      onSelected={() => handleLessonSelect(lesson.moduleId,lesson.id)}
+                      progress={0.5} // Mock progress - in real app this would come from user progress data
+                      indexNum={lesson.orderIndex}
+                      type={lesson.lessonType}
+                    />
+                  ))}
+              </div>
+            )}
           </div>
         </CollapsibleContent>
       </Collapsible>

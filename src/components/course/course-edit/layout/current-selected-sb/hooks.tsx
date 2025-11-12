@@ -1,17 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { useCourseEdit } from "@/contexts/course/course-edit";
+import { useCourseEdit } from "@/contexts/course/use-course-edit";
 
 export function useCurrentSelectedSidebar() {
   const {
     selectedModuleId,
     selectedLessonId,
-    deleteModule,
-    deleteLesson,
-    setSelectedModule,
-    setSelectedLesson,
-    setSelectMode,
+    openDeleteModal,
   } = useCourseEdit();
 
   const [deleteModal, setDeleteModal] = useState<{
@@ -28,44 +24,19 @@ export function useCurrentSelectedSidebar() {
 
   const handleDeleteModule = () => {
     if (!selectedModuleId) return;
-
-    setDeleteModal({
-      isOpen: true,
-      type: 'module',
-      title: 'Delete Module',
-      description: 'Are you sure you want to delete this module? This action cannot be undone and will also delete all lessons within this module.',
-    });
+    
+    // Use the context's openDeleteModal function
+    openDeleteModal('module', selectedModuleId, 'Selected Module');
   };
 
   const handleDeleteLesson = () => {
     if (!selectedModuleId || !selectedLessonId) return;
-
-    setDeleteModal({
-      isOpen: true,
-      type: 'lesson',
-      title: 'Delete Lesson',
-      description: 'Are you sure you want to delete this lesson? This action cannot be undone.',
-    });
+    
+    // Use the context's openDeleteModal function
+    openDeleteModal('lesson', selectedLessonId, 'Selected Lesson');
   };
 
-  const confirmDelete = () => {
-    if (deleteModal.type === 'module' && selectedModuleId) {
-      deleteModule(selectedModuleId);
-      setSelectedModule(null);
-      setSelectMode(null);
-    } else if (deleteModal.type === 'lesson' && selectedModuleId && selectedLessonId) {
-      deleteLesson(selectedModuleId, selectedLessonId);
-      setSelectedLesson(null);
-      setSelectMode('module');
-    }
-
-    setDeleteModal({
-      isOpen: false,
-      type: null,
-      title: '',
-      description: '',
-    });
-  };
+  // Remove the confirmDelete function as it's now handled by the context
 
   const closeDeleteModal = () => {
     setDeleteModal({
@@ -80,7 +51,6 @@ export function useCurrentSelectedSidebar() {
     deleteModal,
     handleDeleteModule,
     handleDeleteLesson,
-    confirmDelete,
     closeDeleteModal,
   };
 }

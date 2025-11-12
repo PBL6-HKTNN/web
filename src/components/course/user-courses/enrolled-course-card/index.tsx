@@ -5,6 +5,7 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "@tanstack/react-router";
 import type { EnrolledCourse } from "@/types/db/course/course";
+import type { Course } from "@/types/db/course";
 
 interface EnrolledCourseCardProps {
   enrolledCourse: EnrolledCourse;
@@ -86,7 +87,7 @@ export function EnrolledCourseCard({ enrolledCourse }: EnrolledCourseCardProps) 
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-muted-foreground">by</span>
-                  <span className="text-sm font-medium">{(course as any).instructor?.name || 'Unknown'}</span>
+                  <span className="text-sm font-medium">{(course as unknown as Course).instructorId || 'Unknown'}</span>
                 </div>
 
                 {enrolledCourse.certificateEarned && (

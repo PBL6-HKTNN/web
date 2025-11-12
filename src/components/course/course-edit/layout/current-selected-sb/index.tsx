@@ -1,13 +1,13 @@
 "use client";
 
-import { useCourseEdit } from "@/contexts/course/course-edit";
+import { useCourseEdit } from "@/contexts/course/use-course-edit";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { BookOpen, FileText, Clock, Eye, EyeOff, HelpCircle, Trash2 } from "lucide-react";
-import type { LessonType } from "@/types/db/course/lesson";
+
 
 export function CurrentSelectedSidebar({ isLoading = false }: { isLoading?: boolean }) {
   const {
@@ -20,18 +20,13 @@ export function CurrentSelectedSidebar({ isLoading = false }: { isLoading?: bool
   const selectedModule = getSelectedModule();
   const selectedLesson = getSelectedLesson();
 
-  const formatDuration = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    return `${minutes} min`;
-  };
-
-  const getLessonTypeBadge = (lessonType: LessonType | null) => {
+  const getLessonTypeBadge = (lessonType: number | null) => {
     switch (lessonType) {
-      case "video":
-        return { variant: "default" as const, label: "Video" };
-      case "markdown":
+      case 0:
         return { variant: "secondary" as const, label: "Markdown" };
-      case "quiz":
+      case 1:
+        return { variant: "default" as const, label: "Video" };
+      case 2:
         return { variant: "default" as const, label: "Quiz" };
       default:
         return { variant: "outline" as const, label: "Unknown" };
@@ -98,7 +93,7 @@ export function CurrentSelectedSidebar({ isLoading = false }: { isLoading?: bool
             <Button
               size="sm"
               variant="outline"
-              onClick={() => selectedModule?.id && openDeleteModal('module', selectedModule.id)}
+              onClick={() => selectedModule?.id && openDeleteModal('module', selectedModule.id, selectedModule.title)}
               className="h-7 px-2 text-destructive hover:text-destructive"
             >
               <Trash2 className="h-3 w-3" />
@@ -121,7 +116,7 @@ export function CurrentSelectedSidebar({ isLoading = false }: { isLoading?: bool
             </div>
             <div>
               <h3 className="font-medium text-sm mb-1">Lessons</h3>
-              <p className="text-sm text-muted-foreground">{selectedModule.lessons.length}</p>
+              <p className="text-sm text-muted-foreground">{selectedModule.lessons?.length}</p>
             </div>
           </div>
 
@@ -130,8 +125,8 @@ export function CurrentSelectedSidebar({ isLoading = false }: { isLoading?: bool
           <div>
             <h3 className="font-medium text-sm mb-2">Lessons</h3>
             <div className="space-y-2">
-              {selectedModule.lessons.length > 0 ? (
-                selectedModule.lessons.map((lesson, index) => {
+              {selectedModule.lessons && selectedModule.lessons?.length > 0 ? (
+                selectedModule.lessons?.map((lesson, index) => {
                   const badgeInfo = getLessonTypeBadge(lesson.lessonType);
                   return (
                     <div key={lesson.id || index} className="flex items-center gap-2 p-2 bg-muted/50 rounded-md">
@@ -193,7 +188,7 @@ export function CurrentSelectedSidebar({ isLoading = false }: { isLoading?: bool
               <div className="flex items-center gap-1">
                 <Clock className="h-3 w-3 text-muted-foreground" />
                 <span className="text-xs text-muted-foreground">
-                  {formatDuration(selectedLesson.duration)}
+                  {(selectedLesson.duration)}
                 </span>
               </div>
             </div>
@@ -202,7 +197,7 @@ export function CurrentSelectedSidebar({ isLoading = false }: { isLoading?: bool
           <div>
             <h3 className="font-medium text-sm mb-1">Preview</h3>
             <div className="flex items-center gap-2">
-              {selectedLesson.isPreviewable ? (
+              {selectedLesson.isPreview ? (
                 <>
                   <Eye className="h-3 w-3 text-green-600" />
                   <span className="text-xs text-green-600">Available</span>
@@ -218,25 +213,25 @@ export function CurrentSelectedSidebar({ isLoading = false }: { isLoading?: bool
 
           <Separator />
 
-          {selectedLesson.lessonType === "quiz" && selectedLesson.quiz ? (
+          {selectedLesson.lessonType === 2 && selectedLesson.quiz ? (
             <div>
               <h3 className="font-medium text-sm mb-2">Quiz Information</h3>
               <div className="space-y-2">
                 <div>
                   <span className="text-xs text-muted-foreground">Questions: </span>
                   <span className="text-xs font-medium">
-                    {selectedLesson.quiz.quizQuestions.length}
+                    {selectedLesson.quiz.questions?.length}
                   </span>
                 </div>
                 <div>
                   <span className="text-xs text-muted-foreground">Total Points: </span>
                   <span className="text-xs font-medium">
-                    {selectedLesson.quiz.quizQuestions.reduce((total, q) => total + (q.marks || 0), 0)}
+                    {selectedLesson.quiz.questions?.reduce((total, q) => total + (q.marks || 0), 0)}
                   </span>
                 </div>
               </div>
             </div>
-          ) : selectedLesson.lessonType === "video" ? (
+          ) : selectedLesson.lessonType === 1 ? (
             <div>
               <h3 className="font-medium text-sm mb-2">Video Information</h3>
               <div className="space-y-2">
@@ -254,13 +249,13 @@ export function CurrentSelectedSidebar({ isLoading = false }: { isLoading?: bool
                 </div>
               </div>
             </div>
-          ) : selectedLesson.lessonType === "markdown" ? (
+          ) : selectedLesson.lessonType === 0 ? (
             <div>
               <h3 className="font-medium text-sm mb-2">Content Preview</h3>
               <div className="bg-muted/50 p-2 rounded-md">
                 <p className="text-xs text-muted-foreground line-clamp-3">
-                  {selectedLesson.rawContent.substring(0, 100)}
-                  {selectedLesson.rawContent.length > 100 && "..."}
+                  {selectedLesson.contentUrl.substring(0, 100)}
+                  {selectedLesson.contentUrl.length > 100 && "..."}
                 </p>
               </div>
             </div>
@@ -311,7 +306,7 @@ export function CurrentSelectedSidebar({ isLoading = false }: { isLoading?: bool
                 <div className="flex items-center gap-1">
                   <Clock className="h-3 w-3 text-muted-foreground" />
                   <span className="text-xs text-muted-foreground">
-                    {formatDuration(selectedLesson.duration)}
+                    {(selectedLesson.duration)}
                   </span>
                 </div>
               </div>
@@ -320,7 +315,7 @@ export function CurrentSelectedSidebar({ isLoading = false }: { isLoading?: bool
             <div>
               <h3 className="font-medium text-sm mb-1">Preview</h3>
               <div className="flex items-center gap-2">
-                {selectedLesson.isPreviewable ? (
+                {selectedLesson.isPreview ? (
                   <>
                     <Eye className="h-3 w-3 text-green-600" />
                     <span className="text-xs text-green-600">Available</span>
@@ -336,25 +331,25 @@ export function CurrentSelectedSidebar({ isLoading = false }: { isLoading?: bool
 
             <Separator />
 
-            {selectedLesson.lessonType === "quiz" && selectedLesson.quiz ? (
+            {selectedLesson.lessonType === 2 && selectedLesson.quiz ? (
               <div>
                 <h3 className="font-medium text-sm mb-2">Quiz Information</h3>
                 <div className="space-y-2">
                   <div>
                     <span className="text-xs text-muted-foreground">Questions: </span>
                     <span className="text-xs font-medium">
-                      {selectedLesson.quiz.quizQuestions.length}
+                      {selectedLesson.quiz.questions?.length}
                     </span>
                   </div>
                   <div>
                     <span className="text-xs text-muted-foreground">Total Points: </span>
                     <span className="text-xs font-medium">
-                      {selectedLesson.quiz.quizQuestions.reduce((total, q) => total + (q.marks || 0), 0)}
+                      {selectedLesson.quiz.questions?.reduce((total, q) => total + (q.marks || 0), 0)}
                     </span>
                   </div>
                 </div>
               </div>
-            ) : selectedLesson.lessonType === "video" ? (
+            ) : selectedLesson.lessonType === 1 ? (
               <div>
                 <h3 className="font-medium text-sm mb-2">Video Information</h3>
                 <div className="space-y-2">
@@ -372,13 +367,13 @@ export function CurrentSelectedSidebar({ isLoading = false }: { isLoading?: bool
                   </div>
                 </div>
               </div>
-            ) : selectedLesson.lessonType === "markdown" ? (
+            ) : selectedLesson.lessonType === 0 ? (
               <div>
                 <h3 className="font-medium text-sm mb-2">Content Preview</h3>
                 <div className="bg-muted/50 p-2 rounded">
                   <p className="text-xs text-muted-foreground line-clamp-3">
-                    {selectedLesson.rawContent?.substring(0, 150) || "No content"}
-                    {selectedLesson.rawContent && selectedLesson.rawContent.length > 150 ? "..." : ""}
+                    {selectedLesson.contentUrl?.substring(0, 150) || "No content"}
+                    {selectedLesson.contentUrl && selectedLesson.contentUrl.length > 150 ? "..." : ""}
                   </p>
                 </div>
               </div>

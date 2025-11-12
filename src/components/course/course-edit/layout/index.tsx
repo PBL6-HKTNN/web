@@ -3,8 +3,10 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ContentTreeSidebar } from "./content-tree-sb";
 import { CurrentSelectedSidebar } from "./current-selected-sb";
-import { useCourseEdit } from "@/contexts/course/course-edit";
+import { useCourseEdit } from "@/contexts/course/use-course-edit";
 import { ConfirmDeleteModal } from "../modals/confirm-del";
+import { CreateModuleDialog } from "../modals/create-module";
+import { CreateLessonDialog } from "../modals/create-lesson";
 import {
   ResizablePanelGroup,
   ResizablePanel,
@@ -19,25 +21,19 @@ interface CourseEditLayoutProps {
 }
 
 export function CourseEditLayout({ open, onOpenChange, children, isLoading = false }: CourseEditLayoutProps) {
-  const { isDeleteModalOpen, deleteTarget, closeDeleteModal, confirmDelete } = useCourseEdit();
+  const { 
+    courseId,
+    isDeleteModalOpen, 
+    deleteTarget, 
+    closeDeleteModal, 
+    confirmDelete,
+    isCreateModuleOpen,
+    closeCreateModule,
+    isCreateLessonOpen,
+    closeCreateLesson,
+    createLessonModuleId
+  } = useCourseEdit();
 
-  const getDeleteModalContent = () => {
-    if (!deleteTarget) return { title: '', description: '' };
-
-    if (deleteTarget.type === 'module') {
-      return {
-        title: 'Delete Module',
-        description: 'Are you sure you want to delete this module? This action cannot be undone and will also delete all lessons within this module.',
-      };
-    } else {
-      return {
-        title: 'Delete Lesson',
-        description: 'Are you sure you want to delete this lesson? This action cannot be undone.',
-      };
-    }
-  };
-
-  const modalContent = getDeleteModalContent();
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[1600px] !container h-[90vh] p-0 gap-0 flex flex-col">
@@ -73,13 +69,32 @@ export function CourseEditLayout({ open, onOpenChange, children, isLoading = fal
         </ResizablePanelGroup>
       </DialogContent>
 
-      <ConfirmDeleteModal
-        isOpen={isDeleteModalOpen}
-        onClose={closeDeleteModal}
-        onConfirm={confirmDelete}
-        title={modalContent.title}
-        description={modalContent.description}
+      {deleteTarget && (
+        <ConfirmDeleteModal
+          isOpen={isDeleteModalOpen}
+          onClose={closeDeleteModal}
+          onConfirm={confirmDelete}
+          type={deleteTarget.type}
+          title={deleteTarget.title}
+          isDeleting={false} // TODO: Add loading state from mutations
+        />
+      )}
+      
+      {/* Create Module Dialog */}
+      <CreateModuleDialog
+        isOpen={isCreateModuleOpen}
+        onClose={closeCreateModule}
+        courseId={courseId}
       />
+
+      {/* Create Lesson Dialog */}
+      {createLessonModuleId && (
+        <CreateLessonDialog
+          isOpen={isCreateLessonOpen}
+          onClose={closeCreateLesson}
+          moduleId={createLessonModuleId}
+        />
+      )}
     </Dialog>
   );
 }

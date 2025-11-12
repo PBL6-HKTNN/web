@@ -1,26 +1,35 @@
-import type { Base } from "@/types/core";
+import type { Base, UUID } from "@/types/core";
 import type { Quiz, QuizReq } from "./quiz";
+import type { ApiResponse } from "@/types/core/api";
 
-const LessonType = {
-  VIDEO: "video",
-  MARKDOWN: "markdown",
-  QUIZ: "quiz",
+export const LessonType = {
+  MARKDOWN: 0,
+  VIDEO: 1,
+  QUIZ: 2,
 } as const;
 
 export type LessonType = (typeof LessonType)[keyof typeof LessonType];
 
 export type Lesson = Base & {
   title: string;
-  moduleId: string;
-  rawContent: string;
+  moduleId: UUID;
   contentUrl: string;
-  duration: number;
+  duration: string;
   orderIndex: number;
-  isPreviewable: boolean;
+  isPreview: boolean;
   lessonType: LessonType;
-  quiz: Quiz | null;
+  quiz?: Quiz | null;
 };
 
+export type CreateLessonReq = Omit<Lesson, keyof Base | "quiz">;
+export type UpdateLessonReq = CreateLessonReq;
+
+export type CreateLessonRes = ApiResponse<Lesson>;
+export type GetLessonRes = ApiResponse<Lesson>;
+export type UpdateLessonRes = ApiResponse<Lesson>;
+export type DeleteLessonRes = ApiResponse<string>;
+
+//mock
 export type LessonReq = {
   id?: string;
   title: string;
@@ -28,7 +37,7 @@ export type LessonReq = {
   contentUrl: string;
   duration: number;
   orderIndex: number;
-  isPreviewable: boolean;
+  isPreview: boolean;
   lessonType: LessonType | null;
-  quiz: QuizReq | null;
+  quiz?: QuizReq | null;
 };

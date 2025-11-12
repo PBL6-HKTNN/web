@@ -35,34 +35,32 @@ type CourseLearnLayoutProps = {
 }
 
 export default function CourseLearnLayout({ children }: CourseLearnLayoutProps) {
-    const { courseId, moduleId, lessonId } = useParams({ from: "/learn/$courseId/$moduleId/$lessonId/" })
-    const { getCourseData, getModulesWithLessons, getLessonContent } = useCourseLearn()
+    const { courseId, moduleId, lessonId } = useParams({strict: false })
     const navigate = useNavigate()
     const isMobile = useIsMobile()
     const [drawerOpen, setDrawerOpen] = useState(false)
 
-    const course = getCourseData()
-    const modules = getModulesWithLessons(courseId)
-    const currentLesson = getLessonContent(courseId, moduleId, lessonId)
-    const currentModule = modules.find(m => m.id === moduleId)
+    const { courseData, modulesWithLessons } = useCourseLearn()
+
+    const currentModule = modulesWithLessons.find(m => m.id === moduleId)
+    const currentLesson = currentModule?.lessons?.find(l => l.id === lessonId)
+    
+    // Determine if we're viewing a lesson or just a module
+    const isViewingLesson = !!lessonId
     
     const CourseLearnSidebar = memo(() => {
-        const handleLessonSelect = (lessonId: string) => {
-            // Find the module that contains this lesson
-            const module = modules.find(m => m.lessons?.some(l => l.id === lessonId))
-            if (module) {
-                navigate({
-                    to: "/learn/$courseId/$moduleId/$lessonId",
-                    params: {
-                        courseId,
-                        moduleId: module.id,
-                        lessonId
-                    }
-                })
-                // Close drawer on mobile after selection
-                if (isMobile) {
-                    setDrawerOpen(false)
+        const handleLessonSelect = (moduleId: string, lessonId: string) => {
+            navigate({
+                to: "/learn/$courseId/$moduleId/$lessonId",
+                params: {
+                    courseId: courseId as string,
+                    moduleId,
+                    lessonId
                 }
+            })
+            // Close drawer on mobile after selection
+            if (isMobile) {
+                setDrawerOpen(false)
             }
         }
 
@@ -79,32 +77,54 @@ export default function CourseLearnLayout({ children }: CourseLearnLayoutProps) 
                                     <BreadcrumbLink
                                         href="#"
                                         className="text-sm font-medium"
+                                        onClick={() => navigate({ to: "/learn/$courseId", params: { courseId: courseId as string } })}
                                     >
-                                        {course.title || 'Course'}
+                                        {courseData?.title || 'Course'}
                                     </BreadcrumbLink>
                                 </BreadcrumbItem>
-                                <BreadcrumbSeparator />
-                                <BreadcrumbItem>
-                                    <BreadcrumbLink
-                                        href="#"
-                                        className="text-sm"
-                                    >
-                                        {currentModule?.title || 'Module'}
-                                    </BreadcrumbLink>
-                                </BreadcrumbItem>
-                                <BreadcrumbSeparator />
-                                <BreadcrumbItem>
-                                    <BreadcrumbPage className="text-sm">
-                                        {currentLesson?.title || 'Lesson'}
-                                    </BreadcrumbPage>
-                                </BreadcrumbItem>
+                                {currentModule && (
+                                    <>
+                                        <BreadcrumbSeparator />
+                                        <BreadcrumbItem>
+                                            {isViewingLesson ? (
+                                                <BreadcrumbLink
+                                                    href="#"
+                                                    className="text-sm"
+                                                    onClick={() => navigate({
+                                                        to: "/learn/$courseId/$moduleId",
+                                                        params: {
+                                                            courseId: courseId as string,
+                                                            moduleId: moduleId as string
+                                                        }
+                                                    })}
+                                                >
+                                                    {currentModule.title}
+                                                </BreadcrumbLink>
+                                            ) : (
+                                                <BreadcrumbPage className="text-sm">
+                                                    {currentModule.title}
+                                                </BreadcrumbPage>
+                                            )}
+                                        </BreadcrumbItem>
+                                    </>
+                                )}
+                                {currentLesson && (
+                                    <>
+                                        <BreadcrumbSeparator />
+                                        <BreadcrumbItem>
+                                            <BreadcrumbPage className="text-sm">
+                                                {currentLesson.title}
+                                            </BreadcrumbPage>
+                                        </BreadcrumbItem>
+                                    </>
+                                )}
                             </BreadcrumbList>
                         </Breadcrumb>
                         <Button
                             variant="outline"
                             size="sm"
                             className="w-full"
-                            onClick={() => navigate({ to: "/learn/$courseId", params: { courseId } })}
+                            onClick={() => navigate({ to: "/learn/$courseId", params: { courseId: courseId as string } })}
                         >
                             Back to Course page
                         </Button>
@@ -113,8 +133,9 @@ export default function CourseLearnLayout({ children }: CourseLearnLayoutProps) 
                 <div className="flex-1 overflow-hidden">
                     <ScrollArea className="h-full">
                         <ItemsListing
-                            modules={modules}
+                            modules={modulesWithLessons}
                             onLessonSelect={handleLessonSelect}
+                            defaultExpandedModuleId={moduleId}
                         />
                     </ScrollArea>
                 </div>
@@ -141,28 +162,26 @@ export default function CourseLearnLayout({ children }: CourseLearnLayoutProps) 
                                     </DrawerHeader>
                                     <div className="max-h-[70vh] overflow-auto">
                                         <ItemsListing
-                                            modules={modules}
-                                            onLessonSelect={(lessonId) => {
-                                                const module = modules.find(m => m.lessons?.some(l => l.id === lessonId))
-                                                if (module) {
-                                                    navigate({
-                                                        to: "/learn/$courseId/$moduleId/$lessonId",
-                                                        params: {
-                                                            courseId,
-                                                            moduleId: module.id,
-                                                            lessonId
-                                                        }
-                                                    })
-                                                    setDrawerOpen(false)
-                                                }
+                                            modules={modulesWithLessons}
+                                            onLessonSelect={(moduleId: string, lessonId: string) => {
+                                                navigate({
+                                                    to: "/learn/$courseId/$moduleId/$lessonId",
+                                                    params: {
+                                                        courseId: courseId as string,
+                                                        moduleId,
+                                                        lessonId
+                                                    }
+                                                })
+                                                setDrawerOpen(false)
                                             }}
+                                            defaultExpandedModuleId={moduleId}
                                         />
                                     </div>
                                 </DrawerContent>
                             </Drawer>
                             <div className="flex-1 min-w-0">
                                 <h2 className="text-sm font-semibold text-foreground truncate">
-                                    {currentLesson?.title || 'Lesson'}
+                                    {courseData?.title || 'Course'}
                                 </h2>
                             </div>
                         </div>
@@ -173,7 +192,7 @@ export default function CourseLearnLayout({ children }: CourseLearnLayoutProps) 
                     </div>
                 </div>
             ) : (
-                <ResizablePanelGroup direction="horizontal" className="h-screen max-h-screen w-full">
+                <ResizablePanelGroup direction="horizontal" className="h-screen min-h-screen w-full">
                     <ResizablePanel defaultSize={30} minSize={20} maxSize={40}>
                         <CourseLearnSidebar/>
                     </ResizablePanel>

@@ -6,7 +6,7 @@ type MarkdownContentProps = {
 }
 
 export default function MarkdownContent({ lesson }: MarkdownContentProps) {
-  if (!lesson.rawContent) {
+  if (!lesson.contentUrl) {
     return (
       <div className="text-center py-8">
         <p className="text-muted-foreground">No content available for this lesson.</p>
@@ -18,7 +18,7 @@ export default function MarkdownContent({ lesson }: MarkdownContentProps) {
     <div className="prose prose-lg container dark:prose-invert lg:min-w-4xl">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
-      >{lesson.rawContent}</ReactMarkdown>
+      >{lesson.contentUrl}</ReactMarkdown>
     </div>
   )
 }

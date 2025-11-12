@@ -8,10 +8,11 @@ export const Route = createFileRoute('/learn/$courseId')({
 })
 
 function RouteComponent() {
+  const { courseId } = Route.useParams()
 
-  return <>
-    <CourseLearnProvider>
+  return (
+    <CourseLearnProvider courseId={courseId}>
       <Outlet />
     </CourseLearnProvider>
-  </>
+  )
 }

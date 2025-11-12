@@ -1,105 +1,158 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Brain, Plus } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import type { LessonReq } from "@/types/db/course/lesson";
-import { QuizQuestion } from "./quiz-question";
-import { useCourseEdit } from "@/contexts/course/course-edit";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Brain, Save, Plus } from "lucide-react";
+import { useQuizLessonRender } from "./hook";
 import { QuestionType } from "@/types/db/course/quiz-question";
+import { QuizQuestionTable } from "./quiz-question-table";
+import type { Lesson } from "@/types/db/course/lesson";
 
 interface QuizLessonRenderProps {
-  lesson: LessonReq;
+  lesson: Lesson;
 }
 
 export function QuizLessonRender({ lesson }: QuizLessonRenderProps) {
-  const { selectedModuleId, selectedLessonId, addQuizQuestion } = useCourseEdit();
+  const {
+    // Data
+    isLoading,
+    isSaving,
 
-  const handleAddQuestion = (type: typeof QuestionType[keyof typeof QuestionType]) => {
-    if (selectedModuleId && selectedLessonId) {
-      addQuizQuestion(selectedModuleId, selectedLessonId, {
-        questionText: "",
-        type,
-        marks: 1,
-        answers: [],
-      });
-    }
-  };
+    // Form
+    form,
+    fields,
 
-  const quiz = lesson.quiz;
+    // Actions
+    handleSave,
+    addQuestion,
+    updateQuestion,
+    removeQuestion,
+  } = useQuizLessonRender({ lesson });
+
+  if (isLoading) {
+    return (
+      <Card className="h-full flex items-center justify-center">
+        <CardContent>
+          <p className="text-muted-foreground">Loading quiz...</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
-    <Card className="h-full flex flex-col overflow-y-auto">
-      <CardHeader className="sticky top-0 bg-card z-10">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Brain className="h-5 w-5" />
-            <CardTitle>Quiz Questions</CardTitle>
-          </div>
-          <div className="flex gap-2">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => handleAddQuestion(QuestionType.SINGLE_CHOICE)}
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Single Choice
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => handleAddQuestion(QuestionType.MULTIPLE_CHOICE)}
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Multiple Choice
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => handleAddQuestion(QuestionType.TRUE_FALSE)}
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              True/False
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => handleAddQuestion(QuestionType.SHORT_ANSWER)}
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Short Answer
+    <form onSubmit={handleSave} className="h-full flex flex-col gap-4 overflow-y-auto">
+      {/* General Info Card */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Brain className="h-5 w-5" />
+              <CardTitle>Quiz Information</CardTitle>
+            </div>
+            <Button type="submit" disabled={isSaving}>
+              <Save className="h-4 w-4 mr-2" />
+              {isSaving ? "Saving..." : "Save Quiz"}
             </Button>
           </div>
-        </div>
-        <CardDescription>
-          Create and manage quiz questions for this lesson
-        </CardDescription>
-      </CardHeader>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="title">Title *</Label>
+            <Input
+              id="title"
+              {...form.register("title")}
+              placeholder="Enter quiz title"
+            />
+            {form.formState.errors.title && (
+              <p className="text-sm text-destructive">{form.formState.errors.title.message}</p>
+            )}
+          </div>
 
-      <CardContent className="flex-1">
-        <ScrollArea className="h-full pr-4">
-          {quiz && quiz.quizQuestions && quiz.quizQuestions.length > 0 ? (
-            <div className="space-y-4">
-              {quiz.quizQuestions.map((question, index) => (
-                <QuizQuestion
-                  key={question.id || index}
-                  question={question}
-                  questionIndex={index}
-                />
-              ))}
+          <div className="space-y-2">
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              id="description"
+              {...form.register("description")}
+              placeholder="Enter quiz description"
+              rows={3}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="passingMarks">Passing Marks *</Label>
+            <Input
+              id="passingMarks"
+              type="number"
+              {...form.register("passingMarks", { valueAsNumber: true })}
+              placeholder="Enter passing marks"
+            />
+            {form.formState.errors.passingMarks && (
+              <p className="text-sm text-destructive">{form.formState.errors.passingMarks.message}</p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Questions Card */}
+      <Card className="flex-1 flex flex-col">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle>Questions</CardTitle>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => addQuestion(QuestionType.SINGLE_CHOICE)}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Single Choice
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => addQuestion(QuestionType.MULTIPLE_CHOICE)}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Multiple Choice
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => addQuestion(QuestionType.TRUE_FALSE)}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                True/False
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => addQuestion(QuestionType.SHORT_ANSWER)}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Short Answer
+              </Button>
             </div>
-          ) : (
-            <div className="flex items-center justify-center h-full text-center text-muted-foreground">
-              <div>
-                <Brain className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p className="text-sm">No questions yet</p>
-                <p className="text-xs mt-1">Add a question to get started</p>
-              </div>
-            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="flex-1 overflow-auto">
+          {form.formState.errors.questions && (
+            <p className="text-sm text-destructive mb-4">{form.formState.errors.questions.message}</p>
           )}
-        </ScrollArea>
-      </CardContent>
-    </Card>
+          <QuizQuestionTable
+            questions={fields}
+            onUpdate={updateQuestion}
+            onRemove={removeQuestion}
+            form={form}
+          />
+        </CardContent>
+      </Card>
+    </form>
   );
 }

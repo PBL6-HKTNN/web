@@ -2,7 +2,7 @@ import { Star, Clock, Users } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import type { Course } from "@/types/db/course/course";
+import type { Course } from "@/types/db/course";
 
 interface CourseCardProps {
   course: Course;
@@ -13,15 +13,6 @@ export function CourseCard({ course }: CourseCardProps) {
 
   const handleClick = () => {
     navigate({ to: `/course/${course.id}` });
-  };
-
-  const formatDuration = (minutes: number) => {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    if (hours > 0) {
-      return `${hours}h ${mins}m`;
-    }
-    return `${mins}m`;
   };
 
   const formatPrice = (price: number) => {
@@ -55,9 +46,9 @@ export function CourseCard({ course }: CourseCardProps) {
           </h3>
 
           {/* Instructor */}
-          {course.instructor && (
+          {course.instructorId && (
             <p className="text-sm text-muted-foreground">
-              By {course.instructor.name}
+              By {course.instructorId}
             </p>
           )}
 
@@ -78,7 +69,7 @@ export function CourseCard({ course }: CourseCardProps) {
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <div className="flex items-center gap-1">
               <Clock className="w-4 h-4" />
-              <span>{formatDuration(course.duration)}</span>
+              <span>{(course.duration)}</span>
             </div>
             <div className="flex items-center gap-1">
               <Users className="w-4 h-4" />

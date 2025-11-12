@@ -1,35 +1,29 @@
 "use client";
 
-import type { LessonReq } from "@/types/db/course/lesson";
-import { useLessonRender } from "./hooks";
-import { EmptyLessonRender } from "./empty";
-import { MarkdownLessonRender } from "./markdown";
+import type { Lesson } from "@/types/db/course/lesson";
+import { MarkdownLessonRender } from "./markdown/new-index";
 import { VideoLessonRender } from "./video";
 import { QuizLessonRender } from "./quiz";
+import { EmptyLessonRender } from "./empty";
 
 interface LessonRenderProps {
-  lesson: LessonReq;
+  lesson: Lesson;
 }
 
 export function LessonRender({ lesson }: LessonRenderProps) {
-  const { selectedLessonType, handleSelectLessonType, handleUpdateContent, handleUpdateContentUrl } =
-    useLessonRender(lesson);
-
-  if (!selectedLessonType || selectedLessonType === null) {
-    return <EmptyLessonRender onSelectType={handleSelectLessonType} />;
+  // Check lesson type and render appropriate component
+  if (lesson.lessonType === 0) {
+    return <MarkdownLessonRender lesson={lesson} />;
   }
 
-  if (selectedLessonType === "markdown") {
-    return <MarkdownLessonRender lesson={lesson} onUpdateContent={handleUpdateContent} />;
+  if (lesson.lessonType === 1) {
+    return <VideoLessonRender lesson={lesson} />;
   }
 
-  if (selectedLessonType === "video") {
-    return <VideoLessonRender lesson={lesson} onUpdateContentUrl={handleUpdateContentUrl} />;
-  }
-
-  if (selectedLessonType === "quiz") {
+  if (lesson.lessonType === 2) {
     return <QuizLessonRender lesson={lesson} />;
   }
 
-  return null;
+  // If no lesson type is set, show empty state with type selection
+  return <EmptyLessonRender onSelectType={() => {}} />;
 }

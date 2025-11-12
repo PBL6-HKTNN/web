@@ -1,18 +1,16 @@
 import { useState } from "react";
-import { Search, Filter, X } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Filter, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
-import { useCategories } from "@/hooks/queries";
-import { Level, type GetCoursesRequest } from "@/types/db/course/course";
+import { useGetCategories } from "@/hooks/queries/course/category-hooks";
+import { Level, type GetCoursesFilterReq } from "@/types/db/course";
 
 interface CourseFiltersProps {
-  filters: GetCoursesRequest;
-  onFiltersChange: (filters: GetCoursesRequest) => void;
+  filters: GetCoursesFilterReq;
+  onFiltersChange: (filters: GetCoursesFilterReq) => void;
   totalResults?: number;
 }
 
@@ -25,88 +23,52 @@ const SORT_OPTIONS = [
 ] as const;
 
 const LEVEL_OPTIONS: { value: Level; label: string }[] = [
-  { value: Level.Beginner, label: "Beginner" },
-  { value: Level.Intermediate, label: "Intermediate" },
-  { value: Level.Advanced, label: "Advanced" },
+  { value: Level.BEGINNER, label: "Beginner" },
+  { value: Level.INTERMEDIATE, label: "Intermediate" },
+  { value: Level.ADVANCED, label: "Advanced" },
 ];
 
 export function CourseFilters({ filters, onFiltersChange, totalResults }: CourseFiltersProps) {
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
-  const { data: categoriesData } = useCategories();
-
-  const handleSearchChange = (value: string) => {
-    onFiltersChange({ ...filters, search: value || undefined, page: 1 });
-  };
+  const { data: categoriesData } = useGetCategories();
 
   const handleCategoryChange = (categoryId: string) => {
     const value = categoryId === "all" ? undefined : categoryId;
-    onFiltersChange({ ...filters, categoryId: value, page: 1 });
+    onFiltersChange({ ...filters, CategoryId: value, Page: 1 });
   };
 
   const handleLevelChange = (level: string) => {
-    const value = level === "all" ? undefined : level as Level;
-    onFiltersChange({ ...filters, level: value, page: 1 });
-  };
-
-  const handlePriceRangeChange = (values: number[]) => {
-    onFiltersChange({
-      ...filters,
-      minPrice: values[0] === 0 ? undefined : values[0],
-      maxPrice: values[1] === 200 ? undefined : values[1],
-      page: 1
-    });
+    const value = level === "all" ? undefined : (parseInt(level) as Level);
+    onFiltersChange({ ...filters, Level: value, Page: 1 });
   };
 
   const handleSortChange = (sortBy: string) => {
-    const [field, order] = sortBy.split("-");
     onFiltersChange({
       ...filters,
-      sortBy: field as GetCoursesRequest['sortBy'],
-      sortOrder: (order as 'asc' | 'desc') || 'desc',
-      page: 1
+      SortBy: sortBy as GetCoursesFilterReq['SortBy'],
+      Page: 1
     });
   };
 
   const clearFilters = () => {
     onFiltersChange({
-      search: undefined,
-      categoryId: undefined,
-      level: undefined,
-      minPrice: undefined,
-      maxPrice: undefined,
-      sortBy: 'createdAt',
-      sortOrder: 'desc',
-      page: 1,
-      pageSize: 12
+      SortBy: 'name',
+      Page: 1,
+      PageSize: 12
     });
   };
 
   const activeFiltersCount = [
-    filters.search,
-    filters.categoryId,
-    filters.level,
-    filters.minPrice || filters.maxPrice
+    filters.CategoryId,
+    filters.Level
   ].filter(Boolean).length;
 
   const getSortValue = () => {
-    const sortBy = filters.sortBy || 'createdAt';
-    const sortOrder = filters.sortOrder || 'desc';
-    return `${sortBy}-${sortOrder}`;
+    return filters.SortBy || 'name';
   };
 
   return (
     <div className="space-y-4">
-      {/* Search Bar */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-        <Input
-          placeholder="Search courses..."
-          value={filters.search || ""}
-          onChange={(e) => handleSearchChange(e.target.value)}
-          className="pl-10"
-        />
-      </div>
-
       {/* Top Controls */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div className="flex items-center gap-4">
@@ -175,12 +137,12 @@ export function CourseFilters({ filters, onFiltersChange, totalResults }: Course
               <CardTitle className="text-lg">Filters</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Category Filter */}
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Category</label>
                   <Select
-                    value={filters.categoryId || "all"}
+                    value={filters.CategoryId || "all"}
                     onValueChange={handleCategoryChange}
                   >
                     <SelectTrigger>
@@ -188,7 +150,7 @@ export function CourseFilters({ filters, onFiltersChange, totalResults }: Course
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Categories</SelectItem>
-                      {categoriesData?.categories?.map((category) => (
+                      {categoriesData?.data!.map((category) => (
                         <SelectItem key={category.id} value={category.id}>
                           {category.name}
                         </SelectItem>
@@ -201,7 +163,7 @@ export function CourseFilters({ filters, onFiltersChange, totalResults }: Course
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Level</label>
                   <Select
-                    value={filters.level || "all"}
+                    value={filters.Level?.toString() || "all"}
                     onValueChange={handleLevelChange}
                   >
                     <SelectTrigger>
@@ -210,34 +172,12 @@ export function CourseFilters({ filters, onFiltersChange, totalResults }: Course
                     <SelectContent>
                       <SelectItem value="all">All Levels</SelectItem>
                       {LEVEL_OPTIONS.map((level) => (
-                        <SelectItem key={level.value} value={level.value}>
+                        <SelectItem key={level.value} value={level.value.toString()}>
                           {level.label}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                </div>
-
-                {/* Price Range Filter */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Price Range</label>
-                  <div className="px-2">
-                    <Slider
-                      value={[
-                        filters.minPrice || 0,
-                        filters.maxPrice || 200
-                      ]}
-                      onValueChange={handlePriceRangeChange}
-                      max={200}
-                      min={0}
-                      step={10}
-                      className="w-full"
-                    />
-                    <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                      <span>${filters.minPrice || 0}</span>
-                      <span>${filters.maxPrice || 200}{filters.maxPrice === 200 ? '+' : ''}</span>
-                    </div>
-                  </div>
                 </div>
               </div>
             </CardContent>
