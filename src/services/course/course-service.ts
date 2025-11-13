@@ -25,6 +25,9 @@ export const getCategories = async (): Promise<GetCategoriesResponse> => {
   const response = await api.get(API_ROUTES.COURSE.getCategories);
   return response.data.data;
 };
+
+
+
 export const getEnrolledCourses = async (): Promise<GetEnrolledCoursesResponse> => {
   const response = await api.get(API_ROUTES.USER_COURSES.getEnrolledCourses);
   return response.data.data;

@@ -24,7 +24,7 @@ import type {
 } from '@/types/db/course/course';
 
 // Flag to enable/disable mock data (set to true when backend is not available)
-const USE_MOCK_DATA = true;
+const USE_MOCK_DATA = false;
 
 // Helper function to filter and sort mock courses
 const getFilteredCourses = (params?: GetCoursesRequest): GetCoursesResponse => {

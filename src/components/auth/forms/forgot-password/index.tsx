@@ -44,6 +44,7 @@ export function ForgotPasswordForm() {
                 onChange={(e) => updateField('email', e.target.value)}
                 required
                 className="pl-10"
+                data-testid="email-input"
               />
               <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
             </div>
@@ -60,11 +61,13 @@ export function ForgotPasswordForm() {
                 value={formData.token}
                 onChange={(e) => updateField('token', e.target.value)}
                 className="pr-24"
+                data-testid="reset-code-input"
               />
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
+                data-testid="get-code-button"
                 onClick={(e) => {
                   e.preventDefault()
                   handleRequestReset(e)
@@ -89,6 +92,7 @@ export function ForgotPasswordForm() {
                 value={formData.password}
                 onChange={(e) => updateField('password', e.target.value)}
                 className="pl-10 pr-10"
+                data-testid="new-password-input"
               />
               <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Button
@@ -118,6 +122,7 @@ export function ForgotPasswordForm() {
                 value={formData.confirmPassword}
                 onChange={(e) => updateField('confirmPassword', e.target.value)}
                 className="pl-10 pr-10"
+                data-testid="confirm-password-input"
               />
               <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Button
@@ -141,6 +146,7 @@ export function ForgotPasswordForm() {
             onClick={(e) => handleResetPassword(e)}
             className="w-full"
             disabled={isLoading || !formData.token || !formData.password || !formData.confirmPassword}
+            data-testid="reset-password-button"
           >
             {isLoading ? 'Resetting password...' : 'Reset Password'}
           </Button>

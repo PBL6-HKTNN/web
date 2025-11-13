@@ -80,3 +80,7 @@ temp/
 
 # OS generated files
 Thumbs.db
+
+# Test results
+playwright-report/
+test-results/

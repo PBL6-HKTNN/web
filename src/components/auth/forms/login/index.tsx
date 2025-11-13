@@ -29,7 +29,7 @@ export function LoginForm() {
         </CardDescription>
       </CardHeader>
       <CardContent className="px-0">
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4" data-testid="login-form">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
@@ -39,6 +39,7 @@ export function LoginForm() {
               value={formData.email}
               onChange={(e) => updateField('email', e.target.value)}
               required
+              data-testid="email-input"
             />
           </div>
           <div className="space-y-2">
@@ -51,6 +52,7 @@ export function LoginForm() {
                 value={formData.password}
                 onChange={(e) => updateField('password', e.target.value)}
                 required
+                data-testid="password-input"
               />
               <Button
                 type="button"
@@ -73,6 +75,7 @@ export function LoginForm() {
                 id="remember"
                 checked={formData.rememberMe}
                 onCheckedChange={(checked) => updateField('rememberMe', checked as boolean)}
+                data-testid="remember-me-checkbox"
               />
               <Label htmlFor="remember" className="text-sm">
                 Remember me
@@ -85,7 +88,7 @@ export function LoginForm() {
               Forgot password?
             </Link>
           </div>
-          <Button type="submit" className="w-full" disabled={isLoading}>
+          <Button type="submit" className="w-full" disabled={isLoading} data-testid="submit-button">
             {isLoading ? 'Signing in...' : 'Sign in'}
           </Button>
         </form>

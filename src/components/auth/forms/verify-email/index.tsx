@@ -50,6 +50,7 @@ export function VerifyEmailForm({ initialEmail, initialToken }: VerifyEmailFormP
               onChange={(e) => updateField('token', e.target.value)}
               required
               disabled={isLoading}
+              data-testid="verification-code-input"
             />
           </div>
 
