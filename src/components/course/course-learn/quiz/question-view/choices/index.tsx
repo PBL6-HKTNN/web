@@ -3,6 +3,7 @@ import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Checkbox } from "@/components/ui/checkbox"
 import type { QuizQuestion } from "@/types/db/course/quiz-question"
+import { QuestionType } from "@/types/db/course/quiz-question"
 import type { UserAnswer } from "@/contexts/course/course-quiz-learning"
 
 type ChoicesQuestionProps = {
@@ -18,11 +19,15 @@ export default function ChoicesQuestion({
   onAnswerChange,
   disabled = false,
 }: ChoicesQuestionProps) {
-  const isMultipleChoice = question.type === 'multiple_choice'
+  const isMultipleChoice = question.questionType === QuestionType.MULTIPLE_CHOICE
   const selectedIds = answer?.selectedAnswerIds || []
 
   const handleSingleChoiceChange = (answerId: string) => {
-    onAnswerChange({ selectedAnswerIds: [answerId] })
+    const selectedAnswer = question.answers.find(ans => ans.answerId === answerId)
+    onAnswerChange({ 
+      selectedAnswerIds: [answerId],
+      answerText: selectedAnswer?.answerText || ''
+    })
   }
 
   const handleMultipleChoiceChange = (answerId: string, checked: boolean) => {
@@ -30,7 +35,14 @@ export default function ChoicesQuestion({
       ? [...selectedIds, answerId]
       : selectedIds.filter(id => id !== answerId)
     
-    onAnswerChange({ selectedAnswerIds: newSelectedIds })
+    // For multiple choice, set answerText to comma-separated selected answer texts
+    const selectedAnswers = question.answers.filter(ans => newSelectedIds.includes(ans.answerId!))
+    const answerText = selectedAnswers.map(ans => ans.answerText).join(', ')
+    
+    onAnswerChange({ 
+      selectedAnswerIds: newSelectedIds,
+      answerText 
+    })
   }
 
   if (isMultipleChoice) {
@@ -38,26 +50,26 @@ export default function ChoicesQuestion({
       <div className="space-y-3">
         {question.answers.map((ans) => (
           <Card
-            key={ans.id}
+            key={ans.answerId}
             className={`cursor-pointer transition-colors ${
-              selectedIds.includes(ans.id) ? 'border-primary bg-primary/5' : ''
+              selectedIds.includes(ans.answerId!) ? 'border-primary bg-primary/5' : ''
             }`}
           >
             <CardContent className="p-4">
               <div className="flex items-start gap-3">
                 <Checkbox
-                  id={ans.id}
-                  checked={selectedIds.includes(ans.id)}
+                  id={ans.answerId}
+                  checked={selectedIds.includes(ans.answerId!)}
                   onCheckedChange={(checked) =>
-                    handleMultipleChoiceChange(ans.id, checked === true)
+                    handleMultipleChoiceChange(ans.answerId!, checked === true)
                   }
                   disabled={disabled}
                 />
                 <Label
-                  htmlFor={ans.id}
+                  htmlFor={ans.answerId}
                   className="flex-1 cursor-pointer leading-relaxed"
                 >
-                  {ans.text}
+                  {ans.answerText}
                 </Label>
               </div>
             </CardContent>
@@ -77,19 +89,19 @@ export default function ChoicesQuestion({
       <div className="space-y-3">
         {question.answers.map((ans) => (
           <Card
-            key={ans.id}
+            key={ans.answerId}
             className={`cursor-pointer transition-colors ${
-              selectedIds[0] === ans.id ? 'border-primary bg-primary/5' : ''
+              selectedIds[0] === ans.answerId ? 'border-primary bg-primary/5' : ''
             }`}
           >
             <CardContent className="p-4">
               <div className="flex items-start gap-3">
-                <RadioGroupItem value={ans.id} id={ans.id} />
+                <RadioGroupItem value={ans.answerId!} id={ans.answerId} />
                 <Label
-                  htmlFor={ans.id}
+                  htmlFor={ans.answerId}
                   className="flex-1 cursor-pointer leading-relaxed"
                 >
-                  {ans.text}
+                  {ans.answerText}
                 </Label>
               </div>
             </CardContent>

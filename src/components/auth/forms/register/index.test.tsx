@@ -10,7 +10,7 @@ vi.mock('./hooks', () => ({
 
 // Mock the router Link component
 vi.mock('@tanstack/react-router', () => ({
-  Link: ({ children, to, className }: any) => (
+  Link: ({ children, to, className }: { children: React.ReactNode; to: string; className?: string }) => (
     <a href={to} className={className} data-testid="link">
       {children}
     </a>

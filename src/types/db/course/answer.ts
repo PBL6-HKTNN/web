@@ -1,6 +1,7 @@
-import type { Base } from "@/types/core";
+import type { UUID } from "@/types/core";
 
-export type Answer = Base & {
-  text: string;
+export type Answer = {
+  answerId?: UUID;
+  answerText: string;
   isCorrect: boolean;
 };

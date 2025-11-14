@@ -1,13 +1,13 @@
 import { authGuard } from '@/utils'
 import { createFileRoute } from '@tanstack/react-router'
-import { useCourseLearn } from '@/contexts/course/course-learn'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { Clock, BookOpen, Users, Star, Play, CheckCircle, ArrowRight } from 'lucide-react'
+import { Clock, BookOpen, Star, Loader2 } from 'lucide-react'
 import { timeDurationFormat } from '@/utils/time-utils'
 import { LearningNavBar } from '@/components/layout/nav-bar-2'
+import ModuleAccordion from '@/components/course/module-accordion'
+import { useCourseOverview } from './-hook'
 
 export const Route = createFileRoute('/learn/$courseId/')({
   component: RouteComponent,
@@ -15,29 +15,42 @@ export const Route = createFileRoute('/learn/$courseId/')({
 })
 
 function CourseOverview() {
-  const { getCourseData } = useCourseLearn()
+  const { course, modules, totalLessons, isLoading, error, handleLessonSelect } = useCourseOverview()
 
-  const course = getCourseData()
-
-  if (!course) {
+  if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px] px-4">
-        <Card className="w-full max-w-md">
-          <CardContent className="p-6 text-center">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
-              <BookOpen className="w-8 h-8 text-muted-foreground" />
-            </div>
-            <h2 className="text-xl font-semibold mb-2">Course Not Found</h2>
-            <p className="text-muted-foreground text-sm">
-              The course you're looking for doesn't exist or you don't have access to it.
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+      <>
+        <LearningNavBar />
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <div className="text-center">
+            <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
+            <p className="text-muted-foreground">Loading course...</p>
+          </div>
+        </div>
+      </>
     )
   }
 
-  const totalLessons = course.modules?.reduce((total, module) => total + (module.numLessons || 0), 0) || 0
+  if (error || !course) {
+    return (
+      <>
+        <LearningNavBar />
+        <div className="flex items-center justify-center min-h-[400px] px-4">
+          <Card className="w-full max-w-md">
+            <CardContent className="p-6 text-center">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
+                <BookOpen className="w-8 h-8 text-muted-foreground" />
+              </div>
+              <h2 className="text-xl font-semibold mb-2">Course Not Found</h2>
+              <p className="text-muted-foreground text-sm">
+                The course you're looking for doesn't exist or you don't have access to it.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </>
+    )
+  }
 
   return (
   <>
@@ -84,11 +97,7 @@ function CourseOverview() {
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <BookOpen className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                      <span>{course.numReviews} reviews</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <Users className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                      <span>{course.numReviews} students</span>
+                      <span>{course.numberOfReviews} reviews</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Star className="w-4 h-4 fill-yellow-400 text-yellow-400 flex-shrink-0" />
@@ -116,7 +125,7 @@ function CourseOverview() {
           <Card>
             <CardContent className="p-4 text-center">
               <div className="text-2xl font-bold text-primary mb-1">
-                {course.modules?.length || 0}
+                {modules.length}
               </div>
               <div className="text-sm text-muted-foreground">Modules</div>
             </CardContent>
@@ -155,7 +164,7 @@ function CourseOverview() {
             <Separator />
             <div className="flex flex-wrap gap-2">
               <Badge variant="secondary">
-                {course.modules?.length || 0} Modules
+                {modules.length} Modules
               </Badge>
               <Badge variant="outline">
                 {totalLessons} Lessons
@@ -167,64 +176,32 @@ function CourseOverview() {
           </CardContent>
         </Card>
 
-        {/* Getting Started Guide */}
-        <Card>
+        {/* Course Content */}
+        <Card className="mb-6">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Play className="w-5 h-5" />
-              Getting Started
+              <BookOpen className="w-5 h-5" />
+              Course Content
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div className="flex flex-col sm:flex-row items-start gap-4 p-4 rounded-lg border bg-muted/50">
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <span className="text-sm font-semibold text-primary">1</span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium mb-1">Browse Course Content</div>
-                  <div className="text-sm text-muted-foreground">
-                    Check out the modules and lessons in the sidebar to see what's available.
-                  </div>
-                </div>
-                <ArrowRight className="w-4 h-4 text-muted-foreground flex-shrink-0 hidden sm:block" />
+            {modules.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <BookOpen className="size-12 mx-auto mb-4 opacity-50" />
+                <p>No modules found for this course.</p>
               </div>
-
-              <div className="flex flex-col sm:flex-row items-start gap-4 p-4 rounded-lg border bg-muted/50">
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <span className="text-sm font-semibold text-primary">2</span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium mb-1">Start with the First Lesson</div>
-                  <div className="text-sm text-muted-foreground">
-                    Click on any lesson to begin learning at your own pace.
-                  </div>
-                </div>
-                <ArrowRight className="w-4 h-4 text-muted-foreground flex-shrink-0 hidden sm:block" />
+            ) : (
+              <div>
+                {modules.map((module) => (
+                  <ModuleAccordion
+                    key={module.id}
+                    data={module}
+                    onLessonSelect={handleLessonSelect}
+                    defaultExpanded={false}
+                  />
+                ))}
               </div>
-
-              <div className="flex flex-col sm:flex-row items-start gap-4 p-4 rounded-lg border bg-muted/50">
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <span className="text-sm font-semibold text-primary">3</span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium mb-1">Complete Quizzes</div>
-                  <div className="text-sm text-muted-foreground">
-                    Test your knowledge with interactive quizzes and track your progress.
-                  </div>
-                </div>
-                <CheckCircle className="w-4 h-4 text-muted-foreground flex-shrink-0 hidden sm:block" />
-              </div>
-            </div>
-
-            <Separator className="my-6" />
-
-            <div className="text-center">
-              <Button size="lg" className="w-full sm:w-auto">
-                <Play className="w-4 h-4 mr-2" />
-                Start Learning
-              </Button>
-            </div>
+            )}
           </CardContent>
         </Card>
       </div>

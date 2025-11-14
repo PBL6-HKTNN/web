@@ -107,7 +107,6 @@ export function useForgotPasswordForm() {
         newPassword: formData.password!,
       })
 
-      console.log(' Password reset successful')
       success('Password reset successful! You can now login with your new password.')
       navigate({ to: '/auth/login' })
     } catch (err: unknown) {

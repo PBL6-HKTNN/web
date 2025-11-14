@@ -37,7 +37,7 @@ function RouteComponent() {
   }
 
   return (
-    <div className="container max-w-3xl mx-auto py-8 px-4">
+    <div className="min-h-screen flex items-center container max-w-3xl mx-auto py-8 px-4">
       <ResultView result={quizResult} onRetry={handleRetry} />
     </div>
   )

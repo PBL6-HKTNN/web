@@ -3,7 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileText, Video, Brain } from "lucide-react";
-import type { LessonReq } from "@/types/db/course/lesson";
+import { LessonType, type LessonReq } from "@/types/db/course/lesson";
 
 interface EmptyLessonRenderProps {
   onSelectType: (type: LessonReq["lessonType"]) => void;
@@ -24,7 +24,7 @@ export function EmptyLessonRender({ onSelectType }: EmptyLessonRenderProps) {
           <Button
             variant="outline"
             className="h-32 flex-col gap-3"
-            onClick={() => onSelectType("markdown")}
+            onClick={() => onSelectType(LessonType.MARKDOWN)}
           >
             <FileText className="h-8 w-8" />
             <div className="text-center">
@@ -36,7 +36,7 @@ export function EmptyLessonRender({ onSelectType }: EmptyLessonRenderProps) {
           <Button
             variant="outline"
             className="h-32 flex-col gap-3"
-            onClick={() => onSelectType("video")}
+            onClick={() => onSelectType(LessonType.VIDEO)}
           >
             <Video className="h-8 w-8" />
             <div className="text-center">
@@ -48,7 +48,7 @@ export function EmptyLessonRender({ onSelectType }: EmptyLessonRenderProps) {
           <Button
             variant="outline"
             className="h-32 flex-col gap-3"
-            onClick={() => onSelectType("quiz")}
+            onClick={() => onSelectType(LessonType.QUIZ)}
           >
             <Brain className="h-8 w-8" />
             <div className="text-center">

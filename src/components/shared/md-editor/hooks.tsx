@@ -1,4 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
+import { useUploadFile } from '@/hooks/queries/storage-hooks'
+import type { FileType } from '@/types/core/storage'
+import { useToast } from '@/hooks/use-toast'
 
 interface UseMarkdownEditorProps {
   value?: string
@@ -17,31 +20,34 @@ export function useMarkdownEditor({
 }: UseMarkdownEditorProps = {}) {
   const [editorValue, setEditorValue] = useState(value)
   const debounceTimeoutRef = useRef<number | null>(null)
+  const uploadFileMutation = useUploadFile()
+  const { error } = useToast()
 
-  // Mock image upload handler - simulates posting blob to backend and getting URL
-  const mockImageUpload = useCallback(async (file: File): Promise<string> => {
-    return new Promise((resolve) => {
-      // Simulate upload delay (1-3 seconds)
-      const delay = Math.random() * 2000 + 1000
-
-      setTimeout(() => {
-        // Generate mock URL based on file type and timestamp
-        const mockUrl = `https://placehold.co/600x400`
-        console.log(`Mock image upload: ${file.name} (${(file.size / 1024).toFixed(1)}KB) -> ${mockUrl}`)
-        resolve(mockUrl)
-      }, delay)
-    })
-  }, [])
 
   const handleImageUpload = useCallback(async (file: File): Promise<string> => {
     try {
-      const imageUrl = await mockImageUpload(file)
-      return imageUrl
-    } catch (error) {
-      console.error('Mock image upload failed:', error)
-      throw new Error('Image upload failed')
+      // Determine file type based on MIME type
+      const getFileType = (mimeType: string): FileType => {
+        if (mimeType.startsWith('image/')) return 'image'
+        if (mimeType.startsWith('video/')) return 'video'
+        if (mimeType.includes('pdf') || mimeType.includes('document')) return 'document'
+        return 'other'
+      }
+
+      const fileType = getFileType(file.type)
+
+      const result = await uploadFileMutation.mutateAsync({
+        type: fileType,
+        file: file
+      })
+
+      console.log(`Image uploaded: ${file.name} (${(file.size / 1024).toFixed(1)}KB) -> ${result.data?.url}`)
+      return result.data?.url ?? "null"
+    } catch (err) {
+      error('Image upload failed: ' + err)
+      throw err
     }
-  }, [mockImageUpload])
+  }, [uploadFileMutation, error])
 
   const handleChange = useCallback((val: string) => {
     setEditorValue(val)
@@ -73,6 +79,7 @@ export function useMarkdownEditor({
     placeholder,
     readOnly,
     height: typeof height === 'number' ? `${height}px` : height,
-    updateValue
+    updateValue,
+    isUploadingImage: uploadFileMutation.isPending
   }
 }

@@ -10,7 +10,7 @@ vi.mock('./hooks', () => ({
 
 // Mock the router Link component
 vi.mock('@tanstack/react-router', () => ({
-  Link: ({ children, to, className }: any) => (
+  Link: ({ children, to, className }: { children: React.ReactNode; to: string; className?: string }) => (
     <a href={to} className={className} data-testid="link">
       {children}
     </a>
@@ -19,7 +19,7 @@ vi.mock('@tanstack/react-router', () => ({
 
 // Mock Google Login component
 vi.mock('@react-oauth/google', () => ({
-  GoogleLogin: ({ onSuccess }: any) => (
+  GoogleLogin: ({ onSuccess }: { onSuccess?: (response: { credential: string }) => void }) => (
     <button
       data-testid="google-login"
       onClick={() => onSuccess?.({ credential: 'mock-credential' })}

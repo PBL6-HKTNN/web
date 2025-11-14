@@ -1,16 +1,28 @@
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, useMemo } from 'react';
 import type { ReactNode } from 'react';
-import { mockCourse } from '@/utils/mock-data';
+import { useGetCourseContentById } from '@/hooks/queries/course/course-hooks';
+
 import type { Module } from '@/types/db/course/module';
 import type { Lesson } from '@/types/db/course/lesson';
 import type { Course } from '@/types/db/course';
+import type { UUID } from '@/types';
 
 interface CourseLearnContextType {
-  getCourseData: () => Partial<Course>;
-  // Get course modules with their lessons for content listing
-  getModulesWithLessons: (courseId: string) => Module[];
-  // Get lesson content by course id, module id, and lesson id
-  getLessonContent: (courseId: string, moduleId: string, lessonId: string) => Lesson | null;
+  // Course data
+  courseData: Course | undefined;
+  courseLoading: boolean;
+  courseError: Error | null;
+  
+  // Modules with lessons data for content listing
+  modulesWithLessons: Module[];
+  
+  // Helper functions
+  getLessonFromModules: (moduleId: string, lessonId: string) => Lesson | null;
+}
+
+interface CourseLearnProviderProps {
+  children: ReactNode;
+  courseId: UUID;
 }
 
 const CourseLearnContext = createContext<CourseLearnContextType | undefined>(undefined);
@@ -19,44 +31,42 @@ interface CourseLearnProviderProps {
   children: ReactNode;
 }
 
-export const CourseLearnProvider: React.FC<CourseLearnProviderProps> = ({ children }) => {
-  
-  const getCourseData = (): Course => {
-    return mockCourse;
-  }
-  
-  
-    // Get course modules with their lessons for content listing
-  const getModulesWithLessons = (courseId: string): Module[] => {
-    // For now, we only have one course in mock data
-    if (courseId === mockCourse.id) {
-      return mockCourse.modules || [];
-    }
-    return [];
-  };
+export const CourseLearnProvider: React.FC<CourseLearnProviderProps> = ({ 
+  children, 
+  courseId 
+}) => {
+  // Fetch course data
+  const {
+    data: courseData,
+    isLoading: courseLoading,
+    error: courseError,
+  } = useGetCourseContentById(courseId);
 
-  // Get lesson content by course id, module id, and lesson id
-  const getLessonContent = (courseId: string, moduleId: string, lessonId: string): Lesson | null => {
-    // For now, we only have one course in mock data
-    if (courseId === mockCourse.id) {
-      const modules = mockCourse.modules || [];
+  // For now, we'll use a simple approach without dynamic lesson fetching
+  // The lessons will be fetched when specifically needed for content rendering
+  const modulesWithLessons = useMemo(() => {
+    if (!courseData?.data) return [];
 
-      // Find the module
-      const module = modules.find(m => m.id === moduleId);
-      if (!module) return null;
+    return courseData.data.module.map((module: Module) => ({
+      ...module,
+      lessons: module.lessons || [], // Use lessons from API response
+    }));
+  }, [courseData]);
 
-      // Find the lesson in the module
-      const lesson = module.lessons?.find(l => l.id === lessonId);
-      if (lesson) return lesson as Lesson;
-    }
+  // Helper function to find lesson in modules
+  const getLessonFromModules = (moduleId: string, lessonId: string): Lesson | null => {
+    const module = modulesWithLessons.find((m: Module) => m.id === moduleId);
+    if (!module || !module.lessons) return null;
 
-    return null;
+    return module.lessons.find((l: Lesson) => l.id === lessonId) || null;
   };
 
   const value: CourseLearnContextType = {
-    getCourseData,
-    getModulesWithLessons,
-    getLessonContent,
+    courseData: courseData?.data?.course || undefined,
+    courseLoading,
+    courseError,
+    modulesWithLessons,
+    getLessonFromModules,
   };
 
   return (

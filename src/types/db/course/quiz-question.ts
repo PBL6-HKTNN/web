@@ -1,20 +1,19 @@
-import type { Base } from "@/types/core";
 import type { Answer } from "./answer";
+import type { UUID } from "@/types/core";
 
-export type QuizQuestion = Base & {
+export type QuizQuestion = {
+  questionId?: UUID;
   questionText: string;
-  type: QuestionType;
+  questionType: QuestionType;
   marks: number;
   answers: Answer[];
 };
 
-export type QuizQuestionReq = Partial<QuizQuestion>;
-
 export const QuestionType = {
-  MULTIPLE_CHOICE: "multiple_choice",
-  SINGLE_CHOICE: "single_choice",
-  TRUE_FALSE: "true_false",
-  SHORT_ANSWER: "short_answer",
+  SINGLE_CHOICE: 0,
+  MULTIPLE_CHOICE: 1,
+  TRUE_FALSE: 2,
+  SHORT_ANSWER: 3,
 } as const;
 
 export type QuestionType = (typeof QuestionType)[keyof typeof QuestionType];

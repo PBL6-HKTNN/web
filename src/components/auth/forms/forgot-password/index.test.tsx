@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { ForgotPasswordForm } from './index'
 
@@ -10,7 +10,7 @@ vi.mock('./hooks', () => ({
 
 // Mock the router Link component
 vi.mock('@tanstack/react-router', () => ({
-  Link: ({ children, to, className }: any) => (
+  Link: ({ children, to, className }: { children: React.ReactNode; to: string; className?: string }) => (
     <a href={to} className={className} data-testid="link">
       {children}
     </a>

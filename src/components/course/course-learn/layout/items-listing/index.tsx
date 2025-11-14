@@ -6,7 +6,7 @@ import { useParams } from "@tanstack/react-router"
 
 type ItemsListingProps = {
   modules: Module[]
-  onLessonSelect?: (lessonId: string) => void
+  onLessonSelect?: (moduleId: string, lessonId: string) => void
   defaultExpandedModuleId?: string
 }
 
@@ -15,7 +15,7 @@ export default function ItemsListing({
   onLessonSelect,
   defaultExpandedModuleId,
 }: ItemsListingProps) {
-  const { lessonId } = useParams({ from: "/learn/$courseId/$moduleId/$lessonId/" })
+  const { lessonId } = useParams({ strict: false })
 
   if (!modules || modules.length === 0) {
     return (

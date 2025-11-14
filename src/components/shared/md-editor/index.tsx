@@ -1,4 +1,4 @@
-import { forwardRef } from 'react'
+import { forwardRef, useEffect } from 'react'
 import { cn } from '@/lib/utils'
 import { useMarkdownEditor } from './hooks'
 import MDEditor from '@uiw/react-md-editor'
@@ -14,6 +14,7 @@ interface MarkdownEditorProps {
   readOnly?: boolean
   className?: string
   height?: string | number
+  onImageUploadStateChange?: (isUploading: boolean) => void
 }
 
 const MarkdownEditor = forwardRef<HTMLDivElement, MarkdownEditorProps>(({
@@ -23,9 +24,10 @@ const MarkdownEditor = forwardRef<HTMLDivElement, MarkdownEditorProps>(({
   readOnly = false,
   className,
   height = '200px',
+  onImageUploadStateChange,
   ...props
 }, ref) => {
-  const { value: editorValue, onChange: handleChange, onImageUpload, height: editorHeight } = useMarkdownEditor({
+  const { value: editorValue, onChange: handleChange, onImageUpload, height: editorHeight, isUploadingImage } = useMarkdownEditor({
     value,
     onChange,
     placeholder,
@@ -33,6 +35,11 @@ const MarkdownEditor = forwardRef<HTMLDivElement, MarkdownEditorProps>(({
     height
   })
   const { theme } = useTheme();
+
+  // Notify parent component about image upload state changes
+  useEffect(() => {
+    onImageUploadStateChange?.(isUploadingImage)
+  }, [isUploadingImage, onImageUploadStateChange])
 
   const customImageCommand: ICommand = {
     name: 'image',
