@@ -29,7 +29,7 @@ export function RegisterForm() {
         </CardDescription>
       </CardHeader>
       <CardContent className="px-0">
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4" data-testid="register-form">
 
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
@@ -40,6 +40,7 @@ export function RegisterForm() {
               value={formData.email}
               onChange={(e) => updateField('email', e.target.value)}
               required
+              data-testid="email-input"
             />
           </div>
 
@@ -48,6 +49,7 @@ export function RegisterForm() {
             <div className="relative">
               <Input
                 id="password"
+                data-testid="password-input"
                 type={showPassword ? 'text' : 'password'}
                 placeholder="Create a strong password"
                 value={formData.password}
@@ -80,6 +82,7 @@ export function RegisterForm() {
                 value={formData.confirmPassword}
                 onChange={(e) => updateField('confirmPassword', e.target.value)}
                 required
+                data-testid="confirm-password-input"
               />
               <Button
                 type="button"
@@ -102,6 +105,7 @@ export function RegisterForm() {
               id="terms"
               checked={formData.agreeToTerms}
               onCheckedChange={(checked) => updateField('agreeToTerms', checked as boolean)}
+              data-testid="terms-checkbox"
             />
             <Label htmlFor="terms" className="text-sm">
               I agree to the{' '}
@@ -115,7 +119,7 @@ export function RegisterForm() {
             </Label>
           </div>
 
-          <Button type="submit" className="w-full" disabled={isLoading} >
+          <Button type="submit" className="w-full" disabled={isLoading} data-testid="submit-button">
             {isLoading ? 'Creating account...' : 'Create account'}
           </Button>
         </form>
