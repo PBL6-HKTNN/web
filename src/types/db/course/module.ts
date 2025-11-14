@@ -8,7 +8,6 @@ export type Module = Base & {
   numberOfLessons: number;
   order: number;
   courseId: UUID;
-  moduleId?: UUID; // Due to returned data naming issue
   lessons?: Lesson[];
 };
 

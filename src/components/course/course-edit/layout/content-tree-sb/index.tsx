@@ -78,16 +78,16 @@ export function ContentTreeSidebar({ isLoading = false }: { isLoading?: boolean 
             {/* temporary mapping due to api data convention mismatch  */}
               {modules.map((module) => (
                 <ModuleTreeItem
-                  key={module.moduleId}
+                  key={module.id}
                   module={module}
-                  isExpanded={expandedModules.has(module.moduleId!)}
+                  isExpanded={expandedModules.has(module.id)}
                   onToggleExpansion={toggleModuleExpansion}
                   onModuleSelect={handleModuleSelect}
                   onLessonSelect={handleLessonSelect}
                   onAddLesson={handleAddLesson}
                   onDeleteModule={handleDeleteModule}
                   onDeleteLesson={handleDeleteLesson}
-                  isSelected={selectedModuleId === module.moduleId}
+                  isSelected={selectedModuleId === module.id}
                 />
               ))}
 

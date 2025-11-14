@@ -56,7 +56,7 @@ export function ModuleTreeItem({
         className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-colors ${
           isSelected ? "bg-primary/10 text-primary" : "hover:bg-muted"
         }`}
-        onClick={() => onModuleSelect(module.moduleId!)}
+        onClick={() => onModuleSelect(module.id)}
       >
         <div className="flex items-center space-x-2 flex-1 min-w-0">
           <Button
@@ -65,7 +65,7 @@ export function ModuleTreeItem({
             className="h-6 w-6 p-0"
             onClick={(e) => {
               e.stopPropagation();
-              onToggleExpansion(module.moduleId!);
+              onToggleExpansion(module.id);
             }}
           >
             {isExpanded ? (
@@ -84,7 +84,7 @@ export function ModuleTreeItem({
             className="h-6 w-6 p-0 opacity-60 hover:opacity-100"
             onClick={(e) => {
               e.stopPropagation();
-              onAddLesson(module.moduleId!);
+              onAddLesson(module.id);
             }}
           >
             <Plus className="h-3 w-3" />
@@ -95,7 +95,7 @@ export function ModuleTreeItem({
             className="h-6 w-6 p-0 opacity-60 hover:opacity-100 hover:text-destructive"
             onClick={(e) => {
               e.stopPropagation();
-              onDeleteModule(module.moduleId!, module.title);
+              onDeleteModule(module.id, module.title);
             }}
           >
             <Trash2 className="h-3 w-3" />
@@ -116,7 +116,7 @@ export function ModuleTreeItem({
                 className={`flex items-center justify-between p-2 rounded-md cursor-pointer transition-colors ${
                   isLessonSelected ? "bg-primary/10 text-primary" : "hover:bg-muted/50"
                 }`}
-                onClick={() => onLessonSelect(module.moduleId!, lesson.id)}
+                onClick={() => onLessonSelect(module.id, lesson.id)}
               >
                 <div className="flex items-center space-x-2 flex-1 min-w-0">
                   <Play className="h-3 w-3 flex-shrink-0" />

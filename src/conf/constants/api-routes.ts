@@ -59,13 +59,11 @@ const API_ROUTES = {
     addToWishlist: (courseId: UUID) => `/Wishlist/add/${courseId}`,
     removeFromWishlist: (courseId: UUID) => `/Wishlist/remove/${courseId}`,
   },
-  USER_COURSES: {
-    getEnrolledCourses: "/UserCourses/enrolled",
-    getWishlist: "/UserCourses/wishlist",
-    enrollCourse: "/UserCourses/enroll/{courseId}",
-    addToWishlist: "/UserCourses/wishlist/{courseId}",
-    removeFromWishlist: "/UserCourses/wishlist/{courseId}",
-    updateProgress: "/UserCourses/progress/{courseId}",
+  ENROLLMENT: {
+    isEnrolled: (courseId: UUID) => `/Enrollment/getCourse/${courseId}`,
+    enroll: (courseId: UUID) => `/Enrollment/enroll/${courseId}`,
+    updateEnrollment: "/Enrollment/update",
+    getEnrolledCourse: "/Enrollment/my-courses",
   },
 };
 
