@@ -1,8 +1,9 @@
+import { storageApiUrl } from "@/conf";
 import API_ROUTES from "@/conf/constants/api-routes";
 import type { UploadFileReq, UploadFileRes } from "@/types/core/storage";
-import { createServiceApi, serviceUrls } from "@/utils/api";
+import { createServiceApi } from "@/utils/api";
 
-const storageApi = createServiceApi(serviceUrls.STORAGE_SERVICE_URL);
+const storageApi = createServiceApi(storageApiUrl);
 
 export const storageService = {
   uploadFile: async (req: UploadFileReq): Promise<UploadFileRes> => {

@@ -1,7 +1,7 @@
 import axios, { type AxiosInstance } from "axios";
 import Persistence from "@/utils/persistence";
 import type { ServiceUrls } from "@/types/core/api";
-import { apiServiceUrlsKey, apiUrl, separatedServiceFlag } from "@/conf";
+import { apiServiceUrlsKey, apiUrl, separatedServiceFlag, storageApiUrl } from "@/conf";
 import { toast } from "sonner";
 
 // filepath: src/utils/api.ts
@@ -45,9 +45,10 @@ export function setApiBaseURL(url: string) {
 }
 
 // Create service-specific axios instances
-export function createServiceApi(baseURL: string): AxiosInstance {
+export function createServiceApi( baseURL: string): AxiosInstance {
+  
   // If separated services are disabled, return the global api instance
-  if (separatedServiceFlag === 0) {
+  if (separatedServiceFlag === 0 && baseURL !== storageApiUrl) {
     return api;
   }
 
