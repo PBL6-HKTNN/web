@@ -27,7 +27,7 @@ export function VerifyEmailForm({ initialEmail, initialToken }: VerifyEmailFormP
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4" data-testid="verify-form">
           {/* <div className="space-y-2">
             <Label htmlFor="email">Email Address</Label>
             <Input
