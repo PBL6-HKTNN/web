@@ -16,6 +16,8 @@ const CourseStatus = {
   ARCHIVED: 2,
 } as const;
 
+export { CourseStatus };
+
 export type CourseStatus = (typeof CourseStatus)[keyof typeof CourseStatus];
 
 export type Course = Base & {
