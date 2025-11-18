@@ -37,5 +37,23 @@ export default defineConfig({
       '**/playwright-report/**',
       '**/test-results/**',
     ],
+    reporters: ['default', 'html'], 
+    outputFile: './reports/vitest-report.html',
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'html', 'json'],
+      reportsDirectory: './reports/coverage',
+      all: true,                                   
+      include: [
+        'src/components/auth/forms/**/*.{ts,tsx}',
+        'src/components/course/course-card/*.{ts,tsx}',
+        'src/components/course/course-edit/general-info/*.{ts,tsx}',
+        'src/components/course/course-list/*.{ts,tsx}',
+        'src/components/course/course-table/*.{ts,tsx}',
+        'src/components/course/lesson-item/*.{ts,tsx}',
+        'src/components/course/module-accordion/*.{ts,tsx}',
+      ],     
+      exclude: ['**/*.d.ts', '**/*.test.{ts,tsx}'],
+    },
   },
 })
