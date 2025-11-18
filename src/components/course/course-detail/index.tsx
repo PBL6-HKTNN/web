@@ -1,5 +1,5 @@
 
-import { Star, Clock, Users, Play, BookOpen, Video, FileText, Trophy } from "lucide-react";
+import { Star, Clock, Users, Play, BookOpen, Video, FileText, Trophy, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +9,8 @@ import { Separator } from "@/components/ui/separator";
 import { useCourseDetail } from "./hook";
 import ModuleAccordion from "@/components/course/module-accordion";
 import { renderLevelLabel } from "@/utils/render-utils";
+import { useAddToWishlist, useIsInWishlist } from "@/hooks/queries/course/wishlist-hooks";
+import { useEnroll, useIsEnrolled } from "@/hooks/queries/course/enrollment-hooks";
 
 interface CourseDetailProps {
   courseId: string;
@@ -17,6 +19,18 @@ interface CourseDetailProps {
 export function CourseDetail({ courseId }: CourseDetailProps) {
   const { course, modules, isLoading, error } = useCourseDetail(courseId);
   // const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
+
+  // Wishlist hooks
+  const { data: isInWishlist } = useIsInWishlist(courseId);
+  const addToWishlistMutation = useAddToWishlist();
+
+  // Enrollment hooks
+  const enrollMutation = useEnroll();
+  const { data: isEnrolledResponse } = useIsEnrolled(courseId);
+  const isEnrolled = !!isEnrolledResponse?.data;
+  const handleWishlistClick = () => {
+    addToWishlistMutation.mutate(courseId);
+  };
 
   if (isLoading) {
     return (
@@ -386,10 +400,47 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
                   )}
                 </div>
 
-                {/* Enroll Button */}
-                <Button className="w-full mb-4" size="lg">
-                  {course.price === 0 ? 'Enroll for Free' : 'Add to Cart'}
-                </Button>
+                {/* Enroll and Wishlist Buttons */}
+                <div className="flex gap-3 mb-4">
+                  <Button
+                    className="flex-1"
+                    size="lg"
+                    onClick={() => {
+                      if (!isEnrolled) {
+                        enrollMutation.mutate(courseId);
+                      }
+                    }}
+                    disabled={enrollMutation.isPending || isEnrolled}
+                  >
+                    {isEnrolled
+                      ? "Enrolled"
+                      : enrollMutation.isPending
+                      ? "Enrolling..."
+                      : "Enroll for Free"}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className={`w-12 h-12 p-0 border-2 transition-all duration-200 ${
+                      isInWishlist
+                        ? 'border-red-500 bg-red-50 text-red-500 hover:bg-red-100'
+                        : 'border-gray-300 text-gray-400 hover:border-red-300 hover:text-red-400 hover:bg-red-50'
+                    }`}
+                    onClick={handleWishlistClick}
+                    disabled={addToWishlistMutation.isPending}
+                    title={isInWishlist ? 'Already in wishlist' : 'Add to wishlist'}
+                  >
+                    {addToWishlistMutation.isPending ? (
+                      <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <Heart
+                        className={`w-5 h-5 transition-all duration-200 ${
+                          isInWishlist ? 'fill-current' : ''
+                        }`}
+                      />
+                    )}
+                  </Button>
+                </div>
 
                 {/* Course includes */}
                 <div className="space-y-3 mb-6">

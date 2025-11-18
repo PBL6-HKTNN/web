@@ -53,6 +53,9 @@ export function NavBar() {
             <Link to="/contact" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors">
               Contact
             </Link>
+            <Link to="/lecturing-tool/course" data-testid="lecturing-tool-link" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors">
+              Tool
+            </Link>
 
             {isAuthenticated ? (
               <div className="flex items-center space-x-4">

@@ -4,7 +4,7 @@ import { useToast } from '@/hooks/use-toast'
 import { verifyEmailSchema, type VerifyEmailFormData } from './validator'
 import { useVerifyEmail } from '@/hooks/queries/auth-hooks'
 
-export function useVerifyEmailForm(initialEmail?: string, initialToken?: string, mockMutation?: any) {
+export function useVerifyEmailForm(initialEmail?: string, initialToken?: string) {
   const [formData, setFormData] = useState<VerifyEmailFormData>({
     email: initialEmail || '',
     token: initialToken || '',

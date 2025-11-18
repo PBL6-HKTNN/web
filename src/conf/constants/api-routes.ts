@@ -55,7 +55,7 @@ const API_ROUTES = {
     deleteQuiz: (quizId: UUID) => `/Quiz/${quizId}`,
   },
   WISHLIST: {
-    getWishlist: "/Wishlist",
+    getWishlist: "/Wishlist/get",
     addToWishlist: (courseId: UUID) => `/Wishlist/add/${courseId}`,
     removeFromWishlist: (courseId: UUID) => `/Wishlist/remove/${courseId}`,
   },

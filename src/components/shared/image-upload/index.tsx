@@ -105,6 +105,7 @@ const MediaUploadDialog: React.FC<MediaUploadDialogProps> = ({
             accept={accept}
             onChange={handleFileInputChange}
             className="hidden"
+            data-testid="course-thumbnail-input"
           />
 
           {selectedFile ? (
@@ -180,6 +181,7 @@ const MediaUploadDialog: React.FC<MediaUploadDialogProps> = ({
             Cancel
           </Button>
           <Button
+            data-testid="upload-button"
             onClick={handleUpload}
             disabled={!selectedFile || isUploading}
           >
