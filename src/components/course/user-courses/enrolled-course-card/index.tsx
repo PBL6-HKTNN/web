@@ -1,126 +1,67 @@
-import { Play, Clock, BookOpen, Award } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "@tanstack/react-router";
-import type { EnrolledCourse } from "@/types/db/course/course";
-import type { Course } from "@/types/db/course";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import type { EnrolledCourseItem } from "@/types/db/course/enrollment";
 
 interface EnrolledCourseCardProps {
-  enrolledCourse: EnrolledCourse;
+  course: EnrolledCourseItem;
 }
 
-export function EnrolledCourseCard({ enrolledCourse }: EnrolledCourseCardProps) {
+
+export function EnrolledCourseCard({ course }: EnrolledCourseCardProps) {
   const navigate = useNavigate();
-  const course = enrolledCourse.course;
-
-  if (!course) return null;
-
-  const formatDuration = (minutes: number) => {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    if (hours > 0) {
-      return `${hours}h ${mins}m`;
-    }
-    return `${mins}m`;
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'completed': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
-      case 'in_progress': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
-      case 'paused': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
-      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
-    }
-  };
-
   return (
-    <Card className="group cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
-      <div className="flex">
+    <Card className="group cursor-pointer py-0 transition-all duration-300 hover:shadow-xl hover:-translate-y-2 border-0 bg-gradient-to-br from-white to-gray-50/50 overflow-hidden">
+      <div className="flex relative">
         {/* Course Thumbnail */}
-        <div className="w-48 h-32 flex-shrink-0 relative overflow-hidden rounded-l-lg">
+        <div className="w-36 h-28 flex-shrink-0 relative overflow-hidden rounded-l-lg">
           <img
             src={course.thumbnail || "/placeholder-course.jpg"}
             alt={course.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
           />
-          <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-            <Play className="w-8 h-8 text-white" />
-          </div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         </div>
 
         {/* Course Content */}
-        <CardContent className="flex-1 p-6">
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <h3 className="font-semibold text-lg mb-2 group-hover:text-primary transition-colors">
+        <div className="flex-1 p-5">
+          <div className="flex items-start justify-between h-full">
+            <div className="flex-1 pr-4">
+              <h3 className="font-semibold text-lg mb-2 group-hover:text-primary transition-colors duration-200 leading-tight">
                 {course.title}
               </h3>
 
-              <div className="flex items-center gap-4 mb-3 text-sm text-muted-foreground">
-                <div className="flex items-center gap-1">
-                  <Clock className="w-4 h-4" />
-                  <span>{formatDuration(course.duration)}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <BookOpen className="w-4 h-4" />
-                  <span>{enrolledCourse.completedLectures}/{enrolledCourse.totalLectures} lectures</span>
-                </div>
-                <Badge className={getStatusColor(enrolledCourse.status)}>
-                  {enrolledCourse.status.replace('_', ' ')}
-                </Badge>
-              </div>
-
-              {/* Progress Bar */}
-              <div className="mb-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium">Progress</span>
-                  <span className="text-sm text-muted-foreground">
-                    {enrolledCourse.progressPercentage}%
-                  </span>
-                </div>
-                <Progress value={enrolledCourse.progressPercentage} className="h-2" />
-              </div>
-
-              {/* Instructor & Stats */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">by</span>
-                  <span className="text-sm font-medium">{(course as unknown as Course).instructorId || 'Unknown'}</span>
-                </div>
-
-                {enrolledCourse.certificateEarned && (
-                  <div className="flex items-center gap-1 text-green-600">
-                    <Award className="w-4 h-4" />
-                    <span className="text-sm font-medium">Certificate earned</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Last accessed */}
-              {enrolledCourse.lastAccessedDate && (
-                <p className="text-xs text-muted-foreground mt-2">
-                  Last accessed: {new Date(enrolledCourse.lastAccessedDate as string).toLocaleDateString()}
+              {course.description && (
+                <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2 mb-2">
+                  {course.description}
                 </p>
               )}
+
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <span className="font-medium">Instructor:</span>
+                <span className="font-medium">{course.instructorId}</span>
+              </div>
             </div>
 
-            {/* Continue Button */}
-            <div className="ml-4">
+            {/* Actions */}
+            <div className="flex flex-col gap-3 ml-6">
               <Button
+                size="sm"
                 onClick={(e) => {
                   e.stopPropagation();
-                  navigate({ to: `/course/${course.id}` });
+                  navigate({ to: `/learn/${course.id}` });
                 }}
-                className="whitespace-nowrap"
+                className="bg-primary hover:bg-primary/90 shadow-md hover:shadow-lg transition-all duration-200 font-medium"
               >
-                {enrolledCourse.status === 'completed' ? 'Review Course' : 'Continue Learning'}
+                Continue Learning
               </Button>
             </div>
           </div>
-        </CardContent>
+        </div>
       </div>
+
+      {/* Subtle bottom gradient */}
+      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary/20 via-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
     </Card>
   );
 }

@@ -75,6 +75,7 @@ export function CourseForm({
                   <FormLabel>Course Title *</FormLabel>
                   <FormControl>
                     <Input
+                      data-testid="course-title-input"
                       placeholder="Enter course title"
                       {...field}
                       disabled={isLoading}
@@ -96,6 +97,7 @@ export function CourseForm({
                   <FormLabel>Description</FormLabel>
                   <FormControl>
                     <Textarea
+                      data-testid="course-description-input"
                       placeholder="Enter course description"
                       className="min-h-[120px] resize-none"
                       {...field}
@@ -119,7 +121,7 @@ export function CourseForm({
                     <FormLabel>Category *</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLoading}>
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger data-testid="course-category-select">
                           <SelectValue placeholder="Select a category" />
                         </SelectTrigger>
                       </FormControl>
@@ -147,7 +149,7 @@ export function CourseForm({
                     <FormLabel>Difficulty Level *</FormLabel>
                     <Select onValueChange={(value) => field.onChange(Number(value))} defaultValue={field.value?.toString()} disabled={isLoading}>
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger data-testid="course-level-select">
                           <SelectValue placeholder="Select difficulty level" />
                         </SelectTrigger>
                       </FormControl>
@@ -175,6 +177,7 @@ export function CourseForm({
                     <FormLabel>Price ($) *</FormLabel>
                     <FormControl>
                       <Input
+                        data-testid="course-price-input"
                         type="number"
                         step="0.01"
                         min="0"
@@ -200,6 +203,7 @@ export function CourseForm({
                     <FormLabel>Language *</FormLabel>
                     <FormControl>
                       <Input
+                        data-testid="course-language-input"
                         placeholder="e.g., English, Spanish, French"
                         {...field}
                         disabled={isLoading}
@@ -245,12 +249,14 @@ export function CourseForm({
                           type="button"
                           variant="outline"
                           disabled={isLoading}
+                          data-testid="course-thumbnail-upload-button"
                           onClick={() => setIsUploadDialogOpen(true)}
                         >
                           <Upload className="h-4 w-4 mr-2" />
                           {field.value ? "Change Thumbnail" : "Upload Thumbnail"}
                         </Button>
                         <MediaUploadDialog
+                          
                           accept="image/*"
                           maxSize={5}
                           title="Upload Course Thumbnail"
