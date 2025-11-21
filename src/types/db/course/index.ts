@@ -41,8 +41,8 @@ export type CreateCourseReq = {
   instructorId: UUID;
   categoryId: UUID;
   title: string;
-  description?: string;
-  thumbnail?: string | null;
+  description: string;
+  thumbnail: string;
   price: number;
   level: Level;
   language: string;
@@ -81,3 +81,10 @@ export type CourseEditReq = {
   thumbnail?: string | null;
   modules?: ModuleReq[];
 };
+
+export type ValidateCourseReq = {
+  courseId: UUID;
+  lessonId: UUID;
+};
+
+export type ValidateCourseRes = ApiResponse<boolean>;

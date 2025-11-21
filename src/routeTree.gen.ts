@@ -20,13 +20,17 @@ import { Route as AuthRouteRouteImport } from './routes/auth/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as YourCoursesIndexRouteImport } from './routes/your-courses/index'
 import { Route as UsersIndexRouteImport } from './routes/users/index'
+import { Route as OrderIndexRouteImport } from './routes/order/index'
 import { Route as LecturingToolIndexRouteImport } from './routes/lecturing-tool/index'
 import { Route as CourseIndexRouteImport } from './routes/course/index'
+import { Route as CartIndexRouteImport } from './routes/cart/index'
 import { Route as UsersUserIdRouteImport } from './routes/users/$userId'
 import { Route as CourseCourseIdRouteImport } from './routes/course/$courseId'
+import { Route as OrderOrderIdRouteRouteImport } from './routes/order/$orderId/route'
 import { Route as LearnCourseIdRouteRouteImport } from './routes/learn/$courseId/route'
 import { Route as AuthMainLayoutRouteRouteImport } from './routes/auth/_mainLayout/route'
 import { Route as LecturingToolCourseIndexRouteImport } from './routes/lecturing-tool/course/index'
+import { Route as LecturingToolAnalyticsIndexRouteImport } from './routes/lecturing-tool/analytics/index'
 import { Route as LearnCourseIdIndexRouteImport } from './routes/learn/$courseId/index'
 import { Route as AuthVerifyIndexRouteImport } from './routes/auth/verify/index'
 import { Route as AuthForgotPasswordIndexRouteImport } from './routes/auth/forgot-password/index'
@@ -99,6 +103,11 @@ const UsersIndexRoute = UsersIndexRouteImport.update({
   path: '/',
   getParentRoute: () => UsersRouteRoute,
 } as any)
+const OrderIndexRoute = OrderIndexRouteImport.update({
+  id: '/order/',
+  path: '/order/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LecturingToolIndexRoute = LecturingToolIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -109,6 +118,11 @@ const CourseIndexRoute = CourseIndexRouteImport.update({
   path: '/',
   getParentRoute: () => CourseRouteRoute,
 } as any)
+const CartIndexRoute = CartIndexRouteImport.update({
+  id: '/cart/',
+  path: '/cart/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const UsersUserIdRoute = UsersUserIdRouteImport.update({
   id: '/$userId',
   path: '/$userId',
@@ -118,6 +132,11 @@ const CourseCourseIdRoute = CourseCourseIdRouteImport.update({
   id: '/$courseId',
   path: '/$courseId',
   getParentRoute: () => CourseRouteRoute,
+} as any)
+const OrderOrderIdRouteRoute = OrderOrderIdRouteRouteImport.update({
+  id: '/order/$orderId',
+  path: '/order/$orderId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const LearnCourseIdRouteRoute = LearnCourseIdRouteRouteImport.update({
   id: '/$courseId',
@@ -132,6 +151,12 @@ const LecturingToolCourseIndexRoute =
   LecturingToolCourseIndexRouteImport.update({
     id: '/course/',
     path: '/course/',
+    getParentRoute: () => LecturingToolRouteRoute,
+  } as any)
+const LecturingToolAnalyticsIndexRoute =
+  LecturingToolAnalyticsIndexRouteImport.update({
+    id: '/analytics/',
+    path: '/analytics/',
     getParentRoute: () => LecturingToolRouteRoute,
   } as any)
 const LearnCourseIdIndexRoute = LearnCourseIdIndexRouteImport.update({
@@ -239,16 +264,20 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/learn/$courseId': typeof LearnCourseIdRouteRouteWithChildren
+  '/order/$orderId': typeof OrderOrderIdRouteRoute
   '/course/$courseId': typeof CourseCourseIdRoute
   '/users/$userId': typeof UsersUserIdRoute
+  '/cart': typeof CartIndexRoute
   '/course/': typeof CourseIndexRoute
   '/lecturing-tool/': typeof LecturingToolIndexRoute
+  '/order': typeof OrderIndexRoute
   '/users/': typeof UsersIndexRoute
   '/your-courses/': typeof YourCoursesIndexRoute
   '/learn/$courseId/$moduleId': typeof LearnCourseIdModuleIdRouteRouteWithChildren
   '/auth/forgot-password': typeof AuthForgotPasswordIndexRoute
   '/auth/verify': typeof AuthVerifyIndexRoute
   '/learn/$courseId/': typeof LearnCourseIdIndexRoute
+  '/lecturing-tool/analytics': typeof LecturingToolAnalyticsIndexRoute
   '/lecturing-tool/course': typeof LecturingToolCourseIndexRoute
   '/learn/$courseId/$moduleId/$lessonId': typeof LearnCourseIdModuleIdLessonIdRouteRouteWithChildren
   '/lecturing-tool/course/$courseId/editing': typeof LecturingToolCourseCourseIdEditingRouteRouteWithChildren
@@ -269,15 +298,19 @@ export interface FileRoutesByTo {
   '/learn': typeof LearnRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
+  '/order/$orderId': typeof OrderOrderIdRouteRoute
   '/course/$courseId': typeof CourseCourseIdRoute
   '/users/$userId': typeof UsersUserIdRoute
+  '/cart': typeof CartIndexRoute
   '/course': typeof CourseIndexRoute
   '/lecturing-tool': typeof LecturingToolIndexRoute
+  '/order': typeof OrderIndexRoute
   '/users': typeof UsersIndexRoute
   '/your-courses': typeof YourCoursesIndexRoute
   '/auth/forgot-password': typeof AuthForgotPasswordIndexRoute
   '/auth/verify': typeof AuthVerifyIndexRoute
   '/learn/$courseId': typeof LearnCourseIdIndexRoute
+  '/lecturing-tool/analytics': typeof LecturingToolAnalyticsIndexRoute
   '/lecturing-tool/course': typeof LecturingToolCourseIndexRoute
   '/auth/login': typeof AuthMainLayoutLoginIndexRoute
   '/auth/register': typeof AuthMainLayoutRegisterIndexRoute
@@ -302,16 +335,20 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/auth/_mainLayout': typeof AuthMainLayoutRouteRouteWithChildren
   '/learn/$courseId': typeof LearnCourseIdRouteRouteWithChildren
+  '/order/$orderId': typeof OrderOrderIdRouteRoute
   '/course/$courseId': typeof CourseCourseIdRoute
   '/users/$userId': typeof UsersUserIdRoute
+  '/cart/': typeof CartIndexRoute
   '/course/': typeof CourseIndexRoute
   '/lecturing-tool/': typeof LecturingToolIndexRoute
+  '/order/': typeof OrderIndexRoute
   '/users/': typeof UsersIndexRoute
   '/your-courses/': typeof YourCoursesIndexRoute
   '/learn/$courseId/$moduleId': typeof LearnCourseIdModuleIdRouteRouteWithChildren
   '/auth/forgot-password/': typeof AuthForgotPasswordIndexRoute
   '/auth/verify/': typeof AuthVerifyIndexRoute
   '/learn/$courseId/': typeof LearnCourseIdIndexRoute
+  '/lecturing-tool/analytics/': typeof LecturingToolAnalyticsIndexRoute
   '/lecturing-tool/course/': typeof LecturingToolCourseIndexRoute
   '/learn/$courseId/$moduleId/$lessonId': typeof LearnCourseIdModuleIdLessonIdRouteRouteWithChildren
   '/lecturing-tool/course/$courseId/editing': typeof LecturingToolCourseCourseIdEditingRouteRouteWithChildren
@@ -339,16 +376,20 @@ export interface FileRouteTypes {
     | '/about'
     | '/contact'
     | '/learn/$courseId'
+    | '/order/$orderId'
     | '/course/$courseId'
     | '/users/$userId'
+    | '/cart'
     | '/course/'
     | '/lecturing-tool/'
+    | '/order'
     | '/users/'
     | '/your-courses/'
     | '/learn/$courseId/$moduleId'
     | '/auth/forgot-password'
     | '/auth/verify'
     | '/learn/$courseId/'
+    | '/lecturing-tool/analytics'
     | '/lecturing-tool/course'
     | '/learn/$courseId/$moduleId/$lessonId'
     | '/lecturing-tool/course/$courseId/editing'
@@ -369,15 +410,19 @@ export interface FileRouteTypes {
     | '/learn'
     | '/about'
     | '/contact'
+    | '/order/$orderId'
     | '/course/$courseId'
     | '/users/$userId'
+    | '/cart'
     | '/course'
     | '/lecturing-tool'
+    | '/order'
     | '/users'
     | '/your-courses'
     | '/auth/forgot-password'
     | '/auth/verify'
     | '/learn/$courseId'
+    | '/lecturing-tool/analytics'
     | '/lecturing-tool/course'
     | '/auth/login'
     | '/auth/register'
@@ -401,16 +446,20 @@ export interface FileRouteTypes {
     | '/contact'
     | '/auth/_mainLayout'
     | '/learn/$courseId'
+    | '/order/$orderId'
     | '/course/$courseId'
     | '/users/$userId'
+    | '/cart/'
     | '/course/'
     | '/lecturing-tool/'
+    | '/order/'
     | '/users/'
     | '/your-courses/'
     | '/learn/$courseId/$moduleId'
     | '/auth/forgot-password/'
     | '/auth/verify/'
     | '/learn/$courseId/'
+    | '/lecturing-tool/analytics/'
     | '/lecturing-tool/course/'
     | '/learn/$courseId/$moduleId/$lessonId'
     | '/lecturing-tool/course/$courseId/editing'
@@ -436,6 +485,9 @@ export interface RootRouteChildren {
   YourCoursesRouteRoute: typeof YourCoursesRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
   ContactRoute: typeof ContactRoute
+  OrderOrderIdRouteRoute: typeof OrderOrderIdRouteRoute
+  CartIndexRoute: typeof CartIndexRoute
+  OrderIndexRoute: typeof OrderIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -517,6 +569,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UsersIndexRouteImport
       parentRoute: typeof UsersRouteRoute
     }
+    '/order/': {
+      id: '/order/'
+      path: '/order'
+      fullPath: '/order'
+      preLoaderRoute: typeof OrderIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lecturing-tool/': {
       id: '/lecturing-tool/'
       path: '/'
@@ -531,6 +590,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CourseIndexRouteImport
       parentRoute: typeof CourseRouteRoute
     }
+    '/cart/': {
+      id: '/cart/'
+      path: '/cart'
+      fullPath: '/cart'
+      preLoaderRoute: typeof CartIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/users/$userId': {
       id: '/users/$userId'
       path: '/$userId'
@@ -544,6 +610,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/course/$courseId'
       preLoaderRoute: typeof CourseCourseIdRouteImport
       parentRoute: typeof CourseRouteRoute
+    }
+    '/order/$orderId': {
+      id: '/order/$orderId'
+      path: '/order/$orderId'
+      fullPath: '/order/$orderId'
+      preLoaderRoute: typeof OrderOrderIdRouteRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/learn/$courseId': {
       id: '/learn/$courseId'
@@ -564,6 +637,13 @@ declare module '@tanstack/react-router' {
       path: '/course'
       fullPath: '/lecturing-tool/course'
       preLoaderRoute: typeof LecturingToolCourseIndexRouteImport
+      parentRoute: typeof LecturingToolRouteRoute
+    }
+    '/lecturing-tool/analytics/': {
+      id: '/lecturing-tool/analytics/'
+      path: '/analytics'
+      fullPath: '/lecturing-tool/analytics'
+      preLoaderRoute: typeof LecturingToolAnalyticsIndexRouteImport
       parentRoute: typeof LecturingToolRouteRoute
     }
     '/learn/$courseId/': {
@@ -819,6 +899,7 @@ const LecturingToolCourseCourseIdEditingRouteRouteWithChildren =
 
 interface LecturingToolRouteRouteChildren {
   LecturingToolIndexRoute: typeof LecturingToolIndexRoute
+  LecturingToolAnalyticsIndexRoute: typeof LecturingToolAnalyticsIndexRoute
   LecturingToolCourseIndexRoute: typeof LecturingToolCourseIndexRoute
   LecturingToolCourseCourseIdEditingRouteRoute: typeof LecturingToolCourseCourseIdEditingRouteRouteWithChildren
   LecturingToolCourseCourseIdIndexRoute: typeof LecturingToolCourseCourseIdIndexRoute
@@ -827,6 +908,7 @@ interface LecturingToolRouteRouteChildren {
 
 const LecturingToolRouteRouteChildren: LecturingToolRouteRouteChildren = {
   LecturingToolIndexRoute: LecturingToolIndexRoute,
+  LecturingToolAnalyticsIndexRoute: LecturingToolAnalyticsIndexRoute,
   LecturingToolCourseIndexRoute: LecturingToolCourseIndexRoute,
   LecturingToolCourseCourseIdEditingRouteRoute:
     LecturingToolCourseCourseIdEditingRouteRouteWithChildren,
@@ -872,6 +954,9 @@ const rootRouteChildren: RootRouteChildren = {
   YourCoursesRouteRoute: YourCoursesRouteRouteWithChildren,
   AboutRoute: AboutRoute,
   ContactRoute: ContactRoute,
+  OrderOrderIdRouteRoute: OrderOrderIdRouteRoute,
+  CartIndexRoute: CartIndexRoute,
+  OrderIndexRoute: OrderIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

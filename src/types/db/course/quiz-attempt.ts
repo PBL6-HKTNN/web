@@ -1,4 +1,5 @@
 import type { Base, UUID } from "@/types/core";
+import type { ApiResponse } from "@/types/core/api";
 
 export type UserAnswer = Base & {
   attemptId: UUID;
@@ -17,3 +18,4 @@ export type QuizAttempt = Base & {
   completedAt: string | null;
   userAnswers?: UserAnswer[];
 };
+export type GetQuizListResultsRes = ApiResponse<QuizAttempt[]>;

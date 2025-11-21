@@ -10,6 +10,7 @@ import type {
   CreateCourseReq,
   GetCoursesFilterReq,
   UpdateCourseReq,
+  ValidateCourseReq,
 } from "@/types/db/course";
 
 export const courseQueryKeys = {
@@ -104,5 +105,11 @@ export const useDeleteCourse = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: courseQueryKeys.allCourses });
     },
+  });
+};
+
+export const useValidateCourse = () => {
+  return useMutation({
+    mutationFn: (data: ValidateCourseReq) => courseService.validateCourse(data),
   });
 };

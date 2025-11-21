@@ -1,17 +1,20 @@
-import { useGetLessonById } from '@/hooks/queries/course/lesson-hooks';
+import { useCheckLessonLocked } from '@/hooks/queries/course/lesson-hooks';
 import { useGetLessonsByModule } from '@/hooks/queries/course/module-hooks';
 import ContentRender from '@/components/course/course-learn/content-render';
+import { LessonProgressWrapper } from '@/components/course/course-learn/lesson-progress-wrapper';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, TriangleAlert } from 'lucide-react';
 import type { UUID } from '@/types';
 
 interface LessonContentLoaderProps {
+  courseId: UUID;
   lessonId: UUID;
   moduleId: UUID;
 }
 
 export function LessonContentLoader({ 
+  courseId,
   lessonId, 
   moduleId
 }: LessonContentLoaderProps) {
@@ -20,7 +23,7 @@ export function LessonContentLoader({
     data: lessonData,
     isLoading: lessonLoading,
     error: lessonError,
-  } = useGetLessonById(lessonId);
+  } = useCheckLessonLocked(lessonId);
 
   // Optionally fetch module lessons for navigation context
   const {
@@ -43,6 +46,25 @@ export function LessonContentLoader({
     );
   }
 
+  if (!lessonData?.data || lessonData.data === null) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center">
+          <TriangleAlert className="mx-auto mb-4 h-10 w-10 text-destructive" />
+          <h2 className="text-2xl font-bold text-muted-foreground mb-2">Lesson Not Found</h2>
+          <p className="text-muted-foreground">The requested lesson could not render due to:</p>
+          <div className="mt-4 space-y-2 text-left text-sm text-destructive">
+            <ul className="list-disc list-inside">
+              <li>The lesson does not exist.</li>
+              <li>The lesson has been deleted.</li>
+              <li>You didn't complete the previous lessons.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (lessonError) {
     return (
       <div className="flex items-center justify-center h-full p-6">
@@ -56,16 +78,7 @@ export function LessonContentLoader({
     );
   }
 
-  if (!lessonData?.data) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-muted-foreground mb-2">Lesson Not Found</h2>
-          <p className="text-muted-foreground">The requested lesson could not be found.</p>
-        </div>
-      </div>
-    );
-  }
+  
 
   const lesson = lessonData.data;
 
@@ -92,7 +105,13 @@ export function LessonContentLoader({
         </div>
       </div>
       <div className="lg:flex lg:justify-center">
-        <ContentRender lesson={lesson} />
+        <LessonProgressWrapper
+          courseId={courseId}
+          lessonId={lessonId}
+          lessonType={lesson.lessonType}
+        >
+          <ContentRender lesson={lesson} courseId={courseId} />
+        </LessonProgressWrapper>
       </div>
     </div>
   );

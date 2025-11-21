@@ -41,3 +41,5 @@ export type LessonReq = {
   lessonType: LessonType | null;
   quiz?: QuizReq | null;
 };
+
+export type CheckLessonLockedRes = ApiResponse<Lesson>;

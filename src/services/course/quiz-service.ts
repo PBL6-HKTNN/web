@@ -13,6 +13,7 @@ import type {
   UpdateQuizReq,
   UpdateQuizRes,
 } from "@/types/db/course/quiz";
+import type { GetQuizListResultsRes } from "@/types/db/course/quiz-attempt";
 import { createServiceApi, serviceUrls } from "@/utils";
 
 const api = createServiceApi(serviceUrls.COURSE_SERVICE_URL);
@@ -71,6 +72,14 @@ export const quizService = {
   beginQuizAttempt: async (quizId: UUID): Promise<QuizStartAttemptRes> => {
     const response = await api.get<QuizStartAttemptRes>(
       API_ROUTES.QUIZ.getQuizAttempts(quizId)
+    );
+    return response.data;
+  },
+  getQuizListResults: async (
+    lessonId: UUID
+  ): Promise<GetQuizListResultsRes> => {
+    const response = await api.get<GetQuizListResultsRes>(
+      API_ROUTES.QUIZ.getQuizListResults(lessonId)
     );
     return response.data;
   },

@@ -27,6 +27,7 @@ const API_ROUTES = {
     createCourse: "/Course/create",
     updateCourse: (courseId: UUID) => `/Course/update/${courseId}`,
     deleteCourse: (courseId: UUID) => `/Course/${courseId}`,
+    validateCourse: "/Course/validate",
   },
   MODULE: {
     getModules: "/Module",
@@ -42,6 +43,7 @@ const API_ROUTES = {
     createLesson: "/Lesson/create",
     updateLesson: (lessonId: UUID) => `/Lesson/update/${lessonId}`,
     deleteLesson: (lessonId: UUID) => `/Lesson/${lessonId}`,
+    checkLessonLocked: (lessonId: UUID) => `/Lesson/check-locked/${lessonId}`,
   },
   QUIZ: {
     getQuizzes: "/Quiz",
@@ -50,6 +52,7 @@ const API_ROUTES = {
     getQuizByLessonId: (lessonId: UUID) => `/Quiz/lessonId/${lessonId}`,
     submitQuiz: "/Quiz/submit",
     getQuizResults: (lessonId: UUID) => `/Quiz/results/${lessonId}`,
+    getQuizListResults: (lessonId: UUID) => `/Quiz/list-results/${lessonId}`,
     getQuizAttempts: (quizId: UUID) => `/Quiz/Attempts/${quizId}`,
     updateQuiz: (quizId: UUID) => `/Quiz/update/${quizId}`,
     deleteQuiz: (quizId: UUID) => `/Quiz/${quizId}`,
@@ -58,12 +61,25 @@ const API_ROUTES = {
     getWishlist: "/Wishlist/get",
     addToWishlist: (courseId: UUID) => `/Wishlist/add/${courseId}`,
     removeFromWishlist: (courseId: UUID) => `/Wishlist/remove/${courseId}`,
+    wishlistCheck: (courseId: UUID) => `/Wishlist/Check/${courseId}`,
   },
   ENROLLMENT: {
     isEnrolled: (courseId: UUID) => `/Enrollment/getCourse/${courseId}`,
     enroll: (courseId: UUID) => `/Enrollment/enroll/${courseId}`,
     updateEnrollment: "/Enrollment/update",
+    updateEnrollmentProgress: "/Enrollment/updateProgress",
     getEnrolledCourse: "/Enrollment/my-courses",
+  },
+  PAYMENT: {
+    getCart: "/Payment/getCart",
+    addToCart: (courseId: UUID) => `/Payment/addToCart/${courseId}`,
+    removeFromCart: (courseId: UUID) => `/Payment/removeFromCart/${courseId}`,
+    createPayment: "/Payment/createPayment",
+    getPayment: "/Payment/payment",
+    listPayments: "/Payment/list-payments",
+    updatePayment: "/Payment/update-payment",
+    createPaymentIntent: "/Payment/create-payment-intent",
+    webhook: "/Payment/webhook",
   },
 };
 

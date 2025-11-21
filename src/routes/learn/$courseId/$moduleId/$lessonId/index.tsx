@@ -9,10 +9,11 @@ export const Route = createFileRoute(
 })
 
 function LessonContent() {
-  const { moduleId, lessonId } = useParams({ from: "/learn/$courseId/$moduleId/$lessonId/" })
+  const {courseId, moduleId, lessonId } = useParams({ from: "/learn/$courseId/$moduleId/$lessonId/" })
 
   return (
     <LessonContentLoader
+      courseId={courseId}
       lessonId={lessonId}
       moduleId={moduleId}
     />

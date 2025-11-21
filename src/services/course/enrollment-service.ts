@@ -6,6 +6,8 @@ import type {
   UpdateEnrollmentResponse,
   IsEnrolledResponse,
   UpdateEnrollmentReq,
+  updateEnrollmentProgressReq,
+  UpdateEnrollmentProgressResponse,
 } from "@/types/db/course/enrollment";
 import { createServiceApi, serviceUrls } from "@/utils/api";
 
@@ -22,8 +24,23 @@ export const enrollmentService = {
     return response.data;
   },
 
-  updateEnrollment: async (data: UpdateEnrollmentReq): Promise<UpdateEnrollmentResponse> => {
-    const response = await api.put(API_ROUTES.ENROLLMENT.updateEnrollment, data);
+  updateEnrollment: async (
+    data: UpdateEnrollmentReq
+  ): Promise<UpdateEnrollmentResponse> => {
+    const response = await api.post(
+      API_ROUTES.ENROLLMENT.updateEnrollment,
+      data
+    );
+    return response.data;
+  },
+
+  updateEnrollmentProgress: async (
+    data: updateEnrollmentProgressReq
+  ): Promise<UpdateEnrollmentProgressResponse> => {
+    const response = await api.post(
+      API_ROUTES.ENROLLMENT.updateEnrollmentProgress,
+      data
+    );
     return response.data;
   },
 

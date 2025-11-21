@@ -5,7 +5,8 @@ import type { UpdateEnrollmentReq } from "@/types/db/course/enrollment";
 
 export const enrollmentQueryKeys = {
   allEnrollments: ["enrollments"] as const,
-  enrollmentLists: () => [...enrollmentQueryKeys.allEnrollments, "list"] as const,
+  enrollmentLists: () =>
+    [...enrollmentQueryKeys.allEnrollments, "list"] as const,
   enrollmentCheck: (courseId: UUID) =>
     [...enrollmentQueryKeys.allEnrollments, "check", courseId] as const,
 };
@@ -35,7 +36,21 @@ export const useUpdateEnrollment = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: UpdateEnrollmentReq) => enrollmentService.updateEnrollment(data),
+    mutationFn: (data: UpdateEnrollmentReq) =>
+      enrollmentService.updateEnrollment(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: enrollmentQueryKeys.allEnrollments,
+      });
+    },
+  });
+};
+
+export const useUpdateEnrollmentProgress = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { courseId: UUID; lessonId: UUID }) =>
+      enrollmentService.updateEnrollmentProgress(data),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: enrollmentQueryKeys.allEnrollments,

@@ -12,6 +12,8 @@ export const lessonQueryKeys = {
   lessonLists: () => [...lessonQueryKeys.allLessons, "list"] as const,
   lessonDetails: () => [...lessonQueryKeys.allLessons, "detail"] as const,
   lessonDetail: (id: UUID) => [...lessonQueryKeys.lessonDetails(), id] as const,
+  lessonLocked: (id: UUID) =>
+    [...lessonQueryKeys.lessonDetail(id), "locked"] as const,
 };
 
 export const useGetLessons = () => {
@@ -84,5 +86,14 @@ export const useDeleteLesson = () => {
         refetchType: "active",
       });
     },
+  });
+};
+
+export const useCheckLessonLocked = (lessonId: UUID) => {
+  return useQuery({
+    queryKey: lessonQueryKeys.lessonLocked(lessonId),
+    queryFn: () => lessonService.checkLessonLocked(lessonId),
+    enabled: !!lessonId,
+    retry: false,
   });
 };

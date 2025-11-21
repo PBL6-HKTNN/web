@@ -7,7 +7,8 @@ export const EnrollmentStatus = {
   CANCELLED: 2,
 } as const;
 
-export type EnrollmentStatus = (typeof EnrollmentStatus)[keyof typeof EnrollmentStatus];
+export type EnrollmentStatus =
+  (typeof EnrollmentStatus)[keyof typeof EnrollmentStatus];
 
 export type Enrollment = Base & {
   studentId: UUID;
@@ -35,6 +36,11 @@ export type UpdateEnrollmentReq = {
   certificateExpiryDate?: string | Date | null;
 };
 
+export type updateEnrollmentProgressReq = {
+  courseId: UUID;
+  lessonId: UUID;
+};
+
 export type EnrollResponse = ApiResponse<Enrollment>;
 
 export type EnrolledCourseItem = {
@@ -48,4 +54,5 @@ export type EnrolledCourseItem = {
 
 export type GetEnrolledCoursesResponse = ApiResponse<EnrolledCourseItem[]>;
 export type UpdateEnrollmentResponse = ApiResponse<Enrollment>;
+export type UpdateEnrollmentProgressResponse = ApiResponse<Enrollment>;
 export type IsEnrolledResponse = ApiResponse<boolean>;

@@ -6,7 +6,11 @@ import { authGuard } from '@/utils'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useCourseDetailPage } from './-hook'
 import ModuleAccordion from '@/components/course/module-accordion'
-import { Edit, Clock, BookOpen, Star, Users } from 'lucide-react'
+import { CoursePublicCheckModal } from '@/components/course/course-public-check'
+import { useCoursePublicCheck } from '@/components/course/course-public-check/hook'
+import { CourseHideForm } from '@/components/course/course-hide-form'
+import { useCourseHideForm } from '@/components/course/course-hide-form/hook'
+import { Edit, Clock, BookOpen, Star, Users, Globe, EyeOff } from 'lucide-react'
 import { timeDurationFormat } from '@/utils/time-utils'
 import { renderLevelLabel } from '@/utils/render-utils'
 import type { Level } from '@/types/db/course'
@@ -19,6 +23,10 @@ export const Route = createFileRoute('/lecturing-tool/course/$courseId/')({
 function RouteComponent() {
   const { courseId } = Route.useParams()
   const { course, modules, isLoading, error } = useCourseDetailPage(courseId)
+  const { isOpen, isChecking, checkResults, openModal, closeModal, performCheck } =
+    useCoursePublicCheck(courseId)
+  const { isOpen: isHideFormOpen, isSubmitting: isHiding, form: hideForm, openModal: openHideForm, closeModal: closeHideForm, onSubmit: onHideSubmit } =
+    useCourseHideForm(courseId)
 
   if (isLoading) {
     return <CourseDetailSkeleton />
@@ -54,16 +62,26 @@ function RouteComponent() {
                   {course.description || 'No description provided.'}
                 </CardDescription>
               </div>
-              <Button asChild>
-                <Link
-                  to="/lecturing-tool/course/$courseId/editing"
-                  params={{ courseId }}
-                  className="flex items-center gap-2"
-                >
-                  <Edit className="size-4" />
-                  Edit Course
-                </Link>
-              </Button>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={openModal} className="flex items-center gap-2">
+                  <Globe className="size-4" />
+                  Publish
+                </Button>
+                <Button variant="outline" onClick={openHideForm} className="flex items-center gap-2">
+                  <EyeOff className="size-4" />
+                  Hide Course
+                </Button>
+                <Button asChild>
+                  <Link
+                    to="/lecturing-tool/course/$courseId/editing"
+                    params={{ courseId }}
+                    className="flex items-center gap-2"
+                  >
+                    <Edit className="size-4" />
+                    Edit Course
+                  </Link>
+                </Button>
+              </div>
             </div>
           </CardHeader>
           <CardContent>
@@ -135,6 +153,29 @@ function RouteComponent() {
             )}
           </CardContent>
         </Card>
+
+        {/* Course Public Check Modal */}
+        <CoursePublicCheckModal
+          isOpen={isOpen}
+          isChecking={isChecking}
+          checkResults={checkResults}
+          onClose={closeModal}
+          onPerformCheck={performCheck}
+          onSubmitPublication={() => {
+            // Handle course publication submission
+            console.log('Course published successfully')
+            closeModal()
+          }}
+        />
+
+        {/* Course Hide Form */}
+        <CourseHideForm
+          isOpen={isHideFormOpen}
+          isSubmitting={isHiding}
+          form={hideForm}
+          onClose={closeHideForm}
+          onSubmit={onHideSubmit}
+        />
       </div>
     </div>
   )
