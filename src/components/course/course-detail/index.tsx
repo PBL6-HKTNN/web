@@ -6,11 +6,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
+import { AddToCartButton } from "@/components/payment/add-to-cart-button";
 import { useCourseDetail } from "./hook";
 import ModuleAccordion from "@/components/course/module-accordion";
 import { renderLevelLabel } from "@/utils/render-utils";
 import { useAddToWishlist, useIsInWishlist } from "@/hooks/queries/course/wishlist-hooks";
 import { useEnroll, useIsEnrolled } from "@/hooks/queries/course/enrollment-hooks";
+import { formatPriceSimple } from "@/utils/format";
 
 interface CourseDetailProps {
   courseId: string;
@@ -71,7 +73,7 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
 
   const formatPrice = (price: number) => {
     if (price === 0) return "Free";
-    return `$${price}`;
+    return formatPriceSimple(price);
   };
 
   const formatNumber = (num: number) => {
@@ -400,46 +402,126 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
                   )}
                 </div>
 
-                {/* Enroll and Wishlist Buttons */}
-                <div className="flex gap-3 mb-4">
-                  <Button
-                    className="flex-1"
-                    size="lg"
-                    onClick={() => {
-                      if (!isEnrolled) {
-                        enrollMutation.mutate(courseId);
-                      }
-                    }}
-                    disabled={enrollMutation.isPending || isEnrolled}
-                  >
-                    {isEnrolled
-                      ? "Enrolled"
-                      : enrollMutation.isPending
-                      ? "Enrolling..."
-                      : "Enroll for Free"}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className={`w-12 h-12 p-0 border-2 transition-all duration-200 ${
-                      isInWishlist
-                        ? 'border-red-500 bg-red-50 text-red-500 hover:bg-red-100'
-                        : 'border-gray-300 text-gray-400 hover:border-red-300 hover:text-red-400 hover:bg-red-50'
-                    }`}
-                    onClick={handleWishlistClick}
-                    disabled={addToWishlistMutation.isPending}
-                    title={isInWishlist ? 'Already in wishlist' : 'Add to wishlist'}
-                  >
-                    {addToWishlistMutation.isPending ? (
-                      <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                    ) : (
-                      <Heart
-                        className={`w-5 h-5 transition-all duration-200 ${
-                          isInWishlist ? 'fill-current' : ''
+                {/* Enroll, Cart, and Wishlist Buttons */}
+                <div className="space-y-3 mb-4">
+                  {course.price === 0 ? (
+                    /* Free Course - Direct Enrollment */
+                    <div className="flex gap-3">
+                      <Button
+                        className="flex-1"
+                        size="lg"
+                        onClick={() => {
+                          if (!isEnrolled) {
+                            enrollMutation.mutate(courseId);
+                          }
+                        }}
+                        disabled={enrollMutation.isPending || isEnrolled}
+                      >
+                        {isEnrolled
+                          ? "Enrolled"
+                          : enrollMutation.isPending
+                          ? "Enrolling..."
+                          : "Enroll for Free"}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        className={`w-12 h-12 p-0 border-2 transition-all duration-200 ${
+                          isInWishlist
+                            ? 'border-red-500 bg-red-50 text-red-500 hover:bg-red-100'
+                            : 'border-gray-300 text-gray-400 hover:border-red-300 hover:text-red-400 hover:bg-red-50'
                         }`}
+                        onClick={handleWishlistClick}
+                        disabled={addToWishlistMutation.isPending}
+                        title={isInWishlist ? 'Already in wishlist' : 'Add to wishlist'}
+                      >
+                        {addToWishlistMutation.isPending ? (
+                          <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <Heart
+                            className={`w-5 h-5 transition-all duration-200 ${
+                              isInWishlist ? 'fill-current' : ''
+                            }`}
+                          />
+                        )}
+                      </Button>
+                    </div>
+                  ) : isEnrolled ? (
+                    /* Paid Course - Already Enrolled */
+                    <div className="space-y-3">
+                      <Button
+                        className="w-full"
+                        size="lg"
+                        disabled
+                      >
+                        Already Enrolled
+                      </Button>
+                      <div className="flex justify-end">
+                        <Button
+                          variant="outline"
+                          size="lg"
+                          className={`w-12 h-12 p-0 border-2 transition-all duration-200 ${
+                            isInWishlist
+                              ? 'border-red-500 bg-red-50 text-red-500 hover:bg-red-100'
+                              : 'border-gray-300 text-gray-400 hover:border-red-300 hover:text-red-400 hover:bg-red-50'
+                          }`}
+                          onClick={handleWishlistClick}
+                          disabled={addToWishlistMutation.isPending}
+                          title={isInWishlist ? 'Already in wishlist' : 'Add to wishlist'}
+                        >
+                          {addToWishlistMutation.isPending ? (
+                            <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                            <Heart
+                              className={`w-5 h-5 transition-all duration-200 ${
+                                isInWishlist ? 'fill-current' : ''
+                              }`}
+                            />
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    /* Paid Course - Cart and Wishlist */
+                    <div className="space-y-3">
+                      <AddToCartButton
+                        courseId={courseId}
+                        size="lg"
+                        className="w-full"
                       />
-                    )}
-                  </Button>
+                      <div className="flex gap-3">
+                        <Button
+                          variant="outline"
+                          className="flex-1"
+                          size="lg"
+                        >
+                          Buy Now
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="lg"
+                          className={`w-12 h-12 p-0 border-2 transition-all duration-200 ${
+                            isInWishlist
+                              ? 'border-red-500 bg-red-50 text-red-500 hover:bg-red-100'
+                              : 'border-gray-300 text-gray-400 hover:border-red-300 hover:text-red-400 hover:bg-red-50'
+                          }`}
+                          onClick={handleWishlistClick}
+                          disabled={addToWishlistMutation.isPending}
+                          title={isInWishlist ? 'Already in wishlist' : 'Add to wishlist'}
+                        >
+                          {addToWishlistMutation.isPending ? (
+                            <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                            <Heart
+                              className={`w-5 h-5 transition-all duration-200 ${
+                                isInWishlist ? 'fill-current' : ''
+                              }`}
+                            />
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Course includes */}
