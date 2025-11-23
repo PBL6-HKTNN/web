@@ -14,5 +14,5 @@ function RouteComponent() {
     { label: 'Course', icon: <BookAIcon />, href: '/lecturing-tool/course' },
     { label: 'Analytics', icon: <BarChartIcon />, href: '/lecturing-tool/analytics' },
   ]
-  return <ToolLayout items={items}><Outlet /></ToolLayout>
+  return <ToolLayout title="Lecturing Tool" items={items}><Outlet /></ToolLayout>
 }

@@ -163,28 +163,7 @@ export function CreateLessonDialog({ isOpen, onClose, moduleId }: CreateLessonDi
               )}
             />
 
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="duration"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Duration</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="e.g. 10:00"
-                        {...field}
-                        disabled={isLoading}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Format: MM:SS or HH:MM:SS
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
+            <div className="grid grid-cols-1 gap-4">
               <FormField
                 control={form.control}
                 name="orderIndex"

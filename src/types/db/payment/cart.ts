@@ -1,5 +1,4 @@
 import type { UUID } from "@/types";
-import type { Course } from "@/types/db/course";
 import type { Base } from "@/types/core/base";
 import type { ApiResponse } from "@/types/core/api";
 
@@ -7,7 +6,9 @@ export interface CartItem extends Base {
   userId: UUID;
   courseId: UUID;
   price: number;
-  course?: Course;
+  thumbnailUrl: string;
+  courseTitle: string;
+  description: string;
 }
 
 export interface Cart {

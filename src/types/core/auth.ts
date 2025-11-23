@@ -42,6 +42,12 @@ export type ResetPasswordReq = {
   newPassword: string;
 };
 
+export type ChangePasswordReq = {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+};
+
 // Auth state for persistence
 export type AuthState = {
   token: string | null;

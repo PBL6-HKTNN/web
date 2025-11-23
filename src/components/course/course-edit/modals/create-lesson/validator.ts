@@ -5,7 +5,6 @@ export const createLessonFormSchema = z.object({
     .string()
     .min(1, "Lesson title is required")
     .max(200, "Title must be less than 200 characters"),
-  duration: z.string().min(1, "Duration is required"),
   orderIndex: z
     .number()
     .int("Order must be an integer")

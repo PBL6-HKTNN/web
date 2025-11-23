@@ -9,7 +9,12 @@ const API_ROUTES = {
     googleLogin: "/Auth/google-login",
     requestResetPassword: "/Auth/token-reset-password",
     resetPassword: "/Auth/reset-password",
+    changePassword: "/Auth/change-password",
     logout: "/Auth/logout",
+  },
+  USER: {
+    changeAvatar: (userId: UUID) => `/User/${userId}/avatar`,
+    updateProfile: (userId: UUID) => `/User/${userId}/profile`,
   },
   STORAGE: {
     uploadFile: (type: FileType) => `/api/files/${type}`,
@@ -69,6 +74,11 @@ const API_ROUTES = {
     updateEnrollment: "/Enrollment/update",
     updateEnrollmentProgress: "/Enrollment/updateProgress",
     getEnrolledCourse: "/Enrollment/my-courses",
+  },
+  REVIEW: {
+    createReview: "/Review",
+    getReviewsByCourse: (courseId: UUID) => `/Review/course/${courseId}`,
+    getAverageRating: (courseId: UUID) => `/Review/course/${courseId}/average`,
   },
   PAYMENT: {
     getCart: "/Payment/getCart",

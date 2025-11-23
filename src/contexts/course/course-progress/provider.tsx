@@ -111,8 +111,8 @@ export const CourseProgressProvider: React.FC<CourseProgressProviderProps> = ({ 
       watchedPercentage: Math.max(currentProgress.watchedPercentage, watchedPercentage)
     })
     
-    // Check if video is 70% watched and mark complete
-    if (watchedPercentage >= 70) {
+    // Check if video is 90% watched and mark complete
+    if (watchedPercentage >= 90) {
       markLessonComplete(courseId, lessonId)
     }
   }, [markLessonComplete])

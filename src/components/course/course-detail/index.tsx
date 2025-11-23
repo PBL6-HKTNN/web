@@ -10,29 +10,30 @@ import { AddToCartButton } from "@/components/payment/add-to-cart-button";
 import { useCourseDetail } from "./hook";
 import ModuleAccordion from "@/components/course/module-accordion";
 import { renderLevelLabel } from "@/utils/render-utils";
-import { useAddToWishlist, useIsInWishlist } from "@/hooks/queries/course/wishlist-hooks";
-import { useEnroll, useIsEnrolled } from "@/hooks/queries/course/enrollment-hooks";
-import { formatPriceSimple } from "@/utils/format";
+import { ReviewList } from "@/components/review";
 
 interface CourseDetailProps {
   courseId: string;
 }
 
 export function CourseDetail({ courseId }: CourseDetailProps) {
-  const { course, modules, isLoading, error } = useCourseDetail(courseId);
-  // const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
-
-  // Wishlist hooks
-  const { data: isInWishlist } = useIsInWishlist(courseId);
-  const addToWishlistMutation = useAddToWishlist();
-
-  // Enrollment hooks
-  const enrollMutation = useEnroll();
-  const { data: isEnrolledResponse } = useIsEnrolled(courseId);
-  const isEnrolled = !!isEnrolledResponse?.data;
-  const handleWishlistClick = () => {
-    addToWishlistMutation.mutate(courseId);
-  };
+  const { 
+    course, 
+    modules, 
+    isLoading, 
+    error,
+    isInWishlist,
+    addToWishlistMutation,
+    handleWishlistClick,
+    enrollMutation,
+    isEnrolled,
+    reviews,
+    averageRating,
+    reviewsLoading,
+    averageLoading,
+    formatPrice,
+    formatNumber
+  } = useCourseDetail(courseId);
 
   if (isLoading) {
     return (
@@ -71,42 +72,20 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
     );
   }
 
-  const formatPrice = (price: number) => {
-    if (price === 0) return "Free";
-    return formatPriceSimple(price);
-  };
 
-  const formatNumber = (num: number) => {
-    if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
-    if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
-    return num.toString();
-  };
-
-  // const toggleSection = (sectionId: string) => {
-  //   const newExpanded = new Set(expandedSections);
-  //   if (newExpanded.has(sectionId)) {
-  //     newExpanded.delete(sectionId);
-  //   } else {
-  //     newExpanded.add(sectionId);
-  //   }
-  //   setExpandedSections(newExpanded);
-  // };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
 
       {/* Header with Video/Thumbnail */}
       <div className="relative bg-black">
-        <div className="aspect-video max-w-4xl mx-auto relative">
+        <div className="aspect-video max-w-6xl mx-auto relative">
           {course.thumbnail ? (
-            <video
+            <img
               className="w-full h-full object-cover"
-              poster={course.thumbnail}
-              controls
-              preload="metadata"
-            >
-              <source src={course.thumbnail} type="video/mp4" />
-            </video>
+              src={course.thumbnail}
+              alt="Course Thumbnail"
+            />
           ) : (
             <div className="w-full h-full bg-gray-800 flex items-center justify-center">
               <div className="text-center text-white">
@@ -140,9 +119,9 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
               <div className="flex flex-wrap items-center gap-4 mb-4">
                 <div className="flex items-center gap-1">
                   <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                  <span className="font-semibold text-lg">{course.averageRating}</span>
+                  <span className="font-semibold text-lg">{averageRating}</span>
                   <span className="text-gray-600 dark:text-gray-400">
-                    ({formatNumber(course.numberOfReviews)} ratings)
+                    ({course.numberOfReviews} ratings)
                   </span>
                 </div>
                 <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
@@ -333,50 +312,13 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
               </TabsContent>
 
               <TabsContent value="reviews" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Student feedback</CardTitle>
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-1">
-                        <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                        <span className="text-2xl font-bold">{course.averageRating}</span>
-                        <span className="text-gray-600 dark:text-gray-400">
-                          course rating • {formatNumber(course.numberOfReviews)} ratings
-                        </span>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    {/* <div className="space-y-6">
-                      {course.reviews?.map((review: CourseReview) => (
-                        <div key={review.id} className="border-b border-gray-200 dark:border-gray-700 pb-6 last:border-0">
-                          <div className="flex items-start gap-3">
-                            <Avatar className="w-10 h-10">
-                              <AvatarImage src={review.user?.avatar} />
-                              <AvatarFallback>
-                                {review.user?.name?.substring(0, 2).toUpperCase()}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className="font-medium">{review.user?.name}</span>
-                                <div className="flex">
-                                  {[...Array(5)].map((_, i) => (
-                                    <Star
-                                      key={i}
-                                      className={`w-4 h-4 ${i < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
-                                    />
-                                  ))}
-                                </div>
-                              </div>
-                              <p className="text-gray-700 dark:text-gray-300">{review.comment}</p>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div> */}
-                  </CardContent>
-                </Card>
+                <ReviewList 
+                  courseId={courseId}
+                  reviews={reviews}
+                  averageRating={averageRating}
+                  isLoading={reviewsLoading || averageLoading}
+                  formatNumber={formatNumber}
+                />
               </TabsContent>
             </Tabs>
           </div>

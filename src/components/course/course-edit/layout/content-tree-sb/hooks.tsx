@@ -13,6 +13,8 @@ export function useContentTreeSidebar() {
     openCreateModule,
     openCreateLesson,
     openDeleteModal,
+    cloneModule,
+    cloneLesson,
   } = useCourseEdit();
 
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set());
@@ -55,6 +57,24 @@ export function useContentTreeSidebar() {
     openDeleteModal('lesson', lessonId, lessonTitle);
   };
 
+  const handleCloneModule = async (moduleId: string) => {
+    try {
+      await cloneModule(moduleId);
+    } catch (err) {
+      // Error handling is done in the context
+      console.error('Clone module failed:', err);
+    }
+  };
+
+  const handleCloneLesson = async (lessonId: string) => {
+    try {
+      await cloneLesson(lessonId);
+    } catch (err) {
+      // Error handling is done in the context
+      console.error('Clone lesson failed:', err);
+    }
+  };
+
   return {
     modules,
     expandedModules,
@@ -66,6 +86,8 @@ export function useContentTreeSidebar() {
     handleAddLesson,
     handleDeleteModule,
     handleDeleteLesson,
+    handleCloneModule,
+    handleCloneLesson,
   };
 }
 

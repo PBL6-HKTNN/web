@@ -91,7 +91,7 @@ export function LessonItem({
 
         {progress !== undefined && progress < 1 && (
           <div className="mt-1">
-            <Progress value={progress * 100} className="h-0.5" />
+            <Progress value={progress * 100} className="h-0.5 hidden" />
           </div>
         )}
       </ItemContent>

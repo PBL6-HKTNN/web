@@ -1,10 +1,12 @@
 import { useMemo } from 'react'
+import { useRouter } from '@tanstack/react-router'
 import { useGetCart, useCreatePayment } from '@/hooks/queries/payment-hooks'
 import { MethodPayment } from '@/types/db/payment'
 import type { CartItem } from '@/types/db/payment/cart'
 import type { UUID } from '@/types'
 
 export function useCartPage() {
+  const router = useRouter()
   const { data: cartData, isLoading, error, refetch } = useGetCart()
   const { mutate: createPayment, isPending: isCreatingPayment } = useCreatePayment()
 
@@ -28,10 +30,20 @@ export function useCartPage() {
     
     const courseIds: UUID[] = cartItems.map((item: CartItem) => item.courseId)
     
-    createPayment({
-      method,
-      courseIds
-    })
+    createPayment(
+      {
+        method,
+        courseIds
+      },
+      {
+        onSuccess: (data) => {
+          if (data.isSuccess) {
+            // Navigate to checkout page on successful payment creation
+            router.navigate({ to: '/checkout' })
+          }
+        }
+      }
+    )
   }
 
   const isEmpty = cartItems.length === 0

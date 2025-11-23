@@ -1,6 +1,7 @@
 import { Link, useRouter } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,14 +9,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Book, Code, LogOut, User } from 'lucide-react'
+import { Book, Code, LogOut, User, ShoppingCart, PenToolIcon, Cog } from 'lucide-react'
 import { useAuthState, useLogout } from '@/hooks/queries/auth-hooks'
+import { useGetCart } from '@/hooks/queries/payment-hooks'
 import { ThemeChanger } from '@/components/shared/theme-changer'
 
 export function NavBar() {
   const { isAuthenticated, user } = useAuthState()
   const logoutMutation = useLogout()
   const router = useRouter()
+  const { data: cartData } = useGetCart()
+  const cartItemCount = cartData?.data?.length || 0
 
   const handleLogout = async () => {
     try {
@@ -50,19 +54,28 @@ export function NavBar() {
             <Link to="/about" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors">
               About
             </Link>
-            <Link to="/contact" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors">
-              Contact
-            </Link>
-            <Link to="/lecturing-tool/course" data-testid="lecturing-tool-link" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors">
-              Tool
-            </Link>
-
             {isAuthenticated ? (
               <div className="flex items-center space-x-4">
+                {/* Cart Icon */}
+                <Button variant="ghost" size="sm" className="relative" asChild>
+                  <Link to="/cart">
+                    <ShoppingCart className="h-5 w-5" />
+                    {cartItemCount > 0 && (
+                      <Badge
+                        variant="destructive"
+                        className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                      >
+                        {cartItemCount > 99 ? '99+' : cartItemCount}
+                      </Badge>
+                    )}
+                  </Link>
+                </Button>
+
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="flex items-center space-x-2 px-3">
                       <Avatar className="h-8 w-8">
+                        <AvatarImage src={user?.profilePicture || ''} alt={user?.email || 'User Avatar'} />
                         <AvatarFallback className="bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-400 text-sm">
                           {getUserInitials(user?.email)}
                         </AvatarFallback>
@@ -85,6 +98,18 @@ export function NavBar() {
                       <Link to="/your-courses" className="flex items-center">
                         <Book className="mr-2 h-4 w-4" />
                         Your Courses
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/lecturing-tool" className="flex items-center">
+                        <PenToolIcon className="mr-2 h-4 w-4" />
+                        Lecturing Tool
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/settings" className="flex items-center">
+                        <Cog className="mr-2 h-4 w-4" />
+                        Settings
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />

@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, ChevronRight, Plus, BookOpen, Play, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronRight, Plus, BookOpen, Play, Trash2, CircleQuestionMarkIcon, Copy } from "lucide-react";
 import { useCourseEdit } from "@/contexts/course/use-course-edit";
 import type { Module } from "@/types/db/course/module";
 import { LessonType } from "@/types/db/course/lesson";
@@ -17,6 +17,8 @@ interface ModuleTreeItemProps {
   onAddLesson: (moduleId: string) => void;
   onDeleteModule: (moduleId: string, moduleTitle: string) => void;
   onDeleteLesson: (lessonId: string, lessonTitle: string) => void;
+  onCloneModule: (moduleId: string) => void;
+  onCloneLesson: (lessonId: string) => void;
   isSelected: boolean;
 }
 
@@ -29,6 +31,8 @@ export function ModuleTreeItem({
   onAddLesson,
   onDeleteModule,
   onDeleteLesson,
+  onCloneModule,
+  onCloneLesson,
   isSelected,
 }: ModuleTreeItemProps) {
   const { selectedLessonId } = useCourseEdit();
@@ -47,6 +51,12 @@ export function ModuleTreeItem({
       default:
         return { variant: "outline" as const, label: "?" };
     }
+  };
+
+  const lessonTypeIcons: Record<LessonType, React.ReactNode> = {
+    [LessonType.MARKDOWN]: <BookOpen className="h-3 w-3 flex-shrink-0" />,
+    [LessonType.VIDEO]: <Play className="h-3 w-3 flex-shrink-0" />,
+    [LessonType.QUIZ]: <CircleQuestionMarkIcon className="h-3 w-3 flex-shrink-0" />,
   };
 
   return (
@@ -86,8 +96,21 @@ export function ModuleTreeItem({
               e.stopPropagation();
               onAddLesson(module.id);
             }}
+            title="Add lesson"
           >
             <Plus className="h-3 w-3" />
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-6 w-6 p-0 opacity-60 hover:opacity-100"
+            onClick={(e) => {
+              e.stopPropagation();
+              onCloneModule(module.id);
+            }}
+            title="Clone module"
+          >
+            <Copy className="h-3 w-3" />
           </Button>
           <Button
             size="sm"
@@ -97,6 +120,7 @@ export function ModuleTreeItem({
               e.stopPropagation();
               onDeleteModule(module.id, module.title);
             }}
+            title="Delete module"
           >
             <Trash2 className="h-3 w-3" />
           </Button>
@@ -119,7 +143,7 @@ export function ModuleTreeItem({
                 onClick={() => onLessonSelect(module.id, lesson.id)}
               >
                 <div className="flex items-center space-x-2 flex-1 min-w-0">
-                  <Play className="h-3 w-3 flex-shrink-0" />
+                  {lessonTypeIcons[lesson.lessonType]}
                   <span className="text-xs truncate">{lesson.title}</span>
                 </div>
                 <div className="flex items-center gap-1">
@@ -129,11 +153,24 @@ export function ModuleTreeItem({
                   <Button
                     size="sm"
                     variant="ghost"
+                    className="h-5 w-5 p-0 opacity-60 hover:opacity-100"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onCloneLesson(lesson.id);
+                    }}
+                    title="Clone lesson"
+                  >
+                    <Copy className="h-2.5 w-2.5" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
                     className="h-5 w-5 p-0 opacity-60 hover:opacity-100 hover:text-destructive"
                     onClick={(e) => {
                       e.stopPropagation();
                       onDeleteLesson(lesson.id, lesson.title);
                     }}
+                    title="Delete lesson"
                   >
                     <Trash2 className="h-2.5 w-2.5" />
                   </Button>

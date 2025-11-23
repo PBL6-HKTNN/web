@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Trash2, Clock, BookOpen, User } from 'lucide-react'
+import { Trash2, BookOpen} from 'lucide-react'
 import type { CartItem } from '@/types/db/payment'
 import { useRemoveFromCart } from '@/hooks/queries/payment-hooks'
 import { formatPrice } from '@/utils/format'
@@ -17,7 +16,7 @@ export function CartItemComponent({ item }: CartItemProps) {
     removeFromCart(item.courseId)
   }
 
-  if (!item.course) {
+  if (!item.courseId) {
     return (
       <Card className="mb-4">
         <CardContent className="p-4">
@@ -40,18 +39,16 @@ export function CartItemComponent({ item }: CartItemProps) {
     )
   }
 
-  const { course } = item
-
   return (
     <Card className="mb-4">
       <CardContent className="p-4">
         <div className="flex gap-4">
           {/* Course Thumbnail */}
           <div className="w-24 h-16 bg-muted rounded-lg flex-shrink-0 overflow-hidden">
-            {course.thumbnail ? (
+            {item.thumbnailUrl ? (
               <img
-                src={course.thumbnail}
-                alt={course.title}
+                src={item.thumbnailUrl}
+                alt={item.courseTitle}
                 className="w-full h-full object-cover"
               />
             ) : (
@@ -65,7 +62,7 @@ export function CartItemComponent({ item }: CartItemProps) {
           <div className="flex-1 min-w-0">
             <div className="flex justify-between items-start mb-2">
               <h3 className="font-semibold text-sm line-clamp-2 pr-2">
-                {course.title}
+                {item.courseTitle}
               </h3>
               <Button
                 variant="ghost"
@@ -78,37 +75,37 @@ export function CartItemComponent({ item }: CartItemProps) {
               </Button>
             </div>
 
-            {course.description && (
+            {item.description && (
               <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
-                {course.description}
+                {item.description}
               </p>
             )}
 
             {/* Course Meta */}
-            <div className="flex items-center gap-3 text-xs text-muted-foreground mb-2">
-              {course.instructorId && (
-                <div className="flex items-center gap-1">
-                  <User className="h-3 w-3" />
-                  <span>{course.instructorId}</span>
-                </div>
-              )}
-              {course.duration && (
-                <div className="flex items-center gap-1">
-                  <Clock className="h-3 w-3" />
-                  <span>{course.duration} hours</span>
-                </div>
-              )}
-            </div>
+              {/* <div className="flex items-center gap-3 text-xs text-muted-foreground mb-2">
+                {item.instructorId && (
+                  <div className="flex items-center gap-1">
+                    <User className="h-3 w-3" />
+                    <span>{item.instructorId}</span>
+                  </div>
+                )}
+                {item.duration && (
+                  <div className="flex items-center gap-1">
+                    <Clock className="h-3 w-3" />
+                    <span>{item.duration} hours</span>
+                  </div>
+                )}
+              </div> */}
 
             {/* Price and Category */}
             <div className="flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                {course.categoryId && (
+              {/* <div className="flex items-center gap-2">
+                {item.categoryId && (
                   <Badge variant="secondary" className="text-xs">
-                    {course.categoryId}
+                    {item.categoryId}
                   </Badge>
                 )}
-              </div>
+              </div> */}
               <div className="text-right">
                 <p className="font-semibold text-primary">
                   {formatPrice(item.price)}

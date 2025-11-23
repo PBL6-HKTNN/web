@@ -20,6 +20,7 @@ export function QuizLessonRender({ lesson }: QuizLessonRenderProps) {
     // Data
     isLoading,
     isSaving,
+    totalMarks,
 
     // Form
     form,
@@ -30,6 +31,7 @@ export function QuizLessonRender({ lesson }: QuizLessonRenderProps) {
     addQuestion,
     updateQuestion,
     removeQuestion,
+    cloneQuestion,
   } = useQuizLessonRender({ lesson });
 
   if (isLoading) {
@@ -82,12 +84,18 @@ export function QuizLessonRender({ lesson }: QuizLessonRenderProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="passingMarks">Passing Marks *</Label>
+            <Label htmlFor="passingMarks">
+              Passing Marks * 
+              <span className="text-sm text-muted-foreground font-normal">
+                (Total: {totalMarks} marks)
+              </span>
+            </Label>
             <Input
               id="passingMarks"
               type="number"
               {...form.register("passingMarks", { valueAsNumber: true })}
               placeholder="Enter passing marks"
+              // max={totalMarks}
             />
             {form.formState.errors.passingMarks && (
               <p className="text-sm text-destructive">{form.formState.errors.passingMarks.message}</p>
@@ -149,6 +157,7 @@ export function QuizLessonRender({ lesson }: QuizLessonRenderProps) {
             questions={fields}
             onUpdate={updateQuestion}
             onRemove={removeQuestion}
+            onClone={cloneQuestion}
             form={form}
           />
         </CardContent>
