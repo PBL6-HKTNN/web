@@ -4,10 +4,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
-import { ArrowLeft, CreditCard, X, Loader2 } from 'lucide-react'
+import { ArrowLeft, CreditCard, X} from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import { formatPrice } from '@/utils/format'
 import type { OrderItem } from '@/types/db/payment'
+import { loadStripe } from '@stripe/stripe-js'
+import { Elements } from '@stripe/react-stripe-js'
+import { stripePk } from '@/conf'
+import { CheckoutForm } from '@/components/payment/checkout-form'
+
+const stripePromise = loadStripe(stripePk)
 
 export const Route = createFileRoute('/checkout/')({ 
   component: RouteComponent,
@@ -20,10 +26,7 @@ function RouteComponent() {
     hasError,
     totalAmount,
     totalItems,
-    isProcessingPayment,
-    isCancelling,
     handlePurchase,
-    handleCancelOrder,
     refetch
   } = useCheckoutPage()
 
@@ -67,8 +70,36 @@ function RouteComponent() {
     )
   }
 
+  // Check if payment is already completed (status = COMPLETED = 1)
+  const isPaymentCompleted = paymentData.payment.orderStatus === 1;
+
+  if (isPaymentCompleted) {
+    return (
+      <div className="container max-w-4xl mx-auto py-8">
+        <Card>
+          <CardContent className="p-8 text-center">
+            <div className="text-5xl mb-4">✅</div>
+            <h2 className="text-2xl font-semibold mb-2">You have no in progress payment</h2>
+            <p className="text-muted-foreground mb-6">
+              Your payment has already been completed.
+            </p>
+            <div className="space-x-2">
+              <Link to="/your-courses">
+                <Button>View My Courses</Button>
+              </Link>
+              <Link to="/cart">
+                <Button variant="outline">Continue Shopping</Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
   return (
-    <div className="container max-w-7xl mx-auto py-8">
+    <Elements stripe={stripePromise}>
+      <div className="container max-w-7xl mx-auto py-8">
       {/* Header */}
       <div className="flex items-center gap-4 mb-8">
         <Link to="/cart" className="text-muted-foreground hover:text-foreground">
@@ -139,74 +170,46 @@ function RouteComponent() {
 
         {/* Payment Summary */}
         <div className="lg:col-span-1">
-          <Card className="sticky top-8">
-            <CardHeader>
-              <CardTitle className="text-lg">Payment Summary</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Subtotal ({totalItems} items)</span>
-                  <span>{formatPrice(totalAmount)}</span>
+          <div className="sticky top-8 space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Order Summary</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Subtotal ({totalItems} items)</span>
+                    <span>{formatPrice(totalAmount)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span>Taxes</span>
+                    <span>$0.00</span>
+                  </div>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span>Taxes</span>
-                  <span>$0.00</span>
-                </div>
-              </div>
-              
-              <Separator />
-              
-              <div className="flex justify-between font-semibold text-lg">
-                <span>Total</span>
-                <span className="text-primary">{formatPrice(totalAmount)}</span>
-              </div>
-              
-              <div className="space-y-2 pt-4">
-                <Button 
-                  className="w-full" 
-                  size="lg"
-                  onClick={handlePurchase}
-                  disabled={isProcessingPayment || isCancelling}
-                >
-                  {isProcessingPayment ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Processing Payment...
-                    </>
-                  ) : (
-                    <>
-                      <CreditCard className="h-4 w-4 mr-2" />
-                      Complete Purchase
-                    </>
-                  )}
-                </Button>
                 
-                <Button 
-                  variant="outline" 
-                  className="w-full"
-                  onClick={handleCancelOrder}
-                  disabled={isProcessingPayment || isCancelling}
-                >
-                  {isCancelling ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Cancelling...
-                    </>
-                  ) : (
-                    'Cancel Order'
-                  )}
-                </Button>
-              </div>
-              
-              <div className="text-xs text-muted-foreground text-center pt-4">
-                <p>Secure checkout powered by Stripe</p>
-                <p>30-day money-back guarantee</p>
-              </div>
-            </CardContent>
-          </Card>
+                <Separator />
+                
+                <div className="flex justify-between font-semibold text-lg">
+                  <span>Total</span>
+                  <span className="text-primary">{formatPrice(totalAmount)}</span>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <CheckoutForm 
+              onSuccess={handlePurchase} 
+              paymentData={paymentData}
+              totalAmount={totalAmount}
+            />
+            
+            <div className="text-xs text-muted-foreground text-center">
+              <p>Secure checkout powered by Stripe</p>
+              <p>30-day money-back guarantee</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
+    </Elements>
   )
 }

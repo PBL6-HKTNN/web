@@ -1,13 +1,12 @@
 import { useMemo } from 'react'
 import { useRouter } from '@tanstack/react-router'
-import { useGetPayment, useCreatePaymentIntent, useUpdatePayment } from '@/hooks/queries/payment-hooks'
+import { useGetPayment, useUpdatePayment } from '@/hooks/queries/payment-hooks'
 import { toast } from 'sonner'
 import type { OrderItem } from '@/types/db/payment'
 
 export function useCheckoutPage() {
   const router = useRouter()
   const { data: paymentResponse, isLoading, error, refetch } = useGetPayment()
-  const { mutate: createPaymentIntent, isPending: isProcessingPayment } = useCreatePaymentIntent()
   const { mutate: updatePayment, isPending: isCancelling } = useUpdatePayment()
 
   const paymentData = useMemo(() => paymentResponse?.data || null, [paymentResponse?.data])
@@ -30,32 +29,10 @@ export function useCheckoutPage() {
   }, [paymentData?.orderItems])
 
   const handlePurchase = () => {
-    if (!paymentData) {
-      toast.error('Payment data not found')
-      return
-    }
-
-    createPaymentIntent(
-      {
-        amount: calculatedTotals.total,
-        paymentId: paymentData.payment.id
-      },
-      {
-        onSuccess: (data) => {
-          if (data.isSuccess) {
-            toast.success('Payment intent created successfully! 💳')
-            setTimeout(() => {
-              router.navigate({ to: '/your-courses' })
-            }, 2000)
-          } else {
-            toast.error('Failed to create payment intent')
-          }
-        },
-        onError: () => {
-          toast.error('Payment processing failed')
-        }
-      }
-    )
+    // Navigate to courses after successful payment
+    setTimeout(() => {
+      router.navigate({ to: '/your-courses' })
+    }, 2000)
   }
 
   const handleCancelOrder = () => {
@@ -96,7 +73,6 @@ export function useCheckoutPage() {
     isEmpty,
     totalAmount: calculatedTotals.total,
     totalItems: calculatedTotals.count,
-    isProcessingPayment,
     isCancelling,
     handlePurchase,
     handleCancelOrder,

@@ -51,12 +51,15 @@ export interface UpdatePaymentRequest {
 export interface PaymentIntentRequest {
   paymentId: UUID;
   amount: number;
+  paymentMethodId?: string;
 }
 
 // Payment intent response data
 export interface PaymentIntentData {
   clientSecret: string;
-  paymentIntentId: string;
+  paymentId: string;
+  amount: number;
+  currency: string;
 }
 export type PaymentData = {
   payment: Payment;
@@ -68,5 +71,5 @@ export type CreatePaymentResponse = ApiResponse<PaymentData>;
 export type PaymentResponse = ApiResponse<PaymentData>;
 export type PaymentListResponse = ApiResponse<PaymentData[]>;
 export type UpdatePaymentResponse = ApiResponse<PaymentData>;
-export type PaymentIntentResponse = ApiResponse<PaymentData>;
+export type PaymentIntentResponse = ApiResponse<PaymentIntentData>;
 export type WebhookResponse = ApiResponse<null>;

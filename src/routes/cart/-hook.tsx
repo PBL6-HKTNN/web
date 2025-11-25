@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useRouter } from '@tanstack/react-router'
-import { useGetCart, useCreatePayment } from '@/hooks/queries/payment-hooks'
+import { useGetCart, useCreatePayment, useGetPayment } from '@/hooks/queries/payment-hooks'
 import { MethodPayment } from '@/types/db/payment'
 import type { CartItem } from '@/types/db/payment/cart'
 import type { UUID } from '@/types'
@@ -8,6 +8,7 @@ import type { UUID } from '@/types'
 export function useCartPage() {
   const router = useRouter()
   const { data: cartData, isLoading, error, refetch } = useGetCart()
+  const { data: currentPaymentData } = useGetPayment()
   const { mutate: createPayment, isPending: isCreatingPayment } = useCreatePayment()
 
   const cartItems = useMemo(() => cartData?.data || [], [cartData?.data])
@@ -49,6 +50,7 @@ export function useCartPage() {
   const isEmpty = cartItems.length === 0
   const hasError = !!error
   const isProcessing = isCreatingPayment
+  const hasOngoingPayment = currentPaymentData?.data && currentPaymentData.data.payment.orderStatus === 0 // PENDING status
 
   return {
     cartItems,
@@ -58,6 +60,7 @@ export function useCartPage() {
     hasError,
     isEmpty,
     isProcessing,
+    hasOngoingPayment,
     handleCheckout,
     refetch
   }

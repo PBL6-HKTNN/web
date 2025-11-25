@@ -3,42 +3,30 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Button } from '@/components/ui/button'
-import { Receipt, AlertCircle, LayoutGrid, LayoutList } from 'lucide-react'
-import { useListPayments } from '@/hooks/queries/payment-hooks'
+import { Receipt, AlertCircle, LayoutGrid, LayoutList, ArrowRight, ShoppingCart } from 'lucide-react'
 import { PaymentCard } from '@/components/payment/payment-card'
 import { PaymentTable } from '@/components/payment/payment-table'
-import { useState } from 'react'
-import type { PaymentData } from '@/types/db/payment'
+import { Link } from '@tanstack/react-router'
+import { formatPrice } from '@/utils/format'
+import type { PaymentData, OrderItem } from '@/types/db/payment'
+import { usePaymentSettings } from './-hook'
 
 export const Route = createFileRoute('/settings/payment/')({ 
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  const { data: paymentsData, isLoading, error } = useListPayments();
-  const payments = paymentsData?.data || [];
-  const [viewMode, setViewMode] = useState<'card' | 'table'>('card');
-  
-  const getStatusStats = () => {
-    const stats = payments.reduce((acc: Record<number, number>, paymentData: PaymentData) => {
-      const status = paymentData.payment.orderStatus;
-      acc[status] = (acc[status] || 0) + 1;
-      return acc;
-    }, {} as Record<number, number>);
-    
-    return {
-      completed: stats[1] || 0,
-      pending: stats[0] || 0,
-      failed: stats[2] || 0,
-      cancelled: stats[3] || 0
-    };
-  };
-  
-  const totalSpent = payments
-    .filter((paymentData: PaymentData) => paymentData.payment.orderStatus === 1) // Only completed payments
-    .reduce((sum: number, paymentData: PaymentData) => sum + paymentData.payment.totalAmount, 0);
-  
-  const stats = getStatusStats();
+  const {
+    payments,
+    currentPayment,
+    hasInProgressPayment,
+    totalSpent,
+    stats,
+    viewMode,
+    setViewMode,
+    isLoading,
+    error,
+  } = usePaymentSettings();
 
   if (isLoading) {
     return (
@@ -96,6 +84,71 @@ function RouteComponent() {
             View your payment history and transaction details.
           </p>
         </div>
+        
+        {/* In Progress Payment */}
+        {hasInProgressPayment && currentPayment && (
+          <Card className="border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-900/20">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <ShoppingCart className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+                  <CardTitle className="text-yellow-800 dark:text-yellow-200">In Progress Payment</CardTitle>
+                </div>
+                <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-200">
+                  Pending
+                </Badge>
+              </div>
+              <CardDescription className="text-yellow-700 dark:text-yellow-300">
+                You have an unfinished payment. Complete your purchase to access your courses.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="font-medium">
+                      {currentPayment.orderItems?.length || 0} course{(currentPayment.orderItems?.length || 0) !== 1 ? 's' : ''}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Total: {formatPrice(currentPayment.payment.totalAmount)}
+                    </p>
+                  </div>
+                  <Link to="/checkout">
+                    <Button className="bg-yellow-600 hover:bg-yellow-700 dark:bg-yellow-500 dark:hover:bg-yellow-600">
+                      Continue Checkout
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </Link>
+                </div>
+                
+                <div className="space-y-2">
+                  {currentPayment.orderItems?.slice(0, 3).map((item: OrderItem) => (
+                    <div key={item.courseId} className="flex items-center gap-3 p-2 bg-white dark:bg-yellow-800 rounded border">
+                      <img
+                        src={item.thumbnailUrl}
+                        alt={item.courseTitle}
+                        className="w-8 h-8 object-cover rounded"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = '/placeholder-course.jpg';
+                        }}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{item.courseTitle}</p>
+                        <p className="text-xs text-muted-foreground">{formatPrice(item.price)}</p>
+                      </div>
+                    </div>
+                  ))}
+                  {(currentPayment.orderItems?.length || 0) > 3 && (
+                    <p className="text-sm text-muted-foreground text-center">
+                      +{(currentPayment.orderItems?.length || 0) - 3} more course{(currentPayment.orderItems?.length || 0) - 3 !== 1 ? 's' : ''}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
         
         {/* Payment Statistics */}
         <div className="grid gap-4 md:grid-cols-4">

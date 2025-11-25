@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
-import { ShoppingCart, CreditCard, AlertCircle, RefreshCw, ArrowLeft } from 'lucide-react'
+import { ShoppingCart, CreditCard, AlertCircle, RefreshCw, ArrowLeft, Receipt } from 'lucide-react'
 import { CartItemComponent } from '@/components/payment/cart/cart-item'
 import { useCartPage } from './-hook'
 import { formatPrice } from '@/utils/format'
@@ -23,6 +23,7 @@ function RouteComponent() {
     hasError,
     isEmpty,
     isProcessing,
+    hasOngoingPayment,
     handleCheckout,
     refetch
   } = useCartPage()
@@ -151,11 +152,26 @@ function RouteComponent() {
                     className="w-full" 
                     size="lg"
                     onClick={() => handleCheckout(MethodPayment.STRIPE)}
-                    disabled={isProcessing}
+                    disabled={isProcessing || hasOngoingPayment!}
                   >
                     <CreditCard className="h-4 w-4 mr-2" />
-                    {isProcessing ? 'Processing...' : 'Proceed to Checkout'}
+                    {isProcessing ? 'Processing...' : hasOngoingPayment ? 'Complete Current Payment First' : 'Proceed to Checkout'}
                   </Button>
+                  
+                  {hasOngoingPayment && (
+                    <div className='space-y-2'>
+                      <div className="text-sm text-amber-600 dark:text-amber-400 text-center p-2 bg-amber-50 dark:bg-amber-900/20 rounded">
+                        You have an unfinished payment. Please complete it before starting a new checkout.
+                      </div>
+                      <Link to='/checkout' className="text-sm text-blue-500">
+                        <Button variant="default" className="w-full cursor-pointer">
+                          <Receipt className="h-4 w-4 mr-2" />
+                          View Ongoing Payment
+                        </Button>
+                      </Link>
+                    </div>
+
+                  )}
                   
                   <Link to="/course" className="block">
                     <Button variant="outline" className="w-full">
