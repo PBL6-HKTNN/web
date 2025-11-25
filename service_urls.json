@@ -1,0 +1,7 @@
+{
+    "AUTH_SERVICE_URL": "http://localhost:5197",
+    "USER_SERVICE_URL": "http://localhost:5197",
+    "COURSE_SERVICE_URL": "https://localhost:7024",
+    "STORAGE_SERVICE_URL": "http://localhost:5164",
+    "ENROLLMENT_SERVICE_URL": "http://localhost:5178"
+}

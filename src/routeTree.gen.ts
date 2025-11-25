@@ -11,10 +11,38 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as YourCoursesRouteRouteImport } from './routes/your-courses/route'
 import { Route as UsersRouteRouteImport } from './routes/users/route'
+import { Route as LecturingToolRouteRouteImport } from './routes/lecturing-tool/route'
+import { Route as LearnRouteRouteImport } from './routes/learn/route'
+import { Route as CourseRouteRouteImport } from './routes/course/route'
+import { Route as AuthRouteRouteImport } from './routes/auth/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as YourCoursesIndexRouteImport } from './routes/your-courses/index'
 import { Route as UsersIndexRouteImport } from './routes/users/index'
+import { Route as LecturingToolIndexRouteImport } from './routes/lecturing-tool/index'
+import { Route as CourseIndexRouteImport } from './routes/course/index'
 import { Route as UsersUserIdRouteImport } from './routes/users/$userId'
+import { Route as CourseCourseIdRouteImport } from './routes/course/$courseId'
+import { Route as LearnCourseIdRouteRouteImport } from './routes/learn/$courseId/route'
+import { Route as AuthMainLayoutRouteRouteImport } from './routes/auth/_mainLayout/route'
+import { Route as LecturingToolCourseIndexRouteImport } from './routes/lecturing-tool/course/index'
+import { Route as LearnCourseIdIndexRouteImport } from './routes/learn/$courseId/index'
+import { Route as AuthVerifyIndexRouteImport } from './routes/auth/verify/index'
+import { Route as AuthForgotPasswordIndexRouteImport } from './routes/auth/forgot-password/index'
+import { Route as LearnCourseIdModuleIdRouteRouteImport } from './routes/learn/$courseId/$moduleId/route'
+import { Route as LecturingToolCourseCreateIndexRouteImport } from './routes/lecturing-tool/course/create/index'
+import { Route as LecturingToolCourseCourseIdIndexRouteImport } from './routes/lecturing-tool/course/$courseId/index'
+import { Route as LearnCourseIdModuleIdIndexRouteImport } from './routes/learn/$courseId/$moduleId/index'
+import { Route as AuthMainLayoutRegisterIndexRouteImport } from './routes/auth/_mainLayout/register/index'
+import { Route as AuthMainLayoutLoginIndexRouteImport } from './routes/auth/_mainLayout/login/index'
+import { Route as LecturingToolCourseCourseIdEditingRouteRouteImport } from './routes/lecturing-tool/course/$courseId/editing/route'
+import { Route as LearnCourseIdModuleIdLessonIdRouteRouteImport } from './routes/learn/$courseId/$moduleId/$lessonId/route'
+import { Route as LecturingToolCourseCourseIdEditingIndexRouteImport } from './routes/lecturing-tool/course/$courseId/editing/index'
+import { Route as LearnCourseIdModuleIdLessonIdIndexRouteImport } from './routes/learn/$courseId/$moduleId/$lessonId/index'
+import { Route as LearnCourseIdModuleIdLessonIdQuizRouteRouteImport } from './routes/learn/$courseId/$moduleId/$lessonId/quiz/route'
+import { Route as LearnCourseIdModuleIdLessonIdQuizIndexRouteImport } from './routes/learn/$courseId/$moduleId/$lessonId/quiz/index'
+import { Route as LearnCourseIdModuleIdLessonIdQuizResultIndexRouteImport } from './routes/learn/$courseId/$moduleId/$lessonId/quiz/result/index'
 
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
@@ -26,9 +54,34 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
+const YourCoursesRouteRoute = YourCoursesRouteRouteImport.update({
+  id: '/your-courses',
+  path: '/your-courses',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const UsersRouteRoute = UsersRouteRouteImport.update({
   id: '/users',
   path: '/users',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LecturingToolRouteRoute = LecturingToolRouteRouteImport.update({
+  id: '/lecturing-tool',
+  path: '/lecturing-tool',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LearnRouteRoute = LearnRouteRouteImport.update({
+  id: '/learn',
+  path: '/learn',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CourseRouteRoute = CourseRouteRouteImport.update({
+  id: '/course',
+  path: '/course',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRouteRoute = AuthRouteRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -36,65 +89,351 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const YourCoursesIndexRoute = YourCoursesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => YourCoursesRouteRoute,
+} as any)
 const UsersIndexRoute = UsersIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => UsersRouteRoute,
+} as any)
+const LecturingToolIndexRoute = LecturingToolIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => LecturingToolRouteRoute,
+} as any)
+const CourseIndexRoute = CourseIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => CourseRouteRoute,
 } as any)
 const UsersUserIdRoute = UsersUserIdRouteImport.update({
   id: '/$userId',
   path: '/$userId',
   getParentRoute: () => UsersRouteRoute,
 } as any)
+const CourseCourseIdRoute = CourseCourseIdRouteImport.update({
+  id: '/$courseId',
+  path: '/$courseId',
+  getParentRoute: () => CourseRouteRoute,
+} as any)
+const LearnCourseIdRouteRoute = LearnCourseIdRouteRouteImport.update({
+  id: '/$courseId',
+  path: '/$courseId',
+  getParentRoute: () => LearnRouteRoute,
+} as any)
+const AuthMainLayoutRouteRoute = AuthMainLayoutRouteRouteImport.update({
+  id: '/_mainLayout',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+const LecturingToolCourseIndexRoute =
+  LecturingToolCourseIndexRouteImport.update({
+    id: '/course/',
+    path: '/course/',
+    getParentRoute: () => LecturingToolRouteRoute,
+  } as any)
+const LearnCourseIdIndexRoute = LearnCourseIdIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => LearnCourseIdRouteRoute,
+} as any)
+const AuthVerifyIndexRoute = AuthVerifyIndexRouteImport.update({
+  id: '/verify/',
+  path: '/verify/',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+const AuthForgotPasswordIndexRoute = AuthForgotPasswordIndexRouteImport.update({
+  id: '/forgot-password/',
+  path: '/forgot-password/',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+const LearnCourseIdModuleIdRouteRoute =
+  LearnCourseIdModuleIdRouteRouteImport.update({
+    id: '/$moduleId',
+    path: '/$moduleId',
+    getParentRoute: () => LearnCourseIdRouteRoute,
+  } as any)
+const LecturingToolCourseCreateIndexRoute =
+  LecturingToolCourseCreateIndexRouteImport.update({
+    id: '/course/create/',
+    path: '/course/create/',
+    getParentRoute: () => LecturingToolRouteRoute,
+  } as any)
+const LecturingToolCourseCourseIdIndexRoute =
+  LecturingToolCourseCourseIdIndexRouteImport.update({
+    id: '/course/$courseId/',
+    path: '/course/$courseId/',
+    getParentRoute: () => LecturingToolRouteRoute,
+  } as any)
+const LearnCourseIdModuleIdIndexRoute =
+  LearnCourseIdModuleIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => LearnCourseIdModuleIdRouteRoute,
+  } as any)
+const AuthMainLayoutRegisterIndexRoute =
+  AuthMainLayoutRegisterIndexRouteImport.update({
+    id: '/register/',
+    path: '/register/',
+    getParentRoute: () => AuthMainLayoutRouteRoute,
+  } as any)
+const AuthMainLayoutLoginIndexRoute =
+  AuthMainLayoutLoginIndexRouteImport.update({
+    id: '/login/',
+    path: '/login/',
+    getParentRoute: () => AuthMainLayoutRouteRoute,
+  } as any)
+const LecturingToolCourseCourseIdEditingRouteRoute =
+  LecturingToolCourseCourseIdEditingRouteRouteImport.update({
+    id: '/course/$courseId/editing',
+    path: '/course/$courseId/editing',
+    getParentRoute: () => LecturingToolRouteRoute,
+  } as any)
+const LearnCourseIdModuleIdLessonIdRouteRoute =
+  LearnCourseIdModuleIdLessonIdRouteRouteImport.update({
+    id: '/$lessonId',
+    path: '/$lessonId',
+    getParentRoute: () => LearnCourseIdModuleIdRouteRoute,
+  } as any)
+const LecturingToolCourseCourseIdEditingIndexRoute =
+  LecturingToolCourseCourseIdEditingIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => LecturingToolCourseCourseIdEditingRouteRoute,
+  } as any)
+const LearnCourseIdModuleIdLessonIdIndexRoute =
+  LearnCourseIdModuleIdLessonIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => LearnCourseIdModuleIdLessonIdRouteRoute,
+  } as any)
+const LearnCourseIdModuleIdLessonIdQuizRouteRoute =
+  LearnCourseIdModuleIdLessonIdQuizRouteRouteImport.update({
+    id: '/quiz',
+    path: '/quiz',
+    getParentRoute: () => LearnCourseIdModuleIdLessonIdRouteRoute,
+  } as any)
+const LearnCourseIdModuleIdLessonIdQuizIndexRoute =
+  LearnCourseIdModuleIdLessonIdQuizIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => LearnCourseIdModuleIdLessonIdQuizRouteRoute,
+  } as any)
+const LearnCourseIdModuleIdLessonIdQuizResultIndexRoute =
+  LearnCourseIdModuleIdLessonIdQuizResultIndexRouteImport.update({
+    id: '/result/',
+    path: '/result/',
+    getParentRoute: () => LearnCourseIdModuleIdLessonIdQuizRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthMainLayoutRouteRouteWithChildren
+  '/course': typeof CourseRouteRouteWithChildren
+  '/learn': typeof LearnRouteRouteWithChildren
+  '/lecturing-tool': typeof LecturingToolRouteRouteWithChildren
   '/users': typeof UsersRouteRouteWithChildren
+  '/your-courses': typeof YourCoursesRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
+  '/learn/$courseId': typeof LearnCourseIdRouteRouteWithChildren
+  '/course/$courseId': typeof CourseCourseIdRoute
   '/users/$userId': typeof UsersUserIdRoute
+  '/course/': typeof CourseIndexRoute
+  '/lecturing-tool/': typeof LecturingToolIndexRoute
   '/users/': typeof UsersIndexRoute
+  '/your-courses/': typeof YourCoursesIndexRoute
+  '/learn/$courseId/$moduleId': typeof LearnCourseIdModuleIdRouteRouteWithChildren
+  '/auth/forgot-password': typeof AuthForgotPasswordIndexRoute
+  '/auth/verify': typeof AuthVerifyIndexRoute
+  '/learn/$courseId/': typeof LearnCourseIdIndexRoute
+  '/lecturing-tool/course': typeof LecturingToolCourseIndexRoute
+  '/learn/$courseId/$moduleId/$lessonId': typeof LearnCourseIdModuleIdLessonIdRouteRouteWithChildren
+  '/lecturing-tool/course/$courseId/editing': typeof LecturingToolCourseCourseIdEditingRouteRouteWithChildren
+  '/auth/login': typeof AuthMainLayoutLoginIndexRoute
+  '/auth/register': typeof AuthMainLayoutRegisterIndexRoute
+  '/learn/$courseId/$moduleId/': typeof LearnCourseIdModuleIdIndexRoute
+  '/lecturing-tool/course/$courseId': typeof LecturingToolCourseCourseIdIndexRoute
+  '/lecturing-tool/course/create': typeof LecturingToolCourseCreateIndexRoute
+  '/learn/$courseId/$moduleId/$lessonId/quiz': typeof LearnCourseIdModuleIdLessonIdQuizRouteRouteWithChildren
+  '/learn/$courseId/$moduleId/$lessonId/': typeof LearnCourseIdModuleIdLessonIdIndexRoute
+  '/lecturing-tool/course/$courseId/editing/': typeof LecturingToolCourseCourseIdEditingIndexRoute
+  '/learn/$courseId/$moduleId/$lessonId/quiz/': typeof LearnCourseIdModuleIdLessonIdQuizIndexRoute
+  '/learn/$courseId/$moduleId/$lessonId/quiz/result': typeof LearnCourseIdModuleIdLessonIdQuizResultIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthMainLayoutRouteRouteWithChildren
+  '/learn': typeof LearnRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
+  '/course/$courseId': typeof CourseCourseIdRoute
   '/users/$userId': typeof UsersUserIdRoute
+  '/course': typeof CourseIndexRoute
+  '/lecturing-tool': typeof LecturingToolIndexRoute
   '/users': typeof UsersIndexRoute
+  '/your-courses': typeof YourCoursesIndexRoute
+  '/auth/forgot-password': typeof AuthForgotPasswordIndexRoute
+  '/auth/verify': typeof AuthVerifyIndexRoute
+  '/learn/$courseId': typeof LearnCourseIdIndexRoute
+  '/lecturing-tool/course': typeof LecturingToolCourseIndexRoute
+  '/auth/login': typeof AuthMainLayoutLoginIndexRoute
+  '/auth/register': typeof AuthMainLayoutRegisterIndexRoute
+  '/learn/$courseId/$moduleId': typeof LearnCourseIdModuleIdIndexRoute
+  '/lecturing-tool/course/$courseId': typeof LecturingToolCourseCourseIdIndexRoute
+  '/lecturing-tool/course/create': typeof LecturingToolCourseCreateIndexRoute
+  '/learn/$courseId/$moduleId/$lessonId': typeof LearnCourseIdModuleIdLessonIdIndexRoute
+  '/lecturing-tool/course/$courseId/editing': typeof LecturingToolCourseCourseIdEditingIndexRoute
+  '/learn/$courseId/$moduleId/$lessonId/quiz': typeof LearnCourseIdModuleIdLessonIdQuizIndexRoute
+  '/learn/$courseId/$moduleId/$lessonId/quiz/result': typeof LearnCourseIdModuleIdLessonIdQuizResultIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/auth': typeof AuthRouteRouteWithChildren
+  '/course': typeof CourseRouteRouteWithChildren
+  '/learn': typeof LearnRouteRouteWithChildren
+  '/lecturing-tool': typeof LecturingToolRouteRouteWithChildren
   '/users': typeof UsersRouteRouteWithChildren
+  '/your-courses': typeof YourCoursesRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
+  '/auth/_mainLayout': typeof AuthMainLayoutRouteRouteWithChildren
+  '/learn/$courseId': typeof LearnCourseIdRouteRouteWithChildren
+  '/course/$courseId': typeof CourseCourseIdRoute
   '/users/$userId': typeof UsersUserIdRoute
+  '/course/': typeof CourseIndexRoute
+  '/lecturing-tool/': typeof LecturingToolIndexRoute
   '/users/': typeof UsersIndexRoute
+  '/your-courses/': typeof YourCoursesIndexRoute
+  '/learn/$courseId/$moduleId': typeof LearnCourseIdModuleIdRouteRouteWithChildren
+  '/auth/forgot-password/': typeof AuthForgotPasswordIndexRoute
+  '/auth/verify/': typeof AuthVerifyIndexRoute
+  '/learn/$courseId/': typeof LearnCourseIdIndexRoute
+  '/lecturing-tool/course/': typeof LecturingToolCourseIndexRoute
+  '/learn/$courseId/$moduleId/$lessonId': typeof LearnCourseIdModuleIdLessonIdRouteRouteWithChildren
+  '/lecturing-tool/course/$courseId/editing': typeof LecturingToolCourseCourseIdEditingRouteRouteWithChildren
+  '/auth/_mainLayout/login/': typeof AuthMainLayoutLoginIndexRoute
+  '/auth/_mainLayout/register/': typeof AuthMainLayoutRegisterIndexRoute
+  '/learn/$courseId/$moduleId/': typeof LearnCourseIdModuleIdIndexRoute
+  '/lecturing-tool/course/$courseId/': typeof LecturingToolCourseCourseIdIndexRoute
+  '/lecturing-tool/course/create/': typeof LecturingToolCourseCreateIndexRoute
+  '/learn/$courseId/$moduleId/$lessonId/quiz': typeof LearnCourseIdModuleIdLessonIdQuizRouteRouteWithChildren
+  '/learn/$courseId/$moduleId/$lessonId/': typeof LearnCourseIdModuleIdLessonIdIndexRoute
+  '/lecturing-tool/course/$courseId/editing/': typeof LecturingToolCourseCourseIdEditingIndexRoute
+  '/learn/$courseId/$moduleId/$lessonId/quiz/': typeof LearnCourseIdModuleIdLessonIdQuizIndexRoute
+  '/learn/$courseId/$moduleId/$lessonId/quiz/result/': typeof LearnCourseIdModuleIdLessonIdQuizResultIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/auth'
+    | '/course'
+    | '/learn'
+    | '/lecturing-tool'
     | '/users'
+    | '/your-courses'
     | '/about'
     | '/contact'
+    | '/learn/$courseId'
+    | '/course/$courseId'
     | '/users/$userId'
+    | '/course/'
+    | '/lecturing-tool/'
     | '/users/'
+    | '/your-courses/'
+    | '/learn/$courseId/$moduleId'
+    | '/auth/forgot-password'
+    | '/auth/verify'
+    | '/learn/$courseId/'
+    | '/lecturing-tool/course'
+    | '/learn/$courseId/$moduleId/$lessonId'
+    | '/lecturing-tool/course/$courseId/editing'
+    | '/auth/login'
+    | '/auth/register'
+    | '/learn/$courseId/$moduleId/'
+    | '/lecturing-tool/course/$courseId'
+    | '/lecturing-tool/course/create'
+    | '/learn/$courseId/$moduleId/$lessonId/quiz'
+    | '/learn/$courseId/$moduleId/$lessonId/'
+    | '/lecturing-tool/course/$courseId/editing/'
+    | '/learn/$courseId/$moduleId/$lessonId/quiz/'
+    | '/learn/$courseId/$moduleId/$lessonId/quiz/result'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/contact' | '/users/$userId' | '/users'
+  to:
+    | '/'
+    | '/auth'
+    | '/learn'
+    | '/about'
+    | '/contact'
+    | '/course/$courseId'
+    | '/users/$userId'
+    | '/course'
+    | '/lecturing-tool'
+    | '/users'
+    | '/your-courses'
+    | '/auth/forgot-password'
+    | '/auth/verify'
+    | '/learn/$courseId'
+    | '/lecturing-tool/course'
+    | '/auth/login'
+    | '/auth/register'
+    | '/learn/$courseId/$moduleId'
+    | '/lecturing-tool/course/$courseId'
+    | '/lecturing-tool/course/create'
+    | '/learn/$courseId/$moduleId/$lessonId'
+    | '/lecturing-tool/course/$courseId/editing'
+    | '/learn/$courseId/$moduleId/$lessonId/quiz'
+    | '/learn/$courseId/$moduleId/$lessonId/quiz/result'
   id:
     | '__root__'
     | '/'
+    | '/auth'
+    | '/course'
+    | '/learn'
+    | '/lecturing-tool'
     | '/users'
+    | '/your-courses'
     | '/about'
     | '/contact'
+    | '/auth/_mainLayout'
+    | '/learn/$courseId'
+    | '/course/$courseId'
     | '/users/$userId'
+    | '/course/'
+    | '/lecturing-tool/'
     | '/users/'
+    | '/your-courses/'
+    | '/learn/$courseId/$moduleId'
+    | '/auth/forgot-password/'
+    | '/auth/verify/'
+    | '/learn/$courseId/'
+    | '/lecturing-tool/course/'
+    | '/learn/$courseId/$moduleId/$lessonId'
+    | '/lecturing-tool/course/$courseId/editing'
+    | '/auth/_mainLayout/login/'
+    | '/auth/_mainLayout/register/'
+    | '/learn/$courseId/$moduleId/'
+    | '/lecturing-tool/course/$courseId/'
+    | '/lecturing-tool/course/create/'
+    | '/learn/$courseId/$moduleId/$lessonId/quiz'
+    | '/learn/$courseId/$moduleId/$lessonId/'
+    | '/lecturing-tool/course/$courseId/editing/'
+    | '/learn/$courseId/$moduleId/$lessonId/quiz/'
+    | '/learn/$courseId/$moduleId/$lessonId/quiz/result/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthRouteRoute: typeof AuthRouteRouteWithChildren
+  CourseRouteRoute: typeof CourseRouteRouteWithChildren
+  LearnRouteRoute: typeof LearnRouteRouteWithChildren
+  LecturingToolRouteRoute: typeof LecturingToolRouteRouteWithChildren
   UsersRouteRoute: typeof UsersRouteRouteWithChildren
+  YourCoursesRouteRoute: typeof YourCoursesRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
   ContactRoute: typeof ContactRoute
 }
@@ -115,11 +454,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/your-courses': {
+      id: '/your-courses'
+      path: '/your-courses'
+      fullPath: '/your-courses'
+      preLoaderRoute: typeof YourCoursesRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/users': {
       id: '/users'
       path: '/users'
       fullPath: '/users'
       preLoaderRoute: typeof UsersRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lecturing-tool': {
+      id: '/lecturing-tool'
+      path: '/lecturing-tool'
+      fullPath: '/lecturing-tool'
+      preLoaderRoute: typeof LecturingToolRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/learn': {
+      id: '/learn'
+      path: '/learn'
+      fullPath: '/learn'
+      preLoaderRoute: typeof LearnRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/course': {
+      id: '/course'
+      path: '/course'
+      fullPath: '/course'
+      preLoaderRoute: typeof CourseRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -129,12 +503,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/your-courses/': {
+      id: '/your-courses/'
+      path: '/'
+      fullPath: '/your-courses/'
+      preLoaderRoute: typeof YourCoursesIndexRouteImport
+      parentRoute: typeof YourCoursesRouteRoute
+    }
     '/users/': {
       id: '/users/'
       path: '/'
       fullPath: '/users/'
       preLoaderRoute: typeof UsersIndexRouteImport
       parentRoute: typeof UsersRouteRoute
+    }
+    '/lecturing-tool/': {
+      id: '/lecturing-tool/'
+      path: '/'
+      fullPath: '/lecturing-tool/'
+      preLoaderRoute: typeof LecturingToolIndexRouteImport
+      parentRoute: typeof LecturingToolRouteRoute
+    }
+    '/course/': {
+      id: '/course/'
+      path: '/'
+      fullPath: '/course/'
+      preLoaderRoute: typeof CourseIndexRouteImport
+      parentRoute: typeof CourseRouteRoute
     }
     '/users/$userId': {
       id: '/users/$userId'
@@ -143,8 +538,304 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UsersUserIdRouteImport
       parentRoute: typeof UsersRouteRoute
     }
+    '/course/$courseId': {
+      id: '/course/$courseId'
+      path: '/$courseId'
+      fullPath: '/course/$courseId'
+      preLoaderRoute: typeof CourseCourseIdRouteImport
+      parentRoute: typeof CourseRouteRoute
+    }
+    '/learn/$courseId': {
+      id: '/learn/$courseId'
+      path: '/$courseId'
+      fullPath: '/learn/$courseId'
+      preLoaderRoute: typeof LearnCourseIdRouteRouteImport
+      parentRoute: typeof LearnRouteRoute
+    }
+    '/auth/_mainLayout': {
+      id: '/auth/_mainLayout'
+      path: ''
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthMainLayoutRouteRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/lecturing-tool/course/': {
+      id: '/lecturing-tool/course/'
+      path: '/course'
+      fullPath: '/lecturing-tool/course'
+      preLoaderRoute: typeof LecturingToolCourseIndexRouteImport
+      parentRoute: typeof LecturingToolRouteRoute
+    }
+    '/learn/$courseId/': {
+      id: '/learn/$courseId/'
+      path: '/'
+      fullPath: '/learn/$courseId/'
+      preLoaderRoute: typeof LearnCourseIdIndexRouteImport
+      parentRoute: typeof LearnCourseIdRouteRoute
+    }
+    '/auth/verify/': {
+      id: '/auth/verify/'
+      path: '/verify'
+      fullPath: '/auth/verify'
+      preLoaderRoute: typeof AuthVerifyIndexRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/auth/forgot-password/': {
+      id: '/auth/forgot-password/'
+      path: '/forgot-password'
+      fullPath: '/auth/forgot-password'
+      preLoaderRoute: typeof AuthForgotPasswordIndexRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/learn/$courseId/$moduleId': {
+      id: '/learn/$courseId/$moduleId'
+      path: '/$moduleId'
+      fullPath: '/learn/$courseId/$moduleId'
+      preLoaderRoute: typeof LearnCourseIdModuleIdRouteRouteImport
+      parentRoute: typeof LearnCourseIdRouteRoute
+    }
+    '/lecturing-tool/course/create/': {
+      id: '/lecturing-tool/course/create/'
+      path: '/course/create'
+      fullPath: '/lecturing-tool/course/create'
+      preLoaderRoute: typeof LecturingToolCourseCreateIndexRouteImport
+      parentRoute: typeof LecturingToolRouteRoute
+    }
+    '/lecturing-tool/course/$courseId/': {
+      id: '/lecturing-tool/course/$courseId/'
+      path: '/course/$courseId'
+      fullPath: '/lecturing-tool/course/$courseId'
+      preLoaderRoute: typeof LecturingToolCourseCourseIdIndexRouteImport
+      parentRoute: typeof LecturingToolRouteRoute
+    }
+    '/learn/$courseId/$moduleId/': {
+      id: '/learn/$courseId/$moduleId/'
+      path: '/'
+      fullPath: '/learn/$courseId/$moduleId/'
+      preLoaderRoute: typeof LearnCourseIdModuleIdIndexRouteImport
+      parentRoute: typeof LearnCourseIdModuleIdRouteRoute
+    }
+    '/auth/_mainLayout/register/': {
+      id: '/auth/_mainLayout/register/'
+      path: '/register'
+      fullPath: '/auth/register'
+      preLoaderRoute: typeof AuthMainLayoutRegisterIndexRouteImport
+      parentRoute: typeof AuthMainLayoutRouteRoute
+    }
+    '/auth/_mainLayout/login/': {
+      id: '/auth/_mainLayout/login/'
+      path: '/login'
+      fullPath: '/auth/login'
+      preLoaderRoute: typeof AuthMainLayoutLoginIndexRouteImport
+      parentRoute: typeof AuthMainLayoutRouteRoute
+    }
+    '/lecturing-tool/course/$courseId/editing': {
+      id: '/lecturing-tool/course/$courseId/editing'
+      path: '/course/$courseId/editing'
+      fullPath: '/lecturing-tool/course/$courseId/editing'
+      preLoaderRoute: typeof LecturingToolCourseCourseIdEditingRouteRouteImport
+      parentRoute: typeof LecturingToolRouteRoute
+    }
+    '/learn/$courseId/$moduleId/$lessonId': {
+      id: '/learn/$courseId/$moduleId/$lessonId'
+      path: '/$lessonId'
+      fullPath: '/learn/$courseId/$moduleId/$lessonId'
+      preLoaderRoute: typeof LearnCourseIdModuleIdLessonIdRouteRouteImport
+      parentRoute: typeof LearnCourseIdModuleIdRouteRoute
+    }
+    '/lecturing-tool/course/$courseId/editing/': {
+      id: '/lecturing-tool/course/$courseId/editing/'
+      path: '/'
+      fullPath: '/lecturing-tool/course/$courseId/editing/'
+      preLoaderRoute: typeof LecturingToolCourseCourseIdEditingIndexRouteImport
+      parentRoute: typeof LecturingToolCourseCourseIdEditingRouteRoute
+    }
+    '/learn/$courseId/$moduleId/$lessonId/': {
+      id: '/learn/$courseId/$moduleId/$lessonId/'
+      path: '/'
+      fullPath: '/learn/$courseId/$moduleId/$lessonId/'
+      preLoaderRoute: typeof LearnCourseIdModuleIdLessonIdIndexRouteImport
+      parentRoute: typeof LearnCourseIdModuleIdLessonIdRouteRoute
+    }
+    '/learn/$courseId/$moduleId/$lessonId/quiz': {
+      id: '/learn/$courseId/$moduleId/$lessonId/quiz'
+      path: '/quiz'
+      fullPath: '/learn/$courseId/$moduleId/$lessonId/quiz'
+      preLoaderRoute: typeof LearnCourseIdModuleIdLessonIdQuizRouteRouteImport
+      parentRoute: typeof LearnCourseIdModuleIdLessonIdRouteRoute
+    }
+    '/learn/$courseId/$moduleId/$lessonId/quiz/': {
+      id: '/learn/$courseId/$moduleId/$lessonId/quiz/'
+      path: '/'
+      fullPath: '/learn/$courseId/$moduleId/$lessonId/quiz/'
+      preLoaderRoute: typeof LearnCourseIdModuleIdLessonIdQuizIndexRouteImport
+      parentRoute: typeof LearnCourseIdModuleIdLessonIdQuizRouteRoute
+    }
+    '/learn/$courseId/$moduleId/$lessonId/quiz/result/': {
+      id: '/learn/$courseId/$moduleId/$lessonId/quiz/result/'
+      path: '/result'
+      fullPath: '/learn/$courseId/$moduleId/$lessonId/quiz/result'
+      preLoaderRoute: typeof LearnCourseIdModuleIdLessonIdQuizResultIndexRouteImport
+      parentRoute: typeof LearnCourseIdModuleIdLessonIdQuizRouteRoute
+    }
   }
 }
+
+interface AuthMainLayoutRouteRouteChildren {
+  AuthMainLayoutLoginIndexRoute: typeof AuthMainLayoutLoginIndexRoute
+  AuthMainLayoutRegisterIndexRoute: typeof AuthMainLayoutRegisterIndexRoute
+}
+
+const AuthMainLayoutRouteRouteChildren: AuthMainLayoutRouteRouteChildren = {
+  AuthMainLayoutLoginIndexRoute: AuthMainLayoutLoginIndexRoute,
+  AuthMainLayoutRegisterIndexRoute: AuthMainLayoutRegisterIndexRoute,
+}
+
+const AuthMainLayoutRouteRouteWithChildren =
+  AuthMainLayoutRouteRoute._addFileChildren(AuthMainLayoutRouteRouteChildren)
+
+interface AuthRouteRouteChildren {
+  AuthMainLayoutRouteRoute: typeof AuthMainLayoutRouteRouteWithChildren
+  AuthForgotPasswordIndexRoute: typeof AuthForgotPasswordIndexRoute
+  AuthVerifyIndexRoute: typeof AuthVerifyIndexRoute
+}
+
+const AuthRouteRouteChildren: AuthRouteRouteChildren = {
+  AuthMainLayoutRouteRoute: AuthMainLayoutRouteRouteWithChildren,
+  AuthForgotPasswordIndexRoute: AuthForgotPasswordIndexRoute,
+  AuthVerifyIndexRoute: AuthVerifyIndexRoute,
+}
+
+const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
+  AuthRouteRouteChildren,
+)
+
+interface CourseRouteRouteChildren {
+  CourseCourseIdRoute: typeof CourseCourseIdRoute
+  CourseIndexRoute: typeof CourseIndexRoute
+}
+
+const CourseRouteRouteChildren: CourseRouteRouteChildren = {
+  CourseCourseIdRoute: CourseCourseIdRoute,
+  CourseIndexRoute: CourseIndexRoute,
+}
+
+const CourseRouteRouteWithChildren = CourseRouteRoute._addFileChildren(
+  CourseRouteRouteChildren,
+)
+
+interface LearnCourseIdModuleIdLessonIdQuizRouteRouteChildren {
+  LearnCourseIdModuleIdLessonIdQuizIndexRoute: typeof LearnCourseIdModuleIdLessonIdQuizIndexRoute
+  LearnCourseIdModuleIdLessonIdQuizResultIndexRoute: typeof LearnCourseIdModuleIdLessonIdQuizResultIndexRoute
+}
+
+const LearnCourseIdModuleIdLessonIdQuizRouteRouteChildren: LearnCourseIdModuleIdLessonIdQuizRouteRouteChildren =
+  {
+    LearnCourseIdModuleIdLessonIdQuizIndexRoute:
+      LearnCourseIdModuleIdLessonIdQuizIndexRoute,
+    LearnCourseIdModuleIdLessonIdQuizResultIndexRoute:
+      LearnCourseIdModuleIdLessonIdQuizResultIndexRoute,
+  }
+
+const LearnCourseIdModuleIdLessonIdQuizRouteRouteWithChildren =
+  LearnCourseIdModuleIdLessonIdQuizRouteRoute._addFileChildren(
+    LearnCourseIdModuleIdLessonIdQuizRouteRouteChildren,
+  )
+
+interface LearnCourseIdModuleIdLessonIdRouteRouteChildren {
+  LearnCourseIdModuleIdLessonIdQuizRouteRoute: typeof LearnCourseIdModuleIdLessonIdQuizRouteRouteWithChildren
+  LearnCourseIdModuleIdLessonIdIndexRoute: typeof LearnCourseIdModuleIdLessonIdIndexRoute
+}
+
+const LearnCourseIdModuleIdLessonIdRouteRouteChildren: LearnCourseIdModuleIdLessonIdRouteRouteChildren =
+  {
+    LearnCourseIdModuleIdLessonIdQuizRouteRoute:
+      LearnCourseIdModuleIdLessonIdQuizRouteRouteWithChildren,
+    LearnCourseIdModuleIdLessonIdIndexRoute:
+      LearnCourseIdModuleIdLessonIdIndexRoute,
+  }
+
+const LearnCourseIdModuleIdLessonIdRouteRouteWithChildren =
+  LearnCourseIdModuleIdLessonIdRouteRoute._addFileChildren(
+    LearnCourseIdModuleIdLessonIdRouteRouteChildren,
+  )
+
+interface LearnCourseIdModuleIdRouteRouteChildren {
+  LearnCourseIdModuleIdLessonIdRouteRoute: typeof LearnCourseIdModuleIdLessonIdRouteRouteWithChildren
+  LearnCourseIdModuleIdIndexRoute: typeof LearnCourseIdModuleIdIndexRoute
+}
+
+const LearnCourseIdModuleIdRouteRouteChildren: LearnCourseIdModuleIdRouteRouteChildren =
+  {
+    LearnCourseIdModuleIdLessonIdRouteRoute:
+      LearnCourseIdModuleIdLessonIdRouteRouteWithChildren,
+    LearnCourseIdModuleIdIndexRoute: LearnCourseIdModuleIdIndexRoute,
+  }
+
+const LearnCourseIdModuleIdRouteRouteWithChildren =
+  LearnCourseIdModuleIdRouteRoute._addFileChildren(
+    LearnCourseIdModuleIdRouteRouteChildren,
+  )
+
+interface LearnCourseIdRouteRouteChildren {
+  LearnCourseIdModuleIdRouteRoute: typeof LearnCourseIdModuleIdRouteRouteWithChildren
+  LearnCourseIdIndexRoute: typeof LearnCourseIdIndexRoute
+}
+
+const LearnCourseIdRouteRouteChildren: LearnCourseIdRouteRouteChildren = {
+  LearnCourseIdModuleIdRouteRoute: LearnCourseIdModuleIdRouteRouteWithChildren,
+  LearnCourseIdIndexRoute: LearnCourseIdIndexRoute,
+}
+
+const LearnCourseIdRouteRouteWithChildren =
+  LearnCourseIdRouteRoute._addFileChildren(LearnCourseIdRouteRouteChildren)
+
+interface LearnRouteRouteChildren {
+  LearnCourseIdRouteRoute: typeof LearnCourseIdRouteRouteWithChildren
+}
+
+const LearnRouteRouteChildren: LearnRouteRouteChildren = {
+  LearnCourseIdRouteRoute: LearnCourseIdRouteRouteWithChildren,
+}
+
+const LearnRouteRouteWithChildren = LearnRouteRoute._addFileChildren(
+  LearnRouteRouteChildren,
+)
+
+interface LecturingToolCourseCourseIdEditingRouteRouteChildren {
+  LecturingToolCourseCourseIdEditingIndexRoute: typeof LecturingToolCourseCourseIdEditingIndexRoute
+}
+
+const LecturingToolCourseCourseIdEditingRouteRouteChildren: LecturingToolCourseCourseIdEditingRouteRouteChildren =
+  {
+    LecturingToolCourseCourseIdEditingIndexRoute:
+      LecturingToolCourseCourseIdEditingIndexRoute,
+  }
+
+const LecturingToolCourseCourseIdEditingRouteRouteWithChildren =
+  LecturingToolCourseCourseIdEditingRouteRoute._addFileChildren(
+    LecturingToolCourseCourseIdEditingRouteRouteChildren,
+  )
+
+interface LecturingToolRouteRouteChildren {
+  LecturingToolIndexRoute: typeof LecturingToolIndexRoute
+  LecturingToolCourseIndexRoute: typeof LecturingToolCourseIndexRoute
+  LecturingToolCourseCourseIdEditingRouteRoute: typeof LecturingToolCourseCourseIdEditingRouteRouteWithChildren
+  LecturingToolCourseCourseIdIndexRoute: typeof LecturingToolCourseCourseIdIndexRoute
+  LecturingToolCourseCreateIndexRoute: typeof LecturingToolCourseCreateIndexRoute
+}
+
+const LecturingToolRouteRouteChildren: LecturingToolRouteRouteChildren = {
+  LecturingToolIndexRoute: LecturingToolIndexRoute,
+  LecturingToolCourseIndexRoute: LecturingToolCourseIndexRoute,
+  LecturingToolCourseCourseIdEditingRouteRoute:
+    LecturingToolCourseCourseIdEditingRouteRouteWithChildren,
+  LecturingToolCourseCourseIdIndexRoute: LecturingToolCourseCourseIdIndexRoute,
+  LecturingToolCourseCreateIndexRoute: LecturingToolCourseCreateIndexRoute,
+}
+
+const LecturingToolRouteRouteWithChildren =
+  LecturingToolRouteRoute._addFileChildren(LecturingToolRouteRouteChildren)
 
 interface UsersRouteRouteChildren {
   UsersUserIdRoute: typeof UsersUserIdRoute
@@ -160,9 +851,25 @@ const UsersRouteRouteWithChildren = UsersRouteRoute._addFileChildren(
   UsersRouteRouteChildren,
 )
 
+interface YourCoursesRouteRouteChildren {
+  YourCoursesIndexRoute: typeof YourCoursesIndexRoute
+}
+
+const YourCoursesRouteRouteChildren: YourCoursesRouteRouteChildren = {
+  YourCoursesIndexRoute: YourCoursesIndexRoute,
+}
+
+const YourCoursesRouteRouteWithChildren =
+  YourCoursesRouteRoute._addFileChildren(YourCoursesRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthRouteRoute: AuthRouteRouteWithChildren,
+  CourseRouteRoute: CourseRouteRouteWithChildren,
+  LearnRouteRoute: LearnRouteRouteWithChildren,
+  LecturingToolRouteRoute: LecturingToolRouteRouteWithChildren,
   UsersRouteRoute: UsersRouteRouteWithChildren,
+  YourCoursesRouteRoute: YourCoursesRouteRouteWithChildren,
   AboutRoute: AboutRoute,
   ContactRoute: ContactRoute,
 }

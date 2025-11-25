@@ -2,3 +2,4 @@
 
 export * from "./api";
 export { default as Persistence } from "./persistence";
+export * from "./auth-guard";
