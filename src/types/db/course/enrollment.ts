@@ -14,6 +14,7 @@ export type Enrollment = Base & {
   studentId: UUID;
   courseId: UUID;
   progressStatus: number;
+  currentView: UUID | null;
   lessonId: UUID | null;
   enrollmentStatus: EnrollmentStatus;
   enrollmentDate: string | Date;
@@ -36,9 +37,13 @@ export type UpdateEnrollmentReq = {
   certificateExpiryDate?: string | Date | null;
 };
 
-export type updateEnrollmentProgressReq = {
+export type UpdateEnrollmentProgressReq = {
   courseId: UUID;
   lessonId: UUID;
+};
+export type UpdateCurrentViewReq = {
+  courseId: UUID;
+  currentLessonId: UUID;
 };
 
 export type EnrollResponse = ApiResponse<Enrollment>;
@@ -55,4 +60,10 @@ export type EnrolledCourseItem = {
 export type GetEnrolledCoursesResponse = ApiResponse<EnrolledCourseItem[]>;
 export type UpdateEnrollmentResponse = ApiResponse<Enrollment>;
 export type UpdateEnrollmentProgressResponse = ApiResponse<Enrollment>;
-export type IsEnrolledResponse = ApiResponse<boolean>;
+export type UpdateCurrentViewResponse = ApiResponse<Enrollment>;
+export type GetEnrolledCourseCompletedLessonsResponse = ApiResponse<UUID[]>;
+export type IsEnrolledResponse = ApiResponse<{
+  success: boolean;
+  message: string;
+  enrollment: Enrollment | null;
+}>;

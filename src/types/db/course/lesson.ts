@@ -14,7 +14,7 @@ export type Lesson = Base & {
   title: string;
   moduleId: UUID;
   contentUrl: string;
-  duration: number;
+  duration: number | string;
   orderIndex: number;
   isPreview: boolean;
   lessonType: LessonType;

@@ -21,7 +21,6 @@ export const useGetCart = () => {
   return useQuery({
     queryKey: PAYMENT_QUERY_KEYS.cart(),
     queryFn: paymentService.getCart,
-    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 };
 
@@ -91,7 +90,6 @@ export const useGetPayment = () => {
   return useQuery({
     queryKey: PAYMENT_QUERY_KEYS.payment(),
     queryFn: paymentService.getPayment,
-    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 };
 
@@ -99,7 +97,6 @@ export const useListPayments = () => {
   return useQuery({
     queryKey: PAYMENT_QUERY_KEYS.payments(),
     queryFn: paymentService.listPayments,
-    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 };
 

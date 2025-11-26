@@ -4,10 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
-import { ArrowLeft, CreditCard, X} from 'lucide-react'
+import { ArrowLeft, CheckCircle, CreditCard, X} from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import { formatPrice } from '@/utils/format'
-import type { OrderItem } from '@/types/db/payment'
+import { OrderStatus, type OrderItem } from '@/types/db/payment'
 import { loadStripe } from '@stripe/stripe-js'
 import { Elements } from '@stripe/react-stripe-js'
 import { stripePk } from '@/conf'
@@ -71,14 +71,14 @@ function RouteComponent() {
   }
 
   // Check if payment is already completed (status = COMPLETED = 1)
-  const isPaymentCompleted = paymentData.payment.orderStatus === 1;
+  const isPaymentCompleted = (paymentData.payment.orderStatus !== OrderStatus.PENDING);
 
   if (isPaymentCompleted) {
     return (
       <div className="container max-w-4xl mx-auto py-8">
         <Card>
           <CardContent className="p-8 text-center">
-            <div className="text-5xl mb-4">✅</div>
+            <CheckCircle className="h-12 w-12 text-green-600 mx-auto mb-4" />
             <h2 className="text-2xl font-semibold mb-2">You have no in progress payment</h2>
             <p className="text-muted-foreground mb-6">
               Your payment has already been completed.

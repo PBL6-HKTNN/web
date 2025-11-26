@@ -30,6 +30,7 @@ const API_ROUTES = {
     getCourseContentById: (courseId: UUID) => `/Course/getLessons/${courseId}`,
     getModulesByCourse: (courseId: UUID) => `/Course/getModules/${courseId}`,
     createCourse: "/Course/create",
+    completeLesson: "/Course/complete-lesson",
     updateCourse: (courseId: UUID) => `/Course/update/${courseId}`,
     deleteCourse: (courseId: UUID) => `/Course/${courseId}`,
     validateCourse: "/Course/validate",
@@ -71,8 +72,11 @@ const API_ROUTES = {
   ENROLLMENT: {
     isEnrolled: (courseId: UUID) => `/Enrollment/getCourse/${courseId}`,
     enroll: (courseId: UUID) => `/Enrollment/enroll/${courseId}`,
+    getEnrolledCourseCompletedLessons: (enrollmentId: UUID) =>
+      `/Enrollment/lessons-completed/${enrollmentId}`,
     updateEnrollment: "/Enrollment/update",
     updateEnrollmentProgress: "/Enrollment/updateProgress",
+    updateEnrollmentCurrentView: "/Enrollment/update-current-view",
     getEnrolledCourse: "/Enrollment/my-courses",
   },
   REVIEW: {

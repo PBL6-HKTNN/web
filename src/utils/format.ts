@@ -12,7 +12,7 @@ export function formatPrice(
   return new Intl.NumberFormat(locale, {
     style: "currency",
     currency,
-  }).format(price / 100); // Assuming price is in cents
+  }).format(price); // Assuming price is in cents
 }
 
 /**

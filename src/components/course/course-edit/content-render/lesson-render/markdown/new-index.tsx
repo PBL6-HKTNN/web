@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useCourseEdit } from "@/contexts/course/use-course-edit";
 import { useState, useEffect } from "react";
 import type { Lesson } from "@/types/db/course/lesson";
+import { parseTimespanToSeconds } from "@/utils/time-utils";
 
 interface MarkdownLessonRenderProps {
   lesson: Lesson;
@@ -39,7 +40,7 @@ export function MarkdownLessonRender({ lesson }: MarkdownLessonRenderProps) {
           title: lesson.title,
           moduleId: lesson.moduleId,
           contentUrl: content, // Store markdown content in contentUrl
-          duration: lesson.duration,
+          duration: parseTimespanToSeconds(lesson.duration as string),
           orderIndex: lesson.orderIndex,
           isPreview: lesson.isPreview,
           lessonType: lesson.lessonType,

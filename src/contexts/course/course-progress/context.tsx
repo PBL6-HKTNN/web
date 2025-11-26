@@ -19,6 +19,13 @@ export interface CourseProgressContextType {
 
   // Generic progress tracking
   markLessonComplete: (courseId: UUID, lessonId: UUID) => void;
+  
+  // Current view tracking
+  updateCurrentView: (courseId: UUID, currentLessonId: UUID) => void;
+  
+  // Completion status checking
+  isLessonCompleted: (lessonId: UUID) => boolean;
+  getCompletedLessons: () => UUID[];
 }
 
 export const CourseProgressContext = createContext<

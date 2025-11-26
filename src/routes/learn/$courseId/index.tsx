@@ -2,8 +2,9 @@ import { authGuard } from '@/utils'
 import { createFileRoute } from '@tanstack/react-router'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { Clock, BookOpen, Star, Loader2 } from 'lucide-react'
+import { Clock, BookOpen, Star, Loader2, Play } from 'lucide-react'
 import { timeDurationFormat } from '@/utils/time-utils'
 import { LearningNavBar } from '@/components/layout/nav-bar-2'
 import ModuleAccordion from '@/components/course/module-accordion'
@@ -15,7 +16,18 @@ export const Route = createFileRoute('/learn/$courseId/')({
 })
 
 function CourseOverview() {
-  const { course, modules, totalLessons, isLoading, error, handleLessonSelect } = useCourseOverview()
+  const { 
+    course, 
+    modules, 
+    totalLessons, 
+    isLoading, 
+    error, 
+    handleLessonSelect, 
+    currentLesson, 
+    handleContinueLearning, 
+    hasCurrentLesson,
+    completedLessons
+  } = useCourseOverview()
 
   if (isLoading) {
     return (
@@ -157,11 +169,33 @@ function CourseOverview() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-muted-foreground">
-              Start your learning journey by selecting a lesson from the sidebar.
-              Each module contains multiple lessons that will help you master the concepts step by step.
-            </p>
-            <Separator />
+            {hasCurrentLesson && currentLesson ? (
+              <div className="space-y-4">
+                <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-medium">Continue Learning</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Resume: {currentLesson.title}
+                      </p>
+                    </div>
+                    <Button onClick={handleContinueLearning} className="ml-4">
+                      <Play className="w-4 h-4 mr-2" />
+                      Continue
+                    </Button>
+                  </div>
+                </div>
+                <Separator />
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <p className="text-muted-foreground">
+                  Start your learning journey by selecting a lesson from the sidebar.
+                  Each module contains multiple lessons that will help you master the concepts step by step.
+                </p>
+                <Separator />
+              </div>
+            )}
             <div className="flex flex-wrap gap-2">
               <Badge variant="secondary">
                 {modules.length} Modules
@@ -198,6 +232,7 @@ function CourseOverview() {
                     data={module}
                     onLessonSelect={handleLessonSelect}
                     defaultExpanded={false}
+                    completedLessons={completedLessons}
                   />
                 ))}
               </div>

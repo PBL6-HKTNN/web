@@ -30,6 +30,12 @@ export function useCheckoutPage() {
 
   const handlePurchase = () => {
     // Navigate to courses after successful payment
+    // updatePayment(
+    //   {
+    //     paymentId: paymentData?.payment.id as string,
+    //     status: 1 // Completed status
+    //   }
+    // )
     setTimeout(() => {
       router.navigate({ to: '/your-courses' })
     }, 2000)

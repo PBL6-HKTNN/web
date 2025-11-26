@@ -13,7 +13,7 @@ function RouteComponent() {
 
   return (
     <CourseLearnProvider courseId={courseId}>
-      <CourseProgressProvider>
+      <CourseProgressProvider courseId={courseId}>
         <Outlet />
       </CourseProgressProvider>
     </CourseLearnProvider>

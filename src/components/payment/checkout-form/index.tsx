@@ -19,7 +19,6 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ onSuccess, paymentDa
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const { mutate: createPaymentIntent, isPending: isCreatingIntent } = useCreatePaymentIntent();
-
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 

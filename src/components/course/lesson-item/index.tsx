@@ -14,6 +14,7 @@ interface LessonItemProps {
   progress?: number // 0-1 range
   indexNum: number
   type: LessonType
+  isCompleted?: boolean // Explicit completion status from API
 }
 
 const lessonTypeConfig = {
@@ -42,10 +43,12 @@ export function LessonItem({
   progress,
   indexNum,
   type,
+  isCompleted: isCompletedProp,
 }: LessonItemProps) {
   const config = lessonTypeConfig[type]
   const Icon = config.icon
-  const isCompleted = progress === 1
+  // Use explicit completion status if provided, otherwise fall back to progress
+  const isCompleted = isCompletedProp ?? (progress === 1)
 
   // Convert duration to number if it's a string (assuming it's in seconds)
   const durationNum = typeof duration === 'string' ? parseInt(duration) : duration

@@ -39,7 +39,7 @@ api.interceptors.response.use(
       // Persistence.removeItem("auth_token");
       // window.location.href = "/auth/login";
     }
-    return Promise.resolve(error.response);
+    return Promise.reject(error.response);
   }
 );
 

@@ -1,18 +1,42 @@
-import React, { useCallback, useRef, useEffect } from 'react'
+import React, { useCallback, useRef, useEffect, useMemo } from 'react'
 import type { ReactNode } from 'react'
-import { useUpdateEnrollmentProgress } from '@/hooks/queries/course/enrollment-hooks'
+import { 
+  useUpdateEnrollmentProgress, 
+  useUpdateEnrollmentCurrentView, 
+  useIsEnrolled, 
+  useGetEnrolledCourseCompletedLessons 
+} from '@/hooks/queries/course/enrollment-hooks'
 import type { UUID } from '@/types'
 import { CourseProgressContext, type CourseProgressContextType } from './context'
 
 interface CourseProgressProviderProps {
   children: ReactNode
+  courseId?: UUID // Optional courseId for fetching completion data
 }
 
-export const CourseProgressProvider: React.FC<CourseProgressProviderProps> = ({ children }) => {
+export const CourseProgressProvider: React.FC<CourseProgressProviderProps> = ({ children, courseId }) => {
   const updateProgressMutation = useUpdateEnrollmentProgress()
+  const updateCurrentViewMutation = useUpdateEnrollmentCurrentView()
+  
+  // Get enrollment data to fetch completed lessons
+  const { data: enrollmentResponse } = useIsEnrolled(courseId || '')
+  const enrollment = enrollmentResponse?.data?.enrollment
+  
+  // Get completed lessons from API
+  const { data: completedLessonsResponse } = useGetEnrolledCourseCompletedLessons(
+    enrollment?.id || ''
+  )
+  const apiCompletedLessons = useMemo(() => {
+    return completedLessonsResponse?.data || []
+  }, [completedLessonsResponse?.data])
+  
+  // Convert API completed lessons to Set for faster lookup
+  const completedLessonsSet = useMemo(() => {
+    return new Set(apiCompletedLessons)
+  }, [apiCompletedLessons])
   
   // Track completion states to prevent duplicate API calls
-  const completedLessons = useRef<Set<string>>(new Set())
+  const localCompletedLessons = useRef<Set<string>>(new Set())
   const scrollTimeouts = useRef<Map<string, NodeJS.Timeout>>(new Map())
   const videoProgressMap = useRef<Map<string, { lastUpdate: number, watchedPercentage: number }>>(new Map())
 
@@ -25,14 +49,23 @@ export const CourseProgressProvider: React.FC<CourseProgressProviderProps> = ({ 
     }
   }, [])
 
+  // Ref to store current completed lessons for checking without causing re-renders
+  const currentCompletedLessonsRef = useRef<Set<UUID>>(new Set())
+  
+  // Update the ref when completedLessonsSet changes
+  useEffect(() => {
+    currentCompletedLessonsRef.current = completedLessonsSet
+  }, [completedLessonsSet])
+
   const markLessonComplete = useCallback((courseId: UUID, lessonId: UUID) => {
     const lessonKey = `${courseId}-${lessonId}`
     
-    if (completedLessons.current.has(lessonKey)) {
+    // Check if lesson is already completed via API or locally tracked
+    if (currentCompletedLessonsRef.current.has(lessonId) || localCompletedLessons.current.has(lessonKey)) {
       return // Already completed, don't call API again
     }
 
-    completedLessons.current.add(lessonKey)
+    localCompletedLessons.current.add(lessonKey)
     updateProgressMutation.mutate({ courseId, lessonId })
   }, [updateProgressMutation])
 
@@ -124,12 +157,30 @@ export const CourseProgressProvider: React.FC<CourseProgressProviderProps> = ({ 
     // If quiz is failed, don't mark as complete - user needs to retake
   }, [markLessonComplete])
 
+  const updateCurrentView = useCallback((courseId: UUID, currentLessonId: UUID) => {
+    updateCurrentViewMutation.mutate({
+      courseId,
+      currentLessonId
+    })
+  }, [updateCurrentViewMutation])
+  
+  const isLessonCompleted = useCallback((lessonId: UUID) => {
+    return completedLessonsSet.has(lessonId)
+  }, [completedLessonsSet])
+  
+  const getCompletedLessons = useCallback(() => {
+    return apiCompletedLessons
+  }, [apiCompletedLessons])
+
   const value: CourseProgressContextType = {
     trackMarkdownScroll,
     markMarkdownComplete,
     trackVideoProgress,
     markQuizComplete,
     markLessonComplete,
+    updateCurrentView,
+    isLessonCompleted,
+    getCompletedLessons,
   }
 
   return (

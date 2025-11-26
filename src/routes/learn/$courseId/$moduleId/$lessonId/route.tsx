@@ -1,4 +1,4 @@
-import CourseProgressProvider from '@/contexts/course/course-progress/provider'
+import { CourseProgressProvider } from '@/contexts/course/course-progress'
 import { createFileRoute, Outlet } from '@tanstack/react-router'
 
 export const Route = createFileRoute(
@@ -8,9 +8,11 @@ export const Route = createFileRoute(
 })
 
 function RouteComponent() {
+  const { courseId } = Route.useParams()
+
   return <>
-  <CourseProgressProvider>
-    <Outlet />
-  </CourseProgressProvider>
+    <CourseProgressProvider courseId={courseId}>
+      <Outlet />
+    </CourseProgressProvider>
   </>
 }
