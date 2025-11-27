@@ -7,6 +7,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle, CheckCircle, LockIcon } from 'lucide-react';
 import type { UUID } from '@/types';
 import type { LessonType } from '@/types/db/course/lesson';
+import { parseTimespanToMinutes } from '@/utils/time-utils';
 
 interface LessonContentLoaderProps {
   courseId: UUID;
@@ -104,7 +105,7 @@ export function LessonContentLoader({
              lesson?.lessonType === 2 ? 'Quiz' : 'Unknown'}
           </span>
           <span>•</span>
-          <span>{lesson?.duration} minutes</span>
+          <span>{parseTimespanToMinutes(lesson?.duration as string)} minutes</span>
           {!moduleLessonsLoading && moduleLessonsData?.data && (
             <>
               <span>•</span>

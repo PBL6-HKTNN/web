@@ -70,6 +70,7 @@ export function useCourseOverview() {
     currentLesson,
     handleContinueLearning,
     hasCurrentLesson: !!currentLesson,
-    completedLessons
+    completedLessons,
+    enrollmentProgressStatus: enrollment?.progressStatus
   }
 }

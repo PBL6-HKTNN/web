@@ -4,6 +4,7 @@ import type { ServiceUrls } from "@/types/core/api";
 import {
   apiServiceUrlsKey,
   apiUrl,
+  automationApiUrl,
   reviewApiUrl,
   separatedServiceFlag,
   storageApiUrl,
@@ -55,7 +56,7 @@ export function createServiceApi(baseURL: string): AxiosInstance {
   // If separated services are disabled, return the global api instance
   if (
     separatedServiceFlag === 0 &&
-    ![storageApiUrl, reviewApiUrl].includes(baseURL)
+    ![storageApiUrl, reviewApiUrl, automationApiUrl].includes(baseURL)
   ) {
     return api;
   }

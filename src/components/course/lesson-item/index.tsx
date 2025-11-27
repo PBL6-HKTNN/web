@@ -4,7 +4,6 @@ import { Progress } from "@/components/ui/progress"
 import { CheckCircle, Play, FileText, HelpCircle, Clock } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { LessonType } from "@/types/db/course/lesson"
-import { timeDurationFormat } from "@/utils/time-utils"
 
 interface LessonItemProps {
   title: string
@@ -50,9 +49,6 @@ export function LessonItem({
   // Use explicit completion status if provided, otherwise fall back to progress
   const isCompleted = isCompletedProp ?? (progress === 1)
 
-  // Convert duration to number if it's a string (assuming it's in seconds)
-  const durationNum = typeof duration === 'string' ? parseInt(duration) : duration
-
  
 
   return (
@@ -61,7 +57,8 @@ export function LessonItem({
       size="sm"
       className={cn(
         "cursor-pointer transition-all duration-200 hover:bg-accent/50 px-2 py-1.5",
-        isSelected && "ring-2 ring-primary/20 bg-primary/5"
+        isSelected && "ring-2 ring-primary/20 bg-primary/5",
+        isCompleted && "bg-green-100/70",
       )}
       onClick={onSelected}
     >
@@ -84,10 +81,10 @@ export function LessonItem({
           <Badge variant="secondary" className="text-xs px-1 py-0 h-4">
             {config.label}
           </Badge>
-          {durationNum && (
+          {duration && (
             <span className="flex items-center gap-0.5 text-muted-foreground text-xs">
               <Clock className="size-2.5" />
-              {timeDurationFormat(durationNum)}
+              {Math.floor((duration as number)/60)} minutes
             </span>
           )}
         </ItemDescription>

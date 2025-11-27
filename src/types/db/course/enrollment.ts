@@ -10,10 +10,18 @@ export const EnrollmentStatus = {
 export type EnrollmentStatus =
   (typeof EnrollmentStatus)[keyof typeof EnrollmentStatus];
 
+export const EnrollmentProgressStatus = {
+  NOT_STARTED: 0,
+  IN_PROGRESS: 1,
+  COMPLETED: 2,
+} as const;
+export type EnrollmentProgressStatus =
+  (typeof EnrollmentProgressStatus)[keyof typeof EnrollmentProgressStatus];
+
 export type Enrollment = Base & {
   studentId: UUID;
   courseId: UUID;
-  progressStatus: number;
+  progressStatus: EnrollmentProgressStatus;
   currentView: UUID | null;
   lessonId: UUID | null;
   enrollmentStatus: EnrollmentStatus;
@@ -29,7 +37,7 @@ export type CreateEnrollmentReq = {
 };
 
 export type UpdateEnrollmentReq = {
-  progressStatus?: number;
+  progressStatus?: EnrollmentProgressStatus;
   lessonId?: UUID | null;
   enrollmentStatus?: EnrollmentStatus;
   completionDate?: string | Date | null;

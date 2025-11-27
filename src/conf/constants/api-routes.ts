@@ -95,6 +95,10 @@ const API_ROUTES = {
     createPaymentIntent: "/Payment/create-payment-intent",
     webhook: "/Payment/webhook",
   },
+  AUTOMATION: {
+    generateQuiz: "/Automation/generate-quiz",
+    generateContent: "/Automation/generate-content",
+  },
 };
 
 export default API_ROUTES;
