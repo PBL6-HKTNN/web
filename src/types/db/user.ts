@@ -2,8 +2,9 @@ import { type Base } from "../core";
 
 export const UserRole = {
   ADMIN: 0,
-  INSTRUCTOR: 1,
-  STUDENT: 2,
+  MODERATOR: 1,
+  INSTRUCTOR: 2,
+  STUDENT: 3,
 } as const;
 export type UserRole = (typeof UserRole)[keyof typeof UserRole];
 

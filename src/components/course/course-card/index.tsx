@@ -1,4 +1,4 @@
-import { Star, Clock, Users } from "lucide-react";
+import { Star, Clock, Users, ShoppingCart, BookOpen, CheckCircle } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,7 +8,10 @@ import type { Course } from "@/types/db/course";
 import { formatPriceSimple } from "@/utils/format";
 
 interface CourseCardProps {
-  course: Course;
+  course: Course & {
+    isInCart?: boolean;
+    isEnrolled?: boolean;
+  };
 }
 
 export function CourseCard({ course }: CourseCardProps) {
@@ -46,6 +49,18 @@ export function CourseCard({ course }: CourseCardProps) {
         {course.price === 0 && (
           <Badge className="absolute top-2 right-2 bg-green-600">
             Free
+          </Badge>
+        )}
+        {course.isEnrolled && (
+          <Badge className="absolute top-2 left-2 bg-blue-600">
+            <CheckCircle className="w-3 h-3 mr-1" />
+            Enrolled
+          </Badge>
+        )}
+        {course.isInCart && !course.isEnrolled && (
+          <Badge className="absolute top-2 left-2 bg-orange-600">
+            <ShoppingCart className="w-3 h-3 mr-1" />
+            In Cart
           </Badge>
         )}
       </div>
@@ -95,25 +110,63 @@ export function CourseCard({ course }: CourseCardProps) {
               {formatPrice(course.price)}
             </div>
             <div className="flex gap-2">
-              {course.price > 0 && (
-                <AddToCartButton
-                  courseId={course.id}
-                  variant="outline"
+              {course.isEnrolled ? (
+                <Button
                   size="sm"
-                  showText={false}
-                  className="opacity-0 group-hover:opacity-100 transition-opacity"
-                />
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate({ to: `/learn/${course.id}` });
+                  }}
+                >
+                  <BookOpen className="w-4 h-4 mr-2" />
+                  Continue Learning
+                </Button>
+              ) : course.isInCart ? (
+                <>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate({ to: `/cart` });
+                    }}
+                  >
+                    <ShoppingCart className="w-4 h-4 mr-2" />
+                    View Cart
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate({ to: `/course/${course.id}` });
+                    }}
+                  >
+                    View Details
+                  </Button>
+                </>
+              ) : (
+                <>
+                  {course.price > 0 && (
+                    <AddToCartButton
+                      courseId={course.id}
+                      variant="outline"
+                      size="sm"
+                      showText={false}
+                      className="opacity-0 group-hover:opacity-100 transition-opacity"
+                    />
+                  )}
+                  <Button
+                    size="sm"
+                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate({ to: `/course/${course.id}` });
+                    }}
+                  >
+                    View Details
+                  </Button>
+                </>
               )}
-              <Button
-                size="sm"
-                className="opacity-0 group-hover:opacity-100 transition-opacity"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate({ to: `/course/${course.id}` });
-                }}
-              >
-                View Details
-              </Button>
             </div>
           </div>
         </div>

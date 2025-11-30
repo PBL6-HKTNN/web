@@ -22,6 +22,9 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
     modules, 
     isLoading, 
     error,
+    isInstructor,
+    isInCart,
+    addToCartMutation,
     isInWishlist,
     addToWishlistMutation,
     handleWishlistClick,
@@ -324,7 +327,7 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
           </div>
 
           {/* Right Sidebar */}
-          <div className="space-y-6">
+          <div className="space-y-6 lg:-mt-36">
             <Card className="sticky top-24">
               <CardContent className="p-6">
                 {/* Video Preview */}
@@ -346,6 +349,18 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
 
                 {/* Enroll, Cart, and Wishlist Buttons */}
                 <div className="space-y-3 mb-4">
+                  {isInstructor && (
+                    <Button
+                      className="w-full"
+                      size="lg"
+                      variant="outline"
+                      onClick={() => {
+                        window.location.href = `/lecturing-tool/course/${courseId}`;
+                      }}
+                    >
+                      Edit Course
+                    </Button>
+                  )}
                   {course.price === 0 ? (
                     /* Free Course - Direct Enrollment */
                     <div className="flex gap-3">
@@ -394,11 +409,64 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
                       <Button
                         className="w-full"
                         size="lg"
-                        disabled
+                        onClick={() => {
+                          // Navigate to learning page
+                          window.location.href = `/learn/${courseId}`;
+                        }}
                       >
-                        Already Enrolled
+                        Continue Learning
                       </Button>
                       <div className="flex justify-end">
+                        <Button
+                          variant="outline"
+                          size="lg"
+                          className={`w-12 h-12 p-0 border-2 transition-all duration-200 ${
+                            isInWishlist
+                              ? 'border-red-500 bg-red-50 text-red-500 hover:bg-red-100'
+                              : 'border-gray-300 text-gray-400 hover:border-red-300 hover:text-red-400 hover:bg-red-50'
+                          }`}
+                          onClick={handleWishlistClick}
+                          disabled={addToWishlistMutation.isPending}
+                          title={isInWishlist ? 'Already in wishlist' : 'Add to wishlist'}
+                        >
+                          {addToWishlistMutation.isPending ? (
+                            <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                            <Heart
+                              className={`w-5 h-5 transition-all duration-200 ${
+                                isInWishlist ? 'fill-current' : ''
+                              }`}
+                            />
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  ) : isInCart ? (
+                    /* Paid Course - Already in Cart */
+                    <div className="space-y-3">
+                      <Button
+                        className="w-full"
+                        size="lg"
+                        variant="outline"
+                        onClick={() => {
+                          // Navigate to cart
+                          window.location.href = '/cart';
+                        }}
+                      >
+                        View Cart
+                      </Button>
+                      <div className="flex gap-3">
+                        <Button
+                          variant="outline"
+                          className="flex-1"
+                          size="lg"
+                          onClick={() => {
+                            // Navigate to cart (already in cart)
+                            window.location.href = '/cart';
+                          }}
+                        >
+                          Buy Now
+                        </Button>
                         <Button
                           variant="outline"
                           size="lg"
@@ -436,8 +504,17 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
                           variant="outline"
                           className="flex-1"
                           size="lg"
+                          onClick={() => {
+                            addToCartMutation.mutate(courseId, {
+                              onSuccess: () => {
+                                // Navigate to cart after adding to cart
+                                window.location.href = '/cart';
+                              }
+                            });
+                          }}
+                          disabled={addToCartMutation.isPending}
                         >
-                          Buy Now
+                          {addToCartMutation.isPending ? 'Adding...' : 'Buy Now'}
                         </Button>
                         <Button
                           variant="outline"

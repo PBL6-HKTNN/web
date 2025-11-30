@@ -94,6 +94,7 @@ export function ModuleTreeItem({
             className="h-6 w-6 p-0 opacity-60 hover:opacity-100"
             onClick={(e) => {
               e.stopPropagation();
+              onModuleSelect(module.id);
               onAddLesson(module.id);
             }}
             title="Add lesson"
@@ -106,6 +107,7 @@ export function ModuleTreeItem({
             className="h-6 w-6 p-0 opacity-60 hover:opacity-100"
             onClick={(e) => {
               e.stopPropagation();
+              onModuleSelect(module.id);
               onCloneModule(module.id);
             }}
             title="Clone module"
@@ -156,6 +158,7 @@ export function ModuleTreeItem({
                     className="h-5 w-5 p-0 opacity-60 hover:opacity-100"
                     onClick={(e) => {
                       e.stopPropagation();
+                      onModuleSelect(module.id);
                       onCloneLesson(lesson.id);
                     }}
                     title="Clone lesson"

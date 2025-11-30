@@ -95,6 +95,11 @@ export function createServiceApi(baseURL: string): AxiosInstance {
   return serviceApi;
 }
 
+/**
+ * Decode and parse the service URLs from environment variable.
+ * @returns ServiceUrls object decoded from VITE_SERVICES_URLS_KEY
+ * @deprecated Currently not in use since we have gateway already. Will be removed in future versions.
+ */
 function _getServiceUrlsObj(): ServiceUrls {
   const encoded = apiServiceUrlsKey;
   if (!encoded) {

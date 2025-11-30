@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Button } from '@/components/ui/button'
-import { Receipt, AlertCircle, LayoutGrid, LayoutList, ArrowRight, ShoppingCart } from 'lucide-react'
+import { Receipt, LayoutGrid, LayoutList, ArrowRight, ShoppingCart } from 'lucide-react'
 import { PaymentCard } from '@/components/payment/payment-card'
 import { PaymentTable } from '@/components/payment/payment-table'
 import { Link } from '@tanstack/react-router'
@@ -27,6 +27,9 @@ function RouteComponent() {
     isLoading,
     error,
   } = usePaymentSettings();
+
+  // Treat payments as empty array when there's an error
+  const displayPayments = error ? [] : payments;
 
   if (isLoading) {
     return (
@@ -61,18 +64,6 @@ function RouteComponent() {
             ))}
           </div>
         </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="w-full flex flex-col items-center justify-center h-64 space-y-4">
-        <AlertCircle className="h-12 w-12 text-destructive" />
-        <div className="text-center">
-          <h3 className="text-lg font-semibold">Failed to load payments</h3>
-          <p className="text-muted-foreground">There was an error loading your payment history.</p>
-        </div>
-      </div>
     );
   }
 
@@ -195,9 +186,9 @@ function RouteComponent() {
             <div className="flex items-center gap-2">
               <Receipt className="h-5 w-5" />
               <h2 className="text-xl font-semibold">Recent Transactions</h2>
-              <Badge variant="secondary">{payments.length}</Badge>
+              <Badge variant="secondary">{displayPayments.length}</Badge>
             </div>
-            {payments.length > 0 && (
+            {displayPayments.length > 0 && (
               <div className="flex gap-2 bg-muted p-1 rounded">
                 <Button
                   variant={viewMode === 'card' ? 'default' : 'ghost'}
@@ -219,7 +210,7 @@ function RouteComponent() {
             )}
           </div>
           
-          {payments.length === 0 ? (
+          {displayPayments.length === 0 ? (
             <Card>
               <CardContent className="p-8 text-center">
                 <Receipt className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
@@ -231,12 +222,12 @@ function RouteComponent() {
             </Card>
           ) : viewMode === 'card' ? (
             <div className="grid gap-4 lg:grid-cols-2">
-              {payments.map((paymentData: PaymentData) => (
+              {displayPayments.map((paymentData: PaymentData) => (
                 <PaymentCard key={paymentData.payment.id} payment={paymentData} />
               ))}
             </div>
           ) : (
-              <PaymentTable payments={payments} />
+              <PaymentTable payments={displayPayments} />
           )}
       </div>
     </div>

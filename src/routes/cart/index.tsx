@@ -9,9 +9,11 @@ import { useCartPage } from './-hook'
 import { formatPrice } from '@/utils/format'
 import { Link } from '@tanstack/react-router'
 import { MethodPayment } from '@/types/db/payment'
+import { authGuard } from '@/utils'
 
 export const Route = createFileRoute('/cart/')({  
   component: RouteComponent,
+  beforeLoad: authGuard
 })
 
 function RouteComponent() {

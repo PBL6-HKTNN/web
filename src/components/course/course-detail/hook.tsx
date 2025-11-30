@@ -2,10 +2,19 @@ import { useGetCourseContentById } from "@/hooks/queries/course/course-hooks";
 import { useAddToWishlist, useIsInWishlist } from "@/hooks/queries/course/wishlist-hooks";
 import { useEnroll, useIsEnrolled } from "@/hooks/queries/course/enrollment-hooks";
 import { useGetReviewsByCourse, useGetAverageRatingByCourse } from "@/hooks/queries/review-hooks";
+import { useGetCart, useAddToCart } from "@/hooks/queries/payment-hooks";
 import { formatPriceSimple } from "@/utils/format";
+import { getAuthState } from "@/hooks/queries/auth-hooks";
 
 export const useCourseDetail = (courseId: string) => {
   const { data, isLoading, error } = useGetCourseContentById(courseId);
+  
+  // Get current user
+  const { user } = getAuthState();
+  
+  // Cart hook
+  const { data: cartData } = useGetCart();
+  const addToCartMutation = useAddToCart();
   
   // Wishlist hooks
   const { data: isInWishlist } = useIsInWishlist(courseId);
@@ -19,6 +28,12 @@ export const useCourseDetail = (courseId: string) => {
   // Review hooks
   const { data: reviewsData, isLoading: reviewsLoading } = useGetReviewsByCourse(courseId);
   const { data: averageData, isLoading: averageLoading } = useGetAverageRatingByCourse(courseId);
+  
+  // Check if course is in cart
+  const isInCart = cartData?.data?.some(item => item.courseId === courseId) || false;
+  
+  // Check if current user is the instructor
+  const isInstructor = user?.id === data?.data?.course?.instructorId;
   
   const handleWishlistClick = () => {
     addToWishlistMutation.mutate(courseId);
@@ -40,6 +55,11 @@ export const useCourseDetail = (courseId: string) => {
     modules: data?.data?.module || [],
     isLoading,
     error,
+    // Auth
+    isInstructor,
+    // Cart
+    isInCart,
+    addToCartMutation,
     // Wishlist
     isInWishlist,
     addToWishlistMutation,

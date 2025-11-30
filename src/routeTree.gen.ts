@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as R404RouteImport } from './routes/404'
 import { Route as YourCoursesRouteRouteImport } from './routes/your-courses/route'
 import { Route as UsersRouteRouteImport } from './routes/users/route'
 import { Route as SettingsRouteRouteImport } from './routes/settings/route'
@@ -63,6 +64,11 @@ const ContactRoute = ContactRouteImport.update({
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const R404Route = R404RouteImport.update({
+  id: '/404',
+  path: '/404',
   getParentRoute: () => rootRouteImport,
 } as any)
 const YourCoursesRouteRoute = YourCoursesRouteRouteImport.update({
@@ -306,6 +312,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRouteRouteWithChildren
   '/users': typeof UsersRouteRouteWithChildren
   '/your-courses': typeof YourCoursesRouteRouteWithChildren
+  '/404': typeof R404Route
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/learn/$courseId': typeof LearnCourseIdRouteRouteWithChildren
@@ -345,6 +352,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthMainLayoutRouteRouteWithChildren
   '/learn': typeof LearnRouteRouteWithChildren
+  '/404': typeof R404Route
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/course/$courseId': typeof CourseCourseIdRoute
@@ -385,6 +393,7 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRouteRouteWithChildren
   '/users': typeof UsersRouteRouteWithChildren
   '/your-courses': typeof YourCoursesRouteRouteWithChildren
+  '/404': typeof R404Route
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/auth/_mainLayout': typeof AuthMainLayoutRouteRouteWithChildren
@@ -434,6 +443,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/users'
     | '/your-courses'
+    | '/404'
     | '/about'
     | '/contact'
     | '/learn/$courseId'
@@ -473,6 +483,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/learn'
+    | '/404'
     | '/about'
     | '/contact'
     | '/course/$courseId'
@@ -512,6 +523,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/users'
     | '/your-courses'
+    | '/404'
     | '/about'
     | '/contact'
     | '/auth/_mainLayout'
@@ -560,6 +572,7 @@ export interface RootRouteChildren {
   SettingsRouteRoute: typeof SettingsRouteRouteWithChildren
   UsersRouteRoute: typeof UsersRouteRouteWithChildren
   YourCoursesRouteRoute: typeof YourCoursesRouteRouteWithChildren
+  R404Route: typeof R404Route
   AboutRoute: typeof AboutRoute
   ContactRoute: typeof ContactRoute
 }
@@ -578,6 +591,13 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/404': {
+      id: '/404'
+      path: '/404'
+      fullPath: '/404'
+      preLoaderRoute: typeof R404RouteImport
       parentRoute: typeof rootRouteImport
     }
     '/your-courses': {
@@ -1140,6 +1160,7 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRouteRoute: SettingsRouteRouteWithChildren,
   UsersRouteRoute: UsersRouteRouteWithChildren,
   YourCoursesRouteRoute: YourCoursesRouteRouteWithChildren,
+  R404Route: R404Route,
   AboutRoute: AboutRoute,
   ContactRoute: ContactRoute,
 }

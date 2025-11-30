@@ -13,6 +13,8 @@ import { Book, Code, LogOut, User, ShoppingCart, PenToolIcon, Cog } from 'lucide
 import { useAuthState, useLogout } from '@/hooks/queries/auth-hooks'
 import { useGetCart } from '@/hooks/queries/payment-hooks'
 import { ThemeChanger } from '@/components/shared/theme-changer'
+import RequiredRole from '@/components/user/required-role'
+import { UserRole } from '@/types/db'
 
 export function NavBar() {
   const { isAuthenticated, user } = useAuthState()
@@ -100,12 +102,16 @@ export function NavBar() {
                         Your Courses
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/lecturing-tool" className="flex items-center">
-                        <PenToolIcon className="mr-2 h-4 w-4" />
-                        Lecturing Tool
-                      </Link>
-                    </DropdownMenuItem>
+                    <RequiredRole
+                      roles={[UserRole.INSTRUCTOR]}
+                    >
+                      <DropdownMenuItem asChild>
+                        <Link to="/lecturing-tool" className="flex items-center">
+                          <PenToolIcon className="mr-2 h-4 w-4" />
+                          Lecturing Tool
+                        </Link>
+                      </DropdownMenuItem>
+                    </RequiredRole>
                     <DropdownMenuItem asChild>
                       <Link to="/settings" className="flex items-center">
                         <Cog className="mr-2 h-4 w-4" />
