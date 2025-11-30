@@ -3,6 +3,7 @@
 import ModuleAccordion from "@/components/course/module-accordion"
 import type { Module } from "@/types/db/course/module"
 import { useParams } from "@tanstack/react-router"
+import { useCourseProgress } from "@/contexts/course/course-progress"
 
 type ItemsListingProps = {
   modules: Module[]
@@ -16,6 +17,10 @@ export default function ItemsListing({
   defaultExpandedModuleId,
 }: ItemsListingProps) {
   const { lessonId } = useParams({ strict: false })
+  
+  // Get completed lessons from course progress context
+  const { getCompletedLessons } = useCourseProgress()
+  const completedLessons = getCompletedLessons()
 
   if (!modules || modules.length === 0) {
     return (
@@ -39,6 +44,7 @@ export default function ItemsListing({
             selectedLessonId={lessonId}
             onLessonSelect={onLessonSelect}
             defaultExpanded={module.id === defaultExpandedModuleId || module.lessons?.some(l => l.id === lessonId)}
+            completedLessons={completedLessons}
           />
         ))}
     </div>

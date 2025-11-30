@@ -26,7 +26,6 @@ export function useCreateLessonHook({ moduleId, onSuccess }: UseCreateLessonHook
     resolver: zodResolver(createLessonFormSchema),
     defaultValues: {
       title: "",
-      duration: "10:00",
       orderIndex: existingLessonsCount + 1,
       isPreview: false,
       lessonType: 0 as LessonType, // Default to markdown
@@ -49,7 +48,7 @@ export function useCreateLessonHook({ moduleId, onSuccess }: UseCreateLessonHook
           : data.lessonType === LessonType.VIDEO
             ? "sample-video-url.mp4"
             : "null",
-        duration: data.duration,
+        duration: 1,
         orderIndex: data.orderIndex,
         isPreview: data.isPreview,
         lessonType: data.lessonType,
@@ -61,7 +60,7 @@ export function useCreateLessonHook({ moduleId, onSuccess }: UseCreateLessonHook
           lessonId: lessonResponse.data.id,
           title: `${data.title} Quiz`,
           description: `Quiz for ${data.title}`,
-          passingMarks: 70,
+          passingMarks: 0,
           questions: [], // Start with empty questions
         });
       }

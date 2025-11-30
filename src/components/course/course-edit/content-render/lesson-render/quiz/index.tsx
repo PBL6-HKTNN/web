@@ -5,21 +5,26 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Brain, Save, Plus } from "lucide-react";
+import { Brain, Save, Plus, Wand2 } from "lucide-react";
 import { useQuizLessonRender } from "./hook";
+import { GenerateQuizModal } from "@/components/course/course-edit/modals/generate/quiz";
 import { QuestionType } from "@/types/db/course/quiz-question";
 import { QuizQuestionTable } from "./quiz-question-table";
+import { useState } from "react";
 import type { Lesson } from "@/types/db/course/lesson";
+import type { QuizQuestion } from "@/types/db/course/quiz-question";
 
 interface QuizLessonRenderProps {
   lesson: Lesson;
 }
 
 export function QuizLessonRender({ lesson }: QuizLessonRenderProps) {
+  const [isGenerateModalOpen, setIsGenerateModalOpen] = useState(false);
   const {
     // Data
     isLoading,
     isSaving,
+    totalMarks,
 
     // Form
     form,
@@ -30,7 +35,33 @@ export function QuizLessonRender({ lesson }: QuizLessonRenderProps) {
     addQuestion,
     updateQuestion,
     removeQuestion,
+    cloneQuestion,
   } = useQuizLessonRender({ lesson });
+
+  const handleApplyGeneratedQuiz = (quizData: { title: string; description: string; questions: QuizQuestion[] }, mode: "replace" | "append") => {
+    // Update form with generated quiz data
+    form.setValue("title", quizData.title);
+    form.setValue("description", quizData.description);
+    form.setValue("passingMarks", Math.ceil(quizData.questions.length * 0.7)); // 70% passing
+    
+    // Format the generated questions
+    const formattedQuestions = quizData.questions.map(q => ({
+      questionId: q.questionId || undefined,
+      questionText: q.questionText,
+      questionType: q.questionType,
+      marks: q.marks || 1,
+      answers: q.answers || [],
+    }));
+    
+    if (mode === "replace") {
+      // Replace all existing questions
+      form.setValue("questions", formattedQuestions);
+    } else {
+      // Add generated questions to existing questions
+      const currentQuestions = form.getValues("questions") || [];
+      form.setValue("questions", [...currentQuestions, ...formattedQuestions]);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -43,7 +74,8 @@ export function QuizLessonRender({ lesson }: QuizLessonRenderProps) {
   }
 
   return (
-    <form onSubmit={handleSave} className="h-full flex flex-col gap-4 overflow-y-auto">
+    <>
+      <form onSubmit={handleSave} className="h-full flex flex-col gap-4 overflow-y-auto">
       {/* General Info Card */}
       <Card>
         <CardHeader>
@@ -82,12 +114,18 @@ export function QuizLessonRender({ lesson }: QuizLessonRenderProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="passingMarks">Passing Marks *</Label>
+            <Label htmlFor="passingMarks">
+              Passing Marks * 
+              <span className="text-sm text-muted-foreground font-normal">
+                (Total: {totalMarks} marks)
+              </span>
+            </Label>
             <Input
               id="passingMarks"
               type="number"
               {...form.register("passingMarks", { valueAsNumber: true })}
               placeholder="Enter passing marks"
+              // max={totalMarks}
             />
             {form.formState.errors.passingMarks && (
               <p className="text-sm text-destructive">{form.formState.errors.passingMarks.message}</p>
@@ -102,6 +140,15 @@ export function QuizLessonRender({ lesson }: QuizLessonRenderProps) {
           <div className="flex items-center justify-between">
             <CardTitle>Questions</CardTitle>
             <div className="flex gap-2">
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => setIsGenerateModalOpen(true)}
+              >
+                <Wand2 className="h-4 w-4 mr-2" />
+                Generate Quiz
+              </Button>
               <Button
                 type="button"
                 size="sm"
@@ -149,10 +196,18 @@ export function QuizLessonRender({ lesson }: QuizLessonRenderProps) {
             questions={fields}
             onUpdate={updateQuestion}
             onRemove={removeQuestion}
+            onClone={cloneQuestion}
             form={form}
           />
         </CardContent>
       </Card>
     </form>
+
+    <GenerateQuizModal
+      isOpen={isGenerateModalOpen}
+      onClose={() => setIsGenerateModalOpen(false)}
+      onApplyQuiz={handleApplyGeneratedQuiz}
+    />
+    </>
   );
 }

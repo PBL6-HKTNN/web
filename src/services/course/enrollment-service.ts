@@ -6,6 +6,11 @@ import type {
   UpdateEnrollmentResponse,
   IsEnrolledResponse,
   UpdateEnrollmentReq,
+  UpdateEnrollmentProgressReq,
+  UpdateEnrollmentProgressResponse,
+  GetEnrolledCourseCompletedLessonsResponse,
+  UpdateCurrentViewResponse,
+  UpdateCurrentViewReq,
 } from "@/types/db/course/enrollment";
 import { createServiceApi, serviceUrls } from "@/utils/api";
 
@@ -22,13 +27,47 @@ export const enrollmentService = {
     return response.data;
   },
 
-  updateEnrollment: async (data: UpdateEnrollmentReq): Promise<UpdateEnrollmentResponse> => {
-    const response = await api.put(API_ROUTES.ENROLLMENT.updateEnrollment, data);
+  updateEnrollment: async (
+    data: UpdateEnrollmentReq
+  ): Promise<UpdateEnrollmentResponse> => {
+    const response = await api.post(
+      API_ROUTES.ENROLLMENT.updateEnrollment,
+      data
+    );
+    return response.data;
+  },
+
+  updateEnrollmentProgress: async (
+    data: UpdateEnrollmentProgressReq
+  ): Promise<UpdateEnrollmentProgressResponse> => {
+    const response = await api.post(
+      API_ROUTES.ENROLLMENT.updateEnrollmentProgress,
+      data
+    );
     return response.data;
   },
 
   getEnrolledCourses: async (): Promise<GetEnrolledCoursesResponse> => {
     const response = await api.get(API_ROUTES.ENROLLMENT.getEnrolledCourse);
+    return response.data;
+  },
+
+  getEnrolledCourseCompletedLessons: async (
+    enrollmentId: UUID
+  ): Promise<GetEnrolledCourseCompletedLessonsResponse> => {
+    const response = await api.get(
+      API_ROUTES.ENROLLMENT.getEnrolledCourseCompletedLessons(enrollmentId)
+    );
+    return response.data;
+  },
+
+  updateEnrollmentCurrentView: async (
+    data: UpdateCurrentViewReq
+  ): Promise<UpdateCurrentViewResponse> => {
+    const response = await api.post(
+      API_ROUTES.ENROLLMENT.updateEnrollmentCurrentView,
+      data
+    );
     return response.data;
   },
 };

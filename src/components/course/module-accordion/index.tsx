@@ -5,13 +5,14 @@ import { ChevronDown, Clock, BookOpen } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { LessonItem } from "@/components/course/lesson-item"
 import type { Module } from "@/types/db/course/module"
-import { timeDurationFormat } from "@/utils/time-utils"
+import { parseTimespanToSeconds, timeDurationFormat } from "@/utils/time-utils"
 
 type ModuleAccordionProps = {
   data: Module
   selectedLessonId?: string
   onLessonSelect?: (moduleId: string, lessonId: string) => void
   defaultExpanded?: boolean
+  completedLessons?: string[] // List of completed lesson IDs
 }
 
 export default function ModuleAccordion({
@@ -19,6 +20,7 @@ export default function ModuleAccordion({
   selectedLessonId,
   onLessonSelect,
   defaultExpanded = false,
+  completedLessons = [],
 }: ModuleAccordionProps) {
   const [isOpen, setIsOpen] = useState(defaultExpanded)
 
@@ -83,12 +85,13 @@ export default function ModuleAccordion({
                     <LessonItem
                       key={lesson.id}
                       title={lesson.title}
-                      duration={parseInt(lesson.duration) || 0} // Convert duration string to number
+                      duration={parseTimespanToSeconds(lesson.duration as string) || 0} // Convert duration string to number
                       isSelected={selectedLessonId === lesson.id}
                       onSelected={() => handleLessonSelect(lesson.moduleId,lesson.id)}
-                      progress={0.5} // Mock progress - in real app this would come from user progress data
+                      progress={completedLessons.includes(lesson.id) ? 1 : 0}
                       indexNum={lesson.orderIndex}
                       type={lesson.lessonType}
+                      isCompleted={completedLessons.includes(lesson.id)}
                     />
                   ))}
               </div>

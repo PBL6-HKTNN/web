@@ -1,7 +1,7 @@
 import API_ROUTES from "@/conf/constants/api-routes";
 import type { UUID } from "@/types";
 import type { ApiResponse } from "@/types/core/api";
-import type { Lesson } from "@/types/db/course/lesson";
+import type { CheckLessonLockedRes, Lesson } from "@/types/db/course/lesson";
 import type {
   CreateLessonReq,
   CreateLessonRes,
@@ -49,6 +49,12 @@ export const lessonService = {
   deleteLesson: async (lessonId: UUID): Promise<DeleteLessonRes> => {
     const response = await api.delete<DeleteLessonRes>(
       API_ROUTES.LESSON.deleteLesson(lessonId)
+    );
+    return response.data;
+  },
+  checkLessonLocked: async (lessonId: UUID): Promise<CheckLessonLockedRes> => {
+    const response = await api.get<CheckLessonLockedRes>(
+      API_ROUTES.LESSON.checkLessonLocked(lessonId)
     );
     return response.data;
   },

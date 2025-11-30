@@ -11,6 +11,8 @@ import type {
   GetCoursesRes,
   UpdateCourseReq,
   UpdateCourseRes,
+  ValidateCourseReq,
+  ValidateCourseRes,
 } from "@/types/db/course";
 import { createServiceApi, serviceUrls } from "@/utils/api";
 
@@ -63,6 +65,15 @@ export const courseService = {
   deleteCourse: async (courseId: UUID): Promise<DeleteCourseRes> => {
     const res = await api.delete<DeleteCourseRes>(
       API_ROUTES.COURSE.deleteCourse(courseId)
+    );
+    return res.data;
+  },
+  validateCourse: async (
+    validationData: ValidateCourseReq
+  ): Promise<ValidateCourseRes> => {
+    const res = await api.post<ValidateCourseRes>(
+      API_ROUTES.COURSE.validateCourse,
+      validationData
     );
     return res.data;
   },

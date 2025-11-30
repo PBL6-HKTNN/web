@@ -9,6 +9,7 @@ import type {
   RequestResetPasswordReq,
   ResetPasswordReq,
   AuthRes,
+  ChangePasswordReq,
 } from "@/types/core/auth";
 
 export const authService = {
@@ -48,6 +49,14 @@ export const authService = {
   async resetPassword(data: ResetPasswordReq): Promise<AuthRes> {
     const response = await api.post<AuthRes>(
       API_ROUTES.AUTH.resetPassword,
+      data
+    );
+    return response.data;
+  },
+
+  async changePassword(data: ChangePasswordReq): Promise<AuthRes> {
+    const response = await api.put<AuthRes>(
+      API_ROUTES.AUTH.changePassword,
       data
     );
     return response.data;

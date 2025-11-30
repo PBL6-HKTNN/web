@@ -1,0 +1,38 @@
+{
+  # Set defaults for ACME and admin email (helps when using automatic TLS on real domains)
+  email huukhoa04@gmail.com
+}
+
+# Use environment variable APP_DOMAIN for the production host; when APP_DOMAIN is not set
+# Caddy will fall back to :80 (useful for containerized local dev)
+"resolved-617" {
+  # Serve static files for SPA built by Vite
+  root * /srv
+  encode gzip zstd
+  file_server
+
+  # SPA fallback (index.html) so client-side routing works
+  try_files {path} /index.html
+
+  # Basic security headers
+  header {
+    Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+    X-Content-Type-Options "nosniff"
+    X-Frame-Options "DENY"
+    Referrer-Policy "no-referrer-when-downgrade"
+    Permissions-Policy "interest-cohort=()"
+  }
+
+  # Optional: you can also enable access logs. They are disabled by default inside the container.
+  # log {
+  #   output file /var/log/caddy/access.log
+  # }
+}
+
+# Fallback for local development (when APP_DOMAIN isn't defined). This binds to port 80.
+:80 {
+  root * /srv
+  encode gzip zstd
+  file_server
+  try_files {path} /index.html
+}

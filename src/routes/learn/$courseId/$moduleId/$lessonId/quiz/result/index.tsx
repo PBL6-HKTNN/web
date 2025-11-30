@@ -1,8 +1,10 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, useNavigate, useParams } from '@tanstack/react-router'
 import { useCourseQuizLearning } from '@/contexts/course/course-quiz-learning'
+import { useCourseProgress } from '@/contexts/course/course-progress/hook'
 import ResultView from '@/components/course/course-learn/quiz/result-view'
 import { Button } from '@/components/ui/button'
 import { AlertCircle } from 'lucide-react'
+import { useEffect } from 'react'
 
 export const Route = createFileRoute(
   '/learn/$courseId/$moduleId/$lessonId/quiz/result/',
@@ -12,7 +14,16 @@ export const Route = createFileRoute(
 
 function RouteComponent() {
   const navigate = useNavigate()
+  const { courseId, lessonId } = useParams({ from: '/learn/$courseId/$moduleId/$lessonId/quiz/result/' })
   const { quizResult, resetQuiz } = useCourseQuizLearning()
+  const { markQuizComplete } = useCourseProgress()
+
+  // Track quiz completion when result is available
+  useEffect(() => {
+    if (quizResult && quizResult.passed) {
+      markQuizComplete(courseId, lessonId, quizResult.passed)
+    }
+  }, [quizResult, courseId, lessonId, markQuizComplete])
 
   if (!quizResult) {
     return (

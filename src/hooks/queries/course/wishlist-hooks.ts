@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { wishlistService } from "@/services/course/wishlist-service";
 import type { UUID } from "@/types";
-import type { WishlistedCourseItem } from "@/types/db/course/wishlist";
 
 export const wishlistQueryKeys = {
   allWishlist: ["wishlist"] as const,
@@ -55,9 +54,7 @@ export const useRemoveFromWishlist = () => {
 export const useIsInWishlist = (courseId: UUID) => {
   return useQuery({
     queryKey: [...wishlistQueryKeys.allWishlist, "check", courseId],
-    queryFn: () => wishlistService.getWishlist(),
-    select: (data) => {
-      return data?.data?.some((item: WishlistedCourseItem) => item.courseId === courseId) || false;
-    },
+    queryFn: () => wishlistService.wishlistCheck(courseId),
+    enabled: !!courseId,
   });
 };

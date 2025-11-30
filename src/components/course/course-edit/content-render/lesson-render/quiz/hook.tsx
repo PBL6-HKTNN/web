@@ -99,11 +99,31 @@ export function useQuizLessonRender({ lesson }: UseQuizLessonRenderProps) {
     append(newQuestion);
   };
 
+  // Calculate total marks
+  const totalMarks = fields.reduce((sum, question) => sum + (question.marks || 0), 0);
+
+  const cloneQuestion = (index: number) => {
+    const questionToClone = fields[index];
+    if (questionToClone) {
+      const clonedQuestion = {
+        ...questionToClone,
+        questionText: `${questionToClone.questionText} (Copy)`,
+        answers: questionToClone.answers?.map(answer => ({
+          ...answer,
+          answerId: undefined, // Remove ID so it creates a new answer
+        })) || [],
+        questionId: undefined, // Remove ID so it creates a new question
+      };
+      append(clonedQuestion);
+    }
+  };
+
   return {
     // Data
     quiz,
     isLoading,
     isSaving,
+    totalMarks,
 
     // Form
     form,
@@ -114,5 +134,6 @@ export function useQuizLessonRender({ lesson }: UseQuizLessonRenderProps) {
     addQuestion,
     updateQuestion: update,
     removeQuestion: remove,
+    cloneQuestion,
   };
 }

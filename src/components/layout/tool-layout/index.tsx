@@ -8,13 +8,14 @@ type ToolLayoutProps = {
         icon: React.ReactNode
         href: string
     }[],
+    title: string
     children: React.ReactNode
 }
 
-export default function ToolLayout({ items, children }: ToolLayoutProps) {
+export default function ToolLayout({ items, title, children }: ToolLayoutProps) {
     return (
         <SidebarProvider>
-            <MenuSidebar items={items} />
+            <MenuSidebar items={items} title={title} />
             <main className="container flex min-h-screen">
                 <SidebarTrigger />
                 <div className="flex flex-1 p-4">

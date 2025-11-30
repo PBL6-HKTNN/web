@@ -11,23 +11,32 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as R404RouteImport } from './routes/404'
 import { Route as YourCoursesRouteRouteImport } from './routes/your-courses/route'
 import { Route as UsersRouteRouteImport } from './routes/users/route'
+import { Route as SettingsRouteRouteImport } from './routes/settings/route'
 import { Route as ModRouteRouteImport } from './routes/mod/route'
 import { Route as LecturingToolRouteRouteImport } from './routes/lecturing-tool/route'
 import { Route as LearnRouteRouteImport } from './routes/learn/route'
 import { Route as CourseRouteRouteImport } from './routes/course/route'
+import { Route as CheckoutRouteRouteImport } from './routes/checkout/route'
+import { Route as CartRouteRouteImport } from './routes/cart/route'
 import { Route as AuthRouteRouteImport } from './routes/auth/route'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as YourCoursesIndexRouteImport } from './routes/your-courses/index'
 import { Route as UsersIndexRouteImport } from './routes/users/index'
+import { Route as SettingsIndexRouteImport } from './routes/settings/index'
 import { Route as ModIndexRouteImport } from './routes/mod/index'
 import { Route as LecturingToolIndexRouteImport } from './routes/lecturing-tool/index'
 import { Route as CourseIndexRouteImport } from './routes/course/index'
+import { Route as CheckoutIndexRouteImport } from './routes/checkout/index'
+import { Route as CartIndexRouteImport } from './routes/cart/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as UsersUserIdRouteImport } from './routes/users/$userId'
 import { Route as CourseCourseIdRouteImport } from './routes/course/$courseId'
+import { Route as SettingsProfileRouteRouteImport } from './routes/settings/profile/route'
+import { Route as SettingsPaymentRouteRouteImport } from './routes/settings/payment/route'
 import { Route as ModUsersRouteRouteImport } from './routes/mod/users/route'
 import { Route as ModReportsManagementRouteRouteImport } from './routes/mod/reports-management/route'
 import { Route as ModLecturerManagementRouteRouteImport } from './routes/mod/lecturer-management/route'
@@ -38,11 +47,14 @@ import { Route as AdminUsersRouteRouteImport } from './routes/admin/users/route'
 import { Route as AdminTransactionsRouteRouteImport } from './routes/admin/transactions/route'
 import { Route as AdminPermissionsRouteRouteImport } from './routes/admin/permissions/route'
 import { Route as AdminCoursesRouteRouteImport } from './routes/admin/courses/route'
+import { Route as SettingsProfileIndexRouteImport } from './routes/settings/profile/index'
+import { Route as SettingsPaymentIndexRouteImport } from './routes/settings/payment/index'
 import { Route as ModUsersIndexRouteImport } from './routes/mod/users/index'
 import { Route as ModReportsManagementIndexRouteImport } from './routes/mod/reports-management/index'
 import { Route as ModLecturerManagementIndexRouteImport } from './routes/mod/lecturer-management/index'
 import { Route as ModCoursesIndexRouteImport } from './routes/mod/courses/index'
 import { Route as LecturingToolCourseIndexRouteImport } from './routes/lecturing-tool/course/index'
+import { Route as LecturingToolAnalyticsIndexRouteImport } from './routes/lecturing-tool/analytics/index'
 import { Route as LearnCourseIdIndexRouteImport } from './routes/learn/$courseId/index'
 import { Route as AuthVerifyIndexRouteImport } from './routes/auth/verify/index'
 import { Route as AuthForgotPasswordIndexRouteImport } from './routes/auth/forgot-password/index'
@@ -76,6 +88,11 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
+const R404Route = R404RouteImport.update({
+  id: '/404',
+  path: '/404',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const YourCoursesRouteRoute = YourCoursesRouteRouteImport.update({
   id: '/your-courses',
   path: '/your-courses',
@@ -84,6 +101,11 @@ const YourCoursesRouteRoute = YourCoursesRouteRouteImport.update({
 const UsersRouteRoute = UsersRouteRouteImport.update({
   id: '/users',
   path: '/users',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRouteRoute = SettingsRouteRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ModRouteRoute = ModRouteRouteImport.update({
@@ -104,6 +126,16 @@ const LearnRouteRoute = LearnRouteRouteImport.update({
 const CourseRouteRoute = CourseRouteRouteImport.update({
   id: '/course',
   path: '/course',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutRouteRoute = CheckoutRouteRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CartRouteRoute = CartRouteRouteImport.update({
+  id: '/cart',
+  path: '/cart',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRouteRoute = AuthRouteRouteImport.update({
@@ -131,6 +163,11 @@ const UsersIndexRoute = UsersIndexRouteImport.update({
   path: '/',
   getParentRoute: () => UsersRouteRoute,
 } as any)
+const SettingsIndexRoute = SettingsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SettingsRouteRoute,
+} as any)
 const ModIndexRoute = ModIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -146,6 +183,16 @@ const CourseIndexRoute = CourseIndexRouteImport.update({
   path: '/',
   getParentRoute: () => CourseRouteRoute,
 } as any)
+const CheckoutIndexRoute = CheckoutIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => CheckoutRouteRoute,
+} as any)
+const CartIndexRoute = CartIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => CartRouteRoute,
+} as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -160,6 +207,16 @@ const CourseCourseIdRoute = CourseCourseIdRouteImport.update({
   id: '/$courseId',
   path: '/$courseId',
   getParentRoute: () => CourseRouteRoute,
+} as any)
+const SettingsProfileRouteRoute = SettingsProfileRouteRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => SettingsRouteRoute,
+} as any)
+const SettingsPaymentRouteRoute = SettingsPaymentRouteRouteImport.update({
+  id: '/payment',
+  path: '/payment',
+  getParentRoute: () => SettingsRouteRoute,
 } as any)
 const ModUsersRouteRoute = ModUsersRouteRouteImport.update({
   id: '/users',
@@ -212,6 +269,16 @@ const AdminCoursesRouteRoute = AdminCoursesRouteRouteImport.update({
   path: '/courses',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const SettingsProfileIndexRoute = SettingsProfileIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SettingsProfileRouteRoute,
+} as any)
+const SettingsPaymentIndexRoute = SettingsPaymentIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SettingsPaymentRouteRoute,
+} as any)
 const ModUsersIndexRoute = ModUsersIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -238,6 +305,12 @@ const LecturingToolCourseIndexRoute =
   LecturingToolCourseIndexRouteImport.update({
     id: '/course/',
     path: '/course/',
+    getParentRoute: () => LecturingToolRouteRoute,
+  } as any)
+const LecturingToolAnalyticsIndexRoute =
+  LecturingToolAnalyticsIndexRouteImport.update({
+    id: '/analytics/',
+    path: '/analytics/',
     getParentRoute: () => LecturingToolRouteRoute,
   } as any)
 const LearnCourseIdIndexRoute = LearnCourseIdIndexRouteImport.update({
@@ -368,12 +441,16 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
   '/auth': typeof AuthMainLayoutRouteRouteWithChildren
+  '/cart': typeof CartRouteRouteWithChildren
+  '/checkout': typeof CheckoutRouteRouteWithChildren
   '/course': typeof CourseRouteRouteWithChildren
   '/learn': typeof LearnRouteRouteWithChildren
   '/lecturing-tool': typeof LecturingToolRouteRouteWithChildren
   '/mod': typeof ModRouteRouteWithChildren
+  '/settings': typeof SettingsRouteRouteWithChildren
   '/users': typeof UsersRouteRouteWithChildren
   '/your-courses': typeof YourCoursesRouteRouteWithChildren
+  '/404': typeof R404Route
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/admin/courses': typeof AdminCoursesRouteRouteWithChildren
@@ -385,12 +462,17 @@ export interface FileRoutesByFullPath {
   '/mod/lecturer-management': typeof ModLecturerManagementRouteRouteWithChildren
   '/mod/reports-management': typeof ModReportsManagementRouteRouteWithChildren
   '/mod/users': typeof ModUsersRouteRouteWithChildren
+  '/settings/payment': typeof SettingsPaymentRouteRouteWithChildren
+  '/settings/profile': typeof SettingsProfileRouteRouteWithChildren
   '/course/$courseId': typeof CourseCourseIdRoute
   '/users/$userId': typeof UsersUserIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/cart/': typeof CartIndexRoute
+  '/checkout/': typeof CheckoutIndexRoute
   '/course/': typeof CourseIndexRoute
   '/lecturing-tool/': typeof LecturingToolIndexRoute
   '/mod/': typeof ModIndexRoute
+  '/settings/': typeof SettingsIndexRoute
   '/users/': typeof UsersIndexRoute
   '/your-courses/': typeof YourCoursesIndexRoute
   '/learn/$courseId/$moduleId': typeof LearnCourseIdModuleIdRouteRouteWithChildren
@@ -401,11 +483,14 @@ export interface FileRoutesByFullPath {
   '/auth/forgot-password': typeof AuthForgotPasswordIndexRoute
   '/auth/verify': typeof AuthVerifyIndexRoute
   '/learn/$courseId/': typeof LearnCourseIdIndexRoute
+  '/lecturing-tool/analytics': typeof LecturingToolAnalyticsIndexRoute
   '/lecturing-tool/course': typeof LecturingToolCourseIndexRoute
   '/mod/courses/': typeof ModCoursesIndexRoute
   '/mod/lecturer-management/': typeof ModLecturerManagementIndexRoute
   '/mod/reports-management/': typeof ModReportsManagementIndexRoute
   '/mod/users/': typeof ModUsersIndexRoute
+  '/settings/payment/': typeof SettingsPaymentIndexRoute
+  '/settings/profile/': typeof SettingsProfileIndexRoute
   '/learn/$courseId/$moduleId/$lessonId': typeof LearnCourseIdModuleIdLessonIdRouteRouteWithChildren
   '/lecturing-tool/course/$courseId/editing': typeof LecturingToolCourseCourseIdEditingRouteRouteWithChildren
   '/admin/users/$userId': typeof AdminUsersUserIdIndexRoute
@@ -425,14 +510,18 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthMainLayoutRouteRouteWithChildren
   '/learn': typeof LearnRouteRouteWithChildren
+  '/404': typeof R404Route
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/course/$courseId': typeof CourseCourseIdRoute
   '/users/$userId': typeof UsersUserIdRoute
   '/admin': typeof AdminIndexRoute
+  '/cart': typeof CartIndexRoute
+  '/checkout': typeof CheckoutIndexRoute
   '/course': typeof CourseIndexRoute
   '/lecturing-tool': typeof LecturingToolIndexRoute
   '/mod': typeof ModIndexRoute
+  '/settings': typeof SettingsIndexRoute
   '/users': typeof UsersIndexRoute
   '/your-courses': typeof YourCoursesIndexRoute
   '/admin/courses': typeof AdminCoursesIndexRoute
@@ -442,11 +531,14 @@ export interface FileRoutesByTo {
   '/auth/forgot-password': typeof AuthForgotPasswordIndexRoute
   '/auth/verify': typeof AuthVerifyIndexRoute
   '/learn/$courseId': typeof LearnCourseIdIndexRoute
+  '/lecturing-tool/analytics': typeof LecturingToolAnalyticsIndexRoute
   '/lecturing-tool/course': typeof LecturingToolCourseIndexRoute
   '/mod/courses': typeof ModCoursesIndexRoute
   '/mod/lecturer-management': typeof ModLecturerManagementIndexRoute
   '/mod/reports-management': typeof ModReportsManagementIndexRoute
   '/mod/users': typeof ModUsersIndexRoute
+  '/settings/payment': typeof SettingsPaymentIndexRoute
+  '/settings/profile': typeof SettingsProfileIndexRoute
   '/admin/users/$userId': typeof AdminUsersUserIdIndexRoute
   '/auth/login': typeof AuthMainLayoutLoginIndexRoute
   '/auth/register': typeof AuthMainLayoutRegisterIndexRoute
@@ -464,12 +556,16 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
   '/auth': typeof AuthRouteRouteWithChildren
+  '/cart': typeof CartRouteRouteWithChildren
+  '/checkout': typeof CheckoutRouteRouteWithChildren
   '/course': typeof CourseRouteRouteWithChildren
   '/learn': typeof LearnRouteRouteWithChildren
   '/lecturing-tool': typeof LecturingToolRouteRouteWithChildren
   '/mod': typeof ModRouteRouteWithChildren
+  '/settings': typeof SettingsRouteRouteWithChildren
   '/users': typeof UsersRouteRouteWithChildren
   '/your-courses': typeof YourCoursesRouteRouteWithChildren
+  '/404': typeof R404Route
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/admin/courses': typeof AdminCoursesRouteRouteWithChildren
@@ -482,12 +578,17 @@ export interface FileRoutesById {
   '/mod/lecturer-management': typeof ModLecturerManagementRouteRouteWithChildren
   '/mod/reports-management': typeof ModReportsManagementRouteRouteWithChildren
   '/mod/users': typeof ModUsersRouteRouteWithChildren
+  '/settings/payment': typeof SettingsPaymentRouteRouteWithChildren
+  '/settings/profile': typeof SettingsProfileRouteRouteWithChildren
   '/course/$courseId': typeof CourseCourseIdRoute
   '/users/$userId': typeof UsersUserIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/cart/': typeof CartIndexRoute
+  '/checkout/': typeof CheckoutIndexRoute
   '/course/': typeof CourseIndexRoute
   '/lecturing-tool/': typeof LecturingToolIndexRoute
   '/mod/': typeof ModIndexRoute
+  '/settings/': typeof SettingsIndexRoute
   '/users/': typeof UsersIndexRoute
   '/your-courses/': typeof YourCoursesIndexRoute
   '/learn/$courseId/$moduleId': typeof LearnCourseIdModuleIdRouteRouteWithChildren
@@ -498,11 +599,14 @@ export interface FileRoutesById {
   '/auth/forgot-password/': typeof AuthForgotPasswordIndexRoute
   '/auth/verify/': typeof AuthVerifyIndexRoute
   '/learn/$courseId/': typeof LearnCourseIdIndexRoute
+  '/lecturing-tool/analytics/': typeof LecturingToolAnalyticsIndexRoute
   '/lecturing-tool/course/': typeof LecturingToolCourseIndexRoute
   '/mod/courses/': typeof ModCoursesIndexRoute
   '/mod/lecturer-management/': typeof ModLecturerManagementIndexRoute
   '/mod/reports-management/': typeof ModReportsManagementIndexRoute
   '/mod/users/': typeof ModUsersIndexRoute
+  '/settings/payment/': typeof SettingsPaymentIndexRoute
+  '/settings/profile/': typeof SettingsProfileIndexRoute
   '/learn/$courseId/$moduleId/$lessonId': typeof LearnCourseIdModuleIdLessonIdRouteRouteWithChildren
   '/lecturing-tool/course/$courseId/editing': typeof LecturingToolCourseCourseIdEditingRouteRouteWithChildren
   '/admin/users/$userId/': typeof AdminUsersUserIdIndexRoute
@@ -524,12 +628,16 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/auth'
+    | '/cart'
+    | '/checkout'
     | '/course'
     | '/learn'
     | '/lecturing-tool'
     | '/mod'
+    | '/settings'
     | '/users'
     | '/your-courses'
+    | '/404'
     | '/about'
     | '/contact'
     | '/admin/courses'
@@ -541,12 +649,17 @@ export interface FileRouteTypes {
     | '/mod/lecturer-management'
     | '/mod/reports-management'
     | '/mod/users'
+    | '/settings/payment'
+    | '/settings/profile'
     | '/course/$courseId'
     | '/users/$userId'
     | '/admin/'
+    | '/cart/'
+    | '/checkout/'
     | '/course/'
     | '/lecturing-tool/'
     | '/mod/'
+    | '/settings/'
     | '/users/'
     | '/your-courses/'
     | '/learn/$courseId/$moduleId'
@@ -557,11 +670,14 @@ export interface FileRouteTypes {
     | '/auth/forgot-password'
     | '/auth/verify'
     | '/learn/$courseId/'
+    | '/lecturing-tool/analytics'
     | '/lecturing-tool/course'
     | '/mod/courses/'
     | '/mod/lecturer-management/'
     | '/mod/reports-management/'
     | '/mod/users/'
+    | '/settings/payment/'
+    | '/settings/profile/'
     | '/learn/$courseId/$moduleId/$lessonId'
     | '/lecturing-tool/course/$courseId/editing'
     | '/admin/users/$userId'
@@ -581,14 +697,18 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/learn'
+    | '/404'
     | '/about'
     | '/contact'
     | '/course/$courseId'
     | '/users/$userId'
     | '/admin'
+    | '/cart'
+    | '/checkout'
     | '/course'
     | '/lecturing-tool'
     | '/mod'
+    | '/settings'
     | '/users'
     | '/your-courses'
     | '/admin/courses'
@@ -598,11 +718,14 @@ export interface FileRouteTypes {
     | '/auth/forgot-password'
     | '/auth/verify'
     | '/learn/$courseId'
+    | '/lecturing-tool/analytics'
     | '/lecturing-tool/course'
     | '/mod/courses'
     | '/mod/lecturer-management'
     | '/mod/reports-management'
     | '/mod/users'
+    | '/settings/payment'
+    | '/settings/profile'
     | '/admin/users/$userId'
     | '/auth/login'
     | '/auth/register'
@@ -619,12 +742,16 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/auth'
+    | '/cart'
+    | '/checkout'
     | '/course'
     | '/learn'
     | '/lecturing-tool'
     | '/mod'
+    | '/settings'
     | '/users'
     | '/your-courses'
+    | '/404'
     | '/about'
     | '/contact'
     | '/admin/courses'
@@ -637,12 +764,17 @@ export interface FileRouteTypes {
     | '/mod/lecturer-management'
     | '/mod/reports-management'
     | '/mod/users'
+    | '/settings/payment'
+    | '/settings/profile'
     | '/course/$courseId'
     | '/users/$userId'
     | '/admin/'
+    | '/cart/'
+    | '/checkout/'
     | '/course/'
     | '/lecturing-tool/'
     | '/mod/'
+    | '/settings/'
     | '/users/'
     | '/your-courses/'
     | '/learn/$courseId/$moduleId'
@@ -653,11 +785,14 @@ export interface FileRouteTypes {
     | '/auth/forgot-password/'
     | '/auth/verify/'
     | '/learn/$courseId/'
+    | '/lecturing-tool/analytics/'
     | '/lecturing-tool/course/'
     | '/mod/courses/'
     | '/mod/lecturer-management/'
     | '/mod/reports-management/'
     | '/mod/users/'
+    | '/settings/payment/'
+    | '/settings/profile/'
     | '/learn/$courseId/$moduleId/$lessonId'
     | '/lecturing-tool/course/$courseId/editing'
     | '/admin/users/$userId/'
@@ -678,12 +813,16 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
+  CartRouteRoute: typeof CartRouteRouteWithChildren
+  CheckoutRouteRoute: typeof CheckoutRouteRouteWithChildren
   CourseRouteRoute: typeof CourseRouteRouteWithChildren
   LearnRouteRoute: typeof LearnRouteRouteWithChildren
   LecturingToolRouteRoute: typeof LecturingToolRouteRouteWithChildren
   ModRouteRoute: typeof ModRouteRouteWithChildren
+  SettingsRouteRoute: typeof SettingsRouteRouteWithChildren
   UsersRouteRoute: typeof UsersRouteRouteWithChildren
   YourCoursesRouteRoute: typeof YourCoursesRouteRouteWithChildren
+  R404Route: typeof R404Route
   AboutRoute: typeof AboutRoute
   ContactRoute: typeof ContactRoute
 }
@@ -704,6 +843,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/404': {
+      id: '/404'
+      path: '/404'
+      fullPath: '/404'
+      preLoaderRoute: typeof R404RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/your-courses': {
       id: '/your-courses'
       path: '/your-courses'
@@ -716,6 +862,13 @@ declare module '@tanstack/react-router' {
       path: '/users'
       fullPath: '/users'
       preLoaderRoute: typeof UsersRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mod': {
@@ -744,6 +897,20 @@ declare module '@tanstack/react-router' {
       path: '/course'
       fullPath: '/course'
       preLoaderRoute: typeof CourseRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cart': {
+      id: '/cart'
+      path: '/cart'
+      fullPath: '/cart'
+      preLoaderRoute: typeof CartRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -781,6 +948,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UsersIndexRouteImport
       parentRoute: typeof UsersRouteRoute
     }
+    '/settings/': {
+      id: '/settings/'
+      path: '/'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof SettingsIndexRouteImport
+      parentRoute: typeof SettingsRouteRoute
+    }
     '/mod/': {
       id: '/mod/'
       path: '/'
@@ -802,6 +976,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CourseIndexRouteImport
       parentRoute: typeof CourseRouteRoute
     }
+    '/checkout/': {
+      id: '/checkout/'
+      path: '/'
+      fullPath: '/checkout/'
+      preLoaderRoute: typeof CheckoutIndexRouteImport
+      parentRoute: typeof CheckoutRouteRoute
+    }
+    '/cart/': {
+      id: '/cart/'
+      path: '/'
+      fullPath: '/cart/'
+      preLoaderRoute: typeof CartIndexRouteImport
+      parentRoute: typeof CartRouteRoute
+    }
     '/admin/': {
       id: '/admin/'
       path: '/'
@@ -822,6 +1010,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/course/$courseId'
       preLoaderRoute: typeof CourseCourseIdRouteImport
       parentRoute: typeof CourseRouteRoute
+    }
+    '/settings/profile': {
+      id: '/settings/profile'
+      path: '/profile'
+      fullPath: '/settings/profile'
+      preLoaderRoute: typeof SettingsProfileRouteRouteImport
+      parentRoute: typeof SettingsRouteRoute
+    }
+    '/settings/payment': {
+      id: '/settings/payment'
+      path: '/payment'
+      fullPath: '/settings/payment'
+      preLoaderRoute: typeof SettingsPaymentRouteRouteImport
+      parentRoute: typeof SettingsRouteRoute
     }
     '/mod/users': {
       id: '/mod/users'
@@ -893,6 +1095,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCoursesRouteRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/settings/profile/': {
+      id: '/settings/profile/'
+      path: '/'
+      fullPath: '/settings/profile/'
+      preLoaderRoute: typeof SettingsProfileIndexRouteImport
+      parentRoute: typeof SettingsProfileRouteRoute
+    }
+    '/settings/payment/': {
+      id: '/settings/payment/'
+      path: '/'
+      fullPath: '/settings/payment/'
+      preLoaderRoute: typeof SettingsPaymentIndexRouteImport
+      parentRoute: typeof SettingsPaymentRouteRoute
+    }
     '/mod/users/': {
       id: '/mod/users/'
       path: '/'
@@ -926,6 +1142,13 @@ declare module '@tanstack/react-router' {
       path: '/course'
       fullPath: '/lecturing-tool/course'
       preLoaderRoute: typeof LecturingToolCourseIndexRouteImport
+      parentRoute: typeof LecturingToolRouteRoute
+    }
+    '/lecturing-tool/analytics/': {
+      id: '/lecturing-tool/analytics/'
+      path: '/analytics'
+      fullPath: '/lecturing-tool/analytics'
+      preLoaderRoute: typeof LecturingToolAnalyticsIndexRouteImport
       parentRoute: typeof LecturingToolRouteRoute
     }
     '/learn/$courseId/': {
@@ -1186,6 +1409,30 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
   AuthRouteRouteChildren,
 )
 
+interface CartRouteRouteChildren {
+  CartIndexRoute: typeof CartIndexRoute
+}
+
+const CartRouteRouteChildren: CartRouteRouteChildren = {
+  CartIndexRoute: CartIndexRoute,
+}
+
+const CartRouteRouteWithChildren = CartRouteRoute._addFileChildren(
+  CartRouteRouteChildren,
+)
+
+interface CheckoutRouteRouteChildren {
+  CheckoutIndexRoute: typeof CheckoutIndexRoute
+}
+
+const CheckoutRouteRouteChildren: CheckoutRouteRouteChildren = {
+  CheckoutIndexRoute: CheckoutIndexRoute,
+}
+
+const CheckoutRouteRouteWithChildren = CheckoutRouteRoute._addFileChildren(
+  CheckoutRouteRouteChildren,
+)
+
 interface CourseRouteRouteChildren {
   CourseCourseIdRoute: typeof CourseCourseIdRoute
   CourseIndexRoute: typeof CourseIndexRoute
@@ -1295,6 +1542,7 @@ const LecturingToolCourseCourseIdEditingRouteRouteWithChildren =
 
 interface LecturingToolRouteRouteChildren {
   LecturingToolIndexRoute: typeof LecturingToolIndexRoute
+  LecturingToolAnalyticsIndexRoute: typeof LecturingToolAnalyticsIndexRoute
   LecturingToolCourseIndexRoute: typeof LecturingToolCourseIndexRoute
   LecturingToolCourseCourseIdEditingRouteRoute: typeof LecturingToolCourseCourseIdEditingRouteRouteWithChildren
   LecturingToolCourseCourseIdIndexRoute: typeof LecturingToolCourseCourseIdIndexRoute
@@ -1303,6 +1551,7 @@ interface LecturingToolRouteRouteChildren {
 
 const LecturingToolRouteRouteChildren: LecturingToolRouteRouteChildren = {
   LecturingToolIndexRoute: LecturingToolIndexRoute,
+  LecturingToolAnalyticsIndexRoute: LecturingToolAnalyticsIndexRoute,
   LecturingToolCourseIndexRoute: LecturingToolCourseIndexRoute,
   LecturingToolCourseCourseIdEditingRouteRoute:
     LecturingToolCourseCourseIdEditingRouteRouteWithChildren,
@@ -1387,6 +1636,44 @@ const ModRouteRouteWithChildren = ModRouteRoute._addFileChildren(
   ModRouteRouteChildren,
 )
 
+interface SettingsPaymentRouteRouteChildren {
+  SettingsPaymentIndexRoute: typeof SettingsPaymentIndexRoute
+}
+
+const SettingsPaymentRouteRouteChildren: SettingsPaymentRouteRouteChildren = {
+  SettingsPaymentIndexRoute: SettingsPaymentIndexRoute,
+}
+
+const SettingsPaymentRouteRouteWithChildren =
+  SettingsPaymentRouteRoute._addFileChildren(SettingsPaymentRouteRouteChildren)
+
+interface SettingsProfileRouteRouteChildren {
+  SettingsProfileIndexRoute: typeof SettingsProfileIndexRoute
+}
+
+const SettingsProfileRouteRouteChildren: SettingsProfileRouteRouteChildren = {
+  SettingsProfileIndexRoute: SettingsProfileIndexRoute,
+}
+
+const SettingsProfileRouteRouteWithChildren =
+  SettingsProfileRouteRoute._addFileChildren(SettingsProfileRouteRouteChildren)
+
+interface SettingsRouteRouteChildren {
+  SettingsPaymentRouteRoute: typeof SettingsPaymentRouteRouteWithChildren
+  SettingsProfileRouteRoute: typeof SettingsProfileRouteRouteWithChildren
+  SettingsIndexRoute: typeof SettingsIndexRoute
+}
+
+const SettingsRouteRouteChildren: SettingsRouteRouteChildren = {
+  SettingsPaymentRouteRoute: SettingsPaymentRouteRouteWithChildren,
+  SettingsProfileRouteRoute: SettingsProfileRouteRouteWithChildren,
+  SettingsIndexRoute: SettingsIndexRoute,
+}
+
+const SettingsRouteRouteWithChildren = SettingsRouteRoute._addFileChildren(
+  SettingsRouteRouteChildren,
+)
+
 interface UsersRouteRouteChildren {
   UsersUserIdRoute: typeof UsersUserIdRoute
   UsersIndexRoute: typeof UsersIndexRoute
@@ -1416,12 +1703,16 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRouteRoute: AdminRouteRouteWithChildren,
   AuthRouteRoute: AuthRouteRouteWithChildren,
+  CartRouteRoute: CartRouteRouteWithChildren,
+  CheckoutRouteRoute: CheckoutRouteRouteWithChildren,
   CourseRouteRoute: CourseRouteRouteWithChildren,
   LearnRouteRoute: LearnRouteRouteWithChildren,
   LecturingToolRouteRoute: LecturingToolRouteRouteWithChildren,
   ModRouteRoute: ModRouteRouteWithChildren,
+  SettingsRouteRoute: SettingsRouteRouteWithChildren,
   UsersRouteRoute: UsersRouteRouteWithChildren,
   YourCoursesRouteRoute: YourCoursesRouteRouteWithChildren,
+  R404Route: R404Route,
   AboutRoute: AboutRoute,
   ContactRoute: ContactRoute,
 }

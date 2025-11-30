@@ -25,4 +25,8 @@ export const wishlistService = {
     );
     return response.data;
   },
+  wishlistCheck: async (courseId: UUID): Promise<WishlistItem> => {
+    const response = await api.get(API_ROUTES.WISHLIST.wishlistCheck(courseId));
+    return response.data;
+  },
 };

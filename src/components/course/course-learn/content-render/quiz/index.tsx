@@ -3,10 +3,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Clock, Target, Trophy, Play, Loader2 } from "lucide-react"
 import type { Lesson } from "@/types/db/course/lesson"
+import type { UUID } from "@/types"
 import { useQuizContent } from "./hook"
 
 type QuizContentProps = {
   lesson: Lesson
+  courseId: UUID
 }
 
 export default function QuizContent({ lesson }: QuizContentProps) {

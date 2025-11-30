@@ -14,7 +14,7 @@ export type Lesson = Base & {
   title: string;
   moduleId: UUID;
   contentUrl: string;
-  duration: string;
+  duration: number | string;
   orderIndex: number;
   isPreview: boolean;
   lessonType: LessonType;
@@ -41,3 +41,5 @@ export type LessonReq = {
   lessonType: LessonType | null;
   quiz?: QuizReq | null;
 };
+
+export type CheckLessonLockedRes = ApiResponse<Lesson>;

@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useCourseEdit } from "@/contexts/course/use-course-edit";
 import type { Lesson } from "@/types/db/course/lesson";
 import type { UploadFileRes } from "@/types/core/storage";
+import { parseTimespanToSeconds } from "@/utils/time-utils";
 
 interface VideoLessonRenderProps {
   lesson: Lesson;
@@ -48,7 +49,7 @@ export function VideoLessonRender({ lesson }: VideoLessonRenderProps) {
           title: lesson.title,
           moduleId: lesson.moduleId,
           contentUrl: videoUrl,
-          duration: lesson.duration,
+          duration: parseTimespanToSeconds(lesson.duration as string),
           orderIndex: lesson.orderIndex,
           isPreview: lesson.isPreview,
           lessonType: lesson.lessonType,

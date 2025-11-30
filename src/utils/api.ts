@@ -1,7 +1,14 @@
 import axios, { type AxiosInstance } from "axios";
 import Persistence from "@/utils/persistence";
 import type { ServiceUrls } from "@/types/core/api";
-import { apiServiceUrlsKey, apiUrl, separatedServiceFlag, storageApiUrl } from "@/conf";
+import {
+  apiServiceUrlsKey,
+  apiUrl,
+  automationApiUrl,
+  reviewApiUrl,
+  separatedServiceFlag,
+  storageApiUrl,
+} from "@/conf";
 import { toast } from "sonner";
 
 // filepath: src/utils/api.ts
@@ -30,10 +37,10 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       // Handle unauthorized
       toast.error("Session expired. Please log in again.");
-      Persistence.removeItem("auth_token");
-      window.location.href = "/auth/login";
+      // Persistence.removeItem("auth_token");
+      // window.location.href = "/auth/login";
     }
-    return Promise.reject(error);
+    return Promise.reject(error.response);
   }
 );
 
@@ -45,10 +52,12 @@ export function setApiBaseURL(url: string) {
 }
 
 // Create service-specific axios instances
-export function createServiceApi( baseURL: string): AxiosInstance {
-  
+export function createServiceApi(baseURL: string): AxiosInstance {
   // If separated services are disabled, return the global api instance
-  if (separatedServiceFlag === 0 && baseURL !== storageApiUrl) {
+  if (
+    separatedServiceFlag === 0 &&
+    ![storageApiUrl, reviewApiUrl, automationApiUrl].includes(baseURL)
+  ) {
     return api;
   }
 
@@ -66,7 +75,7 @@ export function createServiceApi( baseURL: string): AxiosInstance {
       }
       return config;
     },
-    (error) => Promise.reject(error)
+    (error) => Promise.resolve(error)
   );
 
   // Copy response interceptor
@@ -76,8 +85,8 @@ export function createServiceApi( baseURL: string): AxiosInstance {
       if (error.response?.status === 401) {
         // Handle unauthorized
         toast.error("Session expired. Please log in again.");
-        Persistence.removeItem("auth_token");
-        window.location.href = "/auth/login";
+        // Persistence.removeItem("auth_token");
+        // window.location.href = "/auth/login";
       }
       return Promise.reject(error);
     }
@@ -86,6 +95,11 @@ export function createServiceApi( baseURL: string): AxiosInstance {
   return serviceApi;
 }
 
+/**
+ * Decode and parse the service URLs from environment variable.
+ * @returns ServiceUrls object decoded from VITE_SERVICES_URLS_KEY
+ * @deprecated Currently not in use since we have gateway already. Will be removed in future versions.
+ */
 function _getServiceUrlsObj(): ServiceUrls {
   const encoded = apiServiceUrlsKey;
   if (!encoded) {

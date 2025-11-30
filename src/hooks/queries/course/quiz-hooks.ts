@@ -15,6 +15,10 @@ export const quizQueryKeys = {
     [...quizQueryKeys.allQuizzes, "lesson", lessonId] as const,
   quizAttempts: (quizId: UUID) =>
     [...quizQueryKeys.allQuizzes, "attempts", quizId] as const,
+  quizResults: (lessonId: UUID) =>
+    [...quizQueryKeys.allQuizzes, "results", lessonId] as const,
+  quizListResults: (lessonId: UUID) =>
+    [...quizQueryKeys.allQuizzes, "list-results", lessonId] as const,
   beginQuizAttempt: ["beginQuizAttempt"] as const,
 };
 
@@ -101,5 +105,13 @@ export const useBeginQuizAttempt = (quizId: UUID) => {
   return useMutation({
     mutationKey: [...quizQueryKeys.beginQuizAttempt, quizId],
     mutationFn: () => quizService.beginQuizAttempt(quizId),
+  });
+};
+
+export const useGetQuizListResults = (lessonId: UUID) => {
+  return useQuery({
+    queryKey: quizQueryKeys.quizListResults(lessonId),
+    queryFn: () => quizService.getQuizListResults(lessonId),
+    enabled: !!lessonId,
   });
 };
