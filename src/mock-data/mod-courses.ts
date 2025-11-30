@@ -1,0 +1,138 @@
+export const modCourses = [
+  {
+    id: '1',
+    title: 'Advanced React Patterns',
+    instructor: 'Jane Smith',
+    instructorEmail: 'jane.smith@example.com',
+    status: 'Published',
+    price: 99.99,
+    category: 'Programming',
+    submittedDate: '2024-11-20 14:30',
+    description: 'Comprehensive guide to advanced React patterns and best practices',
+    duration: '8 hours',
+    level: 'Advanced',
+    thumbnail: '/placeholder-course.jpg',
+    students: 0
+  },
+  {
+    id: '2',
+    title: 'Machine Learning Fundamentals',
+    instructor: 'Dr. Sarah Chen',
+    instructorEmail: 'sarah.chen@example.com',
+    status: 'Published',
+    price: 149.99,
+    category: 'AI/ML',
+    submittedDate: '2024-11-20 10:15',
+    description: 'Introduction to machine learning concepts and algorithms',
+    duration: '12 hours',
+    level: 'Intermediate',
+    thumbnail: '/placeholder-course.jpg',
+    students: 0
+  },
+  {
+    id: '3',
+    title: 'Web Development Bootcamp',
+    instructor: 'Mike Johnson',
+    instructorEmail: 'mike.johnson@example.com',
+    status: 'Under Review',
+    price: 199.99,
+    category: 'Programming',
+    submittedDate: '2024-11-19 16:45',
+    description: 'Complete web development course covering HTML, CSS, and JavaScript',
+    duration: '20 hours',
+    level: 'Beginner',
+    thumbnail: '/placeholder-course.jpg',
+    students: 0
+  },
+  {
+    id: '4',
+    title: 'Data Science with Python',
+    instructor: 'Lisa Wong',
+    instructorEmail: 'lisa.wong@example.com',
+    status: 'Published',
+    price: 179.99,
+    category: 'Data Science',
+    submittedDate: '2024-11-19 09:20',
+    approvedDate: '2024-11-19 11:45',
+    description: 'Learn data science fundamentals using Python and popular libraries',
+    duration: '15 hours',
+    level: 'Intermediate',
+    thumbnail: '/placeholder-course.jpg',
+    students: 156
+  },
+  {
+    id: '5',
+    title: 'React Masterclass',
+    instructor: 'Alice Brown',
+    instructorEmail: 'alice.brown@example.com',
+    status: 'Under Review',
+    price: 129.99,
+    category: 'Programming',
+    submittedDate: '2024-11-18 09:15',
+    approvedDate: '2024-11-18 10:30',
+    description: 'Complete React development course from basics to advanced',
+    duration: '25 hours',
+    level: 'All Levels',
+    thumbnail: '/placeholder-course.jpg',
+    students: 342
+  },
+  // {
+  //   id: '6',
+  //   title: 'Old JavaScript Course',
+  //   instructor: 'Bob Wilson',
+  //   instructorEmail: 'bob.wilson@example.com',
+  //   status: 'Disabled',
+  //   price: 79.99,
+  //   category: 'Programming',
+  //   submittedDate: '2024-10-15 14:20',
+  //   approvedDate: '2024-10-16 09:45',
+  //   description: 'Outdated JavaScript course - disabled for quality reasons',
+  //   duration: '15 hours',
+  //   level: 'Beginner',
+  //   thumbnail: '/placeholder-course.jpg',
+  //   students: 89
+  // },
+]
+
+export const courseHideRequests = [
+  {
+    id: 'HR001',
+    courseTitle: 'Advanced React Patterns',
+    instructor: 'Jane Smith',
+    instructorEmail: 'jane.smith@example.com',
+    category: 'Programming',
+    requestDate: '2024-11-25 09:15',
+    reason: 'Course content needs major updates and improvements before being available to students',
+    status: 'Pending'
+  },
+  {
+    id: 'HR002',
+    courseTitle: 'Machine Learning Fundamentals',
+    instructor: 'Dr. Sarah Chen',
+    instructorEmail: 'sarah.chen@example.com',
+    category: 'AI/ML',
+    requestDate: '2024-11-24 14:30',
+    reason: 'Technical issues with video lectures - need to re-record sections',
+    status: 'Approved'
+  },
+  {
+    id: 'HR003',
+    courseTitle: 'Web Development Bootcamp',
+    instructor: 'Mike Johnson',
+    instructorEmail: 'mike.johnson@example.com',
+    category: 'Programming',
+    requestDate: '2024-11-23 11:45',
+    reason: 'Personal reasons - taking temporary leave',
+    status: 'Rejected'
+  },
+  {
+    id: 'HR004',
+    courseTitle: 'Data Science with Python',
+    instructor: 'Lisa Wong',
+    instructorEmail: 'lisa.wong@example.com',
+    category: 'Data Science',
+    requestDate: '2024-11-22 16:20',
+    reason: 'Course materials contain outdated information and need revision',
+    status: 'Pending'
+  }
+]
