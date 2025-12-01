@@ -66,7 +66,7 @@ export const checkAuthStatus = () => {
   return getAuthState();
 };
 
-export const RoleGuard = (allowedRoles: UserRole[]) => {
+export const roleGuard = (allowedRoles: UserRole[]) => {
   const { user, isAuthenticated } = getAuthState();
   if (!user || !isAuthenticated) {
     throw redirect({
