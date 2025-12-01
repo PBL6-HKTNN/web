@@ -7,11 +7,12 @@ import {
   BookOpenIcon,
   ShieldIcon
 } from 'lucide-react'
-import { authGuard } from '@/utils'
+import { roleGuard } from '@/utils'
+import { UserRole } from '@/types/db'
 
 export const Route = createFileRoute('/admin')({
   component: RouteComponent,
-  beforeLoad: authGuard,
+  beforeLoad: () => roleGuard([UserRole.ADMIN]),
 })
 
 function RouteComponent() {
@@ -22,5 +23,5 @@ function RouteComponent() {
     { label: 'Courses', icon: <BookOpenIcon />, href: '/admin/courses' },
     { label: 'Permissions', icon: <ShieldIcon />, href: '/admin/permissions' },
   ]
-  return <ToolLayout items={items}><Outlet /></ToolLayout>
+  return <ToolLayout title='Admin Panel' items={items}><Outlet /></ToolLayout>
 }

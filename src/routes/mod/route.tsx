@@ -6,11 +6,12 @@ import {
   FlagIcon,
   CheckCircleIcon
 } from 'lucide-react'
-import { authGuard } from '@/utils'
+import { roleGuard } from '@/utils'
+import { UserRole } from '@/types/db'
 
 export const Route = createFileRoute('/mod')({
   component: RouteComponent,
-  beforeLoad: authGuard,
+  beforeLoad: () => roleGuard([UserRole.MODERATOR, UserRole.ADMIN]),
 })
 
 function RouteComponent() {
@@ -22,5 +23,7 @@ function RouteComponent() {
     { label: 'Student Reports', icon: <FlagIcon />, href: '/mod/reports-management' },
    
   ]
-  return <ToolLayout items={items}><Outlet /></ToolLayout>
+  return <ToolLayout
+    title='Moderator Panel'
+  items={items}><Outlet /></ToolLayout>
 }
