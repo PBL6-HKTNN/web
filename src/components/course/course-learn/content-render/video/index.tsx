@@ -2,6 +2,7 @@ import { useRef, useCallback } from 'react'
 import type { Lesson } from "@/types/db/course/lesson"
 import type { UUID } from "@/types"
 import { useCourseProgress } from '@/contexts/course/course-progress/hook'
+import { isYouTubeUrl, getYouTubeEmbedUrl } from '@/utils/video-utils'
 
 type VideoContentProps = {
   lesson: Lesson
@@ -28,6 +29,25 @@ export default function VideoContent({ lesson, courseId }: VideoContentProps) {
     )
   }
 
+  // Check if it's a YouTube URL
+  if (isYouTubeUrl(lesson.contentUrl)) {
+    const embedUrl = getYouTubeEmbedUrl(lesson.contentUrl)
+    if (embedUrl) {
+      return (
+        <div className="aspect-video bg-black rounded-lg overflow-hidden">
+          <iframe
+            src={embedUrl}
+            title={lesson.title || "YouTube Video"}
+            className="w-full h-full"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        </div>
+      )
+    }
+  }
+
+  // Default to HTML5 video for direct video URLs
   return (
     <div className="aspect-video bg-black rounded-lg overflow-hidden">
       <video
