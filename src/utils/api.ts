@@ -37,8 +37,8 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       // Handle unauthorized
       toast.error("Session expired. Please log in again.");
-      // Persistence.removeItem("auth_token");
-      // window.location.href = "/auth/login";
+      Persistence.removeItem("auth_token");
+      window.location.href = "/auth/login";
     }
     return Promise.reject(error.response);
   }
