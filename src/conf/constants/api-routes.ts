@@ -99,6 +99,17 @@ const API_ROUTES = {
     generateQuiz: "/Automation/generate-quiz",
     generateContent: "/Automation/generate-content",
   },
+  REQUEST: {
+    getRequests: "/Request",
+    getUserRequest: "/Request/my-request",
+    getResolvedRequests: "/Request/request-resolved-by-me",
+    getRequestTypes: "/Request/request-type",
+    getRequestById: (requestId: UUID) => `/Request/get/${requestId}`,
+    createRequest: "/Request/create",
+    updateRequest: (requestId: UUID) => `/Request/update/${requestId}`,
+    deleteRequest: (requestId: UUID) => `/Request/delete/${requestId}`,
+    resolveRequest: (requestId: UUID) => `/Request/resolve/${requestId}`,
+  },
 };
 
 export default API_ROUTES;
