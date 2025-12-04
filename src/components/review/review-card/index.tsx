@@ -1,5 +1,6 @@
 import { Star } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { ReviewReportForm } from "../review-report-form";
 import type { Review } from "@/types/db/review";
 
 interface ReviewCardProps {
@@ -22,20 +23,23 @@ export function ReviewCard({ review }: ReviewCardProps) {
           </AvatarFallback>
         </Avatar>
         <div className="flex-1">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="font-medium">{review.user?.name || "Anonymous"}</span>
-            <div className="flex">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  className={`w-4 h-4 ${
-                    i < review.rating
-                      ? "fill-yellow-400 text-yellow-400"
-                      : "text-gray-300"
-                  }`}
-                />
-              ))}
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <span className="font-medium">{review.user?.name || "Anonymous"}</span>
+              <div className="flex">
+                {[...Array(5)].map((_, i) => (
+                  <Star
+                    key={i}
+                    className={`w-4 h-4 ${
+                      i < review.rating
+                        ? "fill-yellow-400 text-yellow-400"
+                        : "text-gray-300"
+                    }`}
+                  />
+                ))}
+              </div>
             </div>
+            <ReviewReportForm review={review} />
           </div>
           <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
             {review.comment}

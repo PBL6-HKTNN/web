@@ -5,6 +5,7 @@ import { useGetReviewsByCourse, useGetAverageRatingByCourse } from "@/hooks/quer
 import { useGetCart, useAddToCart } from "@/hooks/queries/payment-hooks";
 import { formatPriceSimple } from "@/utils/format";
 import { getAuthState } from "@/hooks/queries/auth-hooks";
+import { useCourseReportForm } from "@/components/course/course-report-form/hook";
 
 export const useCourseDetail = (courseId: string) => {
   const { data, isLoading, error } = useGetCourseContentById(courseId);
@@ -28,6 +29,9 @@ export const useCourseDetail = (courseId: string) => {
   // Review hooks
   const { data: reviewsData, isLoading: reviewsLoading } = useGetReviewsByCourse(courseId);
   const { data: averageData, isLoading: averageLoading } = useGetAverageRatingByCourse(courseId);
+  
+  // Report hook
+  const reportForm = useCourseReportForm(courseId);
   
   // Check if course is in cart
   const isInCart = cartData?.data?.some(item => item.courseId === courseId) || false;
@@ -72,6 +76,8 @@ export const useCourseDetail = (courseId: string) => {
     averageRating: averageData?.data?.averageRating || 0,
     reviewsLoading,
     averageLoading,
+    // Report
+    reportForm,
     // Utilities
     formatPrice,
     formatNumber,

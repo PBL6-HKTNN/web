@@ -8,6 +8,16 @@ export const RequestStatus = {
 } as const;
 export type RequestStatus = (typeof RequestStatus)[keyof typeof RequestStatus];
 
+export const RequestTypeEnum = {
+  INSTRUCTOR_ROLE: 0,
+  PUBLIC_A_COURSE: 1,
+  HIDE_A_COURSE: 2,
+  REPORT_A_COURSE: 3,
+  REPORT_A_REVIEW: 4,
+} as const;
+export type RequestTypeEnum =
+  (typeof RequestTypeEnum)[keyof typeof RequestTypeEnum];
+
 export type CodemyRequest = Base & {
   userId: UUID;
   requestTypeId: UUID;
@@ -18,14 +28,14 @@ export type CodemyRequest = Base & {
 };
 
 export type RequestType = Base & {
-  type: RequestStatus;
+  type: RequestTypeEnum;
   description: string;
 };
 
 export type CreateRequestReq = {
   requestTypeId: UUID;
   description: string;
-  courseId: UUID;
+  courseId?: UUID;
 };
 
 export type UpdateRequestReq = Pick<CreateRequestReq, "description">;

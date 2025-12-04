@@ -3,10 +3,15 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { UUID } from '@/types'
 import { courseHideSchema, type CourseHideFormData } from './validator'
+import { useGetRequestTypes, useCreateRequest } from '@/hooks/queries/request-hooks'
+import { RequestTypeEnum } from '@/types/db/request'
 
 export const useCourseHideForm = (courseId: UUID) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const { data: requestTypesRes } = useGetRequestTypes()
+  const createRequest = useCreateRequest()
 
   const form = useForm<CourseHideFormData>({
     resolver: zodResolver(courseHideSchema),
@@ -32,20 +37,30 @@ export const useCourseHideForm = (courseId: UUID) => {
     setIsSubmitting(true)
 
     try {
-      // Mock API call - simulate submission
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      // Find the HIDE_A_COURSE request type
+      const hideCourseType = requestTypesRes?.data?.find(
+        (type) => type.type === RequestTypeEnum.HIDE_A_COURSE
+      )
 
-      console.log('Course hide submitted:', {
+      if (!hideCourseType) {
+        throw new Error('Hide course request type not found')
+      }
+
+      const description = `Request to hide course from public view.
+        Start Date: ${data.startDate.toLocaleDateString()}
+        End Date: ${data.endDate.toLocaleDateString()}
+        Reason: ${data.reason}`
+
+      await createRequest.mutateAsync({
+        requestTypeId: hideCourseType.id,
+        description,
         courseId,
-        ...data,
-        startDate: data.startDate.toISOString(),
-        endDate: data.endDate.toISOString(),
       })
 
-      // Show success message or handle response
       closeModal()
     } catch (error) {
-      console.error('Failed to hide course:', error)
+      console.error('Failed to submit hide course request:', error)
+      throw error
     } finally {
       setIsSubmitting(false)
     }

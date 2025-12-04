@@ -8,6 +8,7 @@ import { CheckCircle2, XCircle, AlertCircle, Loader2 } from 'lucide-react'
 interface CoursePublicCheckModalProps {
   isOpen: boolean
   isChecking: boolean
+  isSubmitting: boolean
   checkResults: {
     hasModules: boolean
     hasLessons: boolean
@@ -23,6 +24,7 @@ interface CoursePublicCheckModalProps {
 export function CoursePublicCheckModal({
   isOpen,
   isChecking,
+  isSubmitting,
   checkResults,
   onClose,
   onPerformCheck,
@@ -173,8 +175,18 @@ export function CoursePublicCheckModal({
               <Button variant="outline" onClick={onPerformCheck} disabled={isChecking}>
                 Re-check
               </Button>
-              <Button onClick={onSubmitPublication} disabled={!checkResults.isPublishable}>
-                Submit Course Publication
+              <Button 
+                onClick={onSubmitPublication} 
+                disabled={isSubmitting || !checkResults?.isPublishable}
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Submitting...
+                  </>
+                ) : (
+                  'Submit Course Publication'
+                )}
               </Button>
             </>
           )}

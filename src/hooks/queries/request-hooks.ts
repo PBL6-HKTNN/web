@@ -90,7 +90,7 @@ export const useUpdateRequest = () => {
         queryKey: REQUEST_QUERY_KEYS.userRequests(),
       });
       queryClient.invalidateQueries({
-        queryKey: REQUEST_QUERY_KEYS.request(data.id),
+        queryKey: REQUEST_QUERY_KEYS.request(data.data?.id as string),
       });
       toast.success("Request updated successfully");
     },
@@ -131,7 +131,7 @@ export const useResolveRequest = () => {
         queryKey: REQUEST_QUERY_KEYS.resolvedRequests(),
       });
       queryClient.invalidateQueries({
-        queryKey: REQUEST_QUERY_KEYS.request(data.id),
+        queryKey: REQUEST_QUERY_KEYS.request(data.data?.id as string),
       });
       toast.success("Request resolved successfully");
     },
