@@ -36,6 +36,7 @@ export type CreateRequestReq = {
   requestTypeId: UUID;
   description: string;
   courseId?: UUID;
+  reviewId?: UUID;
 };
 
 export type UpdateRequestReq = Pick<CreateRequestReq, "description">;

@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { RequestCard } from "../request-card";
+import { RequestDetailModal } from "../request-detail-modal";
 import {
   Table,
   TableBody,
@@ -17,17 +18,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { format } from "date-fns";
-import type { CodemyRequest } from "@/types/db/request";
+import type { CodemyRequest, RequestTypeEnum } from "@/types/db/request";
 import { RequestStatus } from "@/types/db/request";
+import { format } from "date-fns";
 import { STATUS_COLORS, STATUS_LABELS, REQUEST_TYPE_COLORS } from "../utils";
 import { useGetRequestTypes } from "@/hooks/queries/request-hooks";
+import {
+  useRequestTypeFilter,
+  useRequestListingFilters,
+  useRequestDetailModal,
+} from "./hooks";
 
 interface RequestListingProps {
   requests: CodemyRequest[];
   isLoading?: boolean;
   onEdit?: (request: CodemyRequest) => void;
   viewMode?: "card" | "table";
+  isModerator?: boolean;
+  fixedRequestTypeFilter?: RequestTypeEnum | RequestTypeEnum[];
 }
 
 export function RequestListing({
@@ -35,23 +43,52 @@ export function RequestListing({
   isLoading,
   onEdit,
   viewMode = "table",
+  isModerator = false,
+  fixedRequestTypeFilter,
 }: RequestListingProps) {
   const { data: requestTypesRes } = useGetRequestTypes();
-  const requestTypes = requestTypesRes?.data || [];
-  
+  const requestTypes = useMemo(() => requestTypesRes?.data || [], [requestTypesRes?.data]);
+
   const [selectedTypeId, setSelectedTypeId] = useState<string | "all">("all");
   const [selectedStatus, setSelectedStatus] = useState<number | "all">("all");
 
-  const filteredRequests = useMemo(() => {
-    return requests.filter((request) => {
-      const typeMatch =
-        selectedTypeId === "all" || request.requestTypeId === selectedTypeId;
-      const statusMatch = selectedStatus === "all" || request.status === selectedStatus;
-      return typeMatch && statusMatch;
-    });
-  }, [requests, selectedTypeId, selectedStatus]);
+  const { applyFixedFilter } = useRequestTypeFilter(requestTypes);
+
+  const applyFixedFilterCallback = useMemo(
+    () => (reqs: CodemyRequest[]) => applyFixedFilter(reqs, fixedRequestTypeFilter),
+    [applyFixedFilter, fixedRequestTypeFilter]
+  );
+
+  const filteredRequests = useRequestListingFilters(
+    requests,
+    selectedTypeId,
+    selectedStatus,
+    applyFixedFilterCallback
+  );
 
   const hasFilters = selectedTypeId !== "all" || selectedStatus !== "all";
+
+  const {
+    selectedRequestId,
+    isDetailModalOpen,
+    handleViewRequest,
+    handleCloseModal,
+  } = useRequestDetailModal();
+
+  // Get the selected request for detail modal
+  const selectedRequest = selectedRequestId
+    ? requests.find((r) => r.id === selectedRequestId)
+    : undefined;
+
+  // Get available request types for filter (excluding fixed filter types)
+  const availableRequestTypes = fixedRequestTypeFilter
+    ? requestTypes.filter((type) => {
+        const enums = Array.isArray(fixedRequestTypeFilter)
+          ? fixedRequestTypeFilter
+          : [fixedRequestTypeFilter];
+        return !enums.includes(type.type as RequestTypeEnum);
+      })
+    : requestTypes;
 
   if (isLoading) {
     return (
@@ -74,72 +111,76 @@ export function RequestListing({
 
   return (
     <div className="space-y-6">
-      {/* Filters */}
-      <div className="bg-white p-4 rounded-lg border space-y-4">
-        <h3 className="font-semibold text-sm">Filter</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Request Type Filter */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Request Type</label>
-            <Select
-              value={String(selectedTypeId)}
-              onValueChange={(value) => setSelectedTypeId(value === "all" ? "all" : value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="All types" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                {requestTypes.map((type) => (
-                  <SelectItem key={type.id} value={type.id}>
-                    {type.description}
+      {/* Filters - Only show if not fixed */}
+      {!fixedRequestTypeFilter && (
+        <div className="bg-white p-4 rounded-lg border space-y-4">
+          <h3 className="font-semibold text-sm">Filter</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Request Type Filter */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Request Type</label>
+              <Select
+                value={String(selectedTypeId)}
+                onValueChange={(value) =>
+                  setSelectedTypeId(value === "all" ? "all" : value)
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="All types" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Types</SelectItem>
+                  {availableRequestTypes.map((type) => (
+                    <SelectItem key={type.id} value={type.id}>
+                      {type.description}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Status Filter */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Status</label>
+              <Select
+                value={String(selectedStatus)}
+                onValueChange={(value) =>
+                  setSelectedStatus(value === "all" ? "all" : parseInt(value))
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="All statuses" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Statuses</SelectItem>
+                  <SelectItem value={String(RequestStatus.Reviewing)}>
+                    Reviewing
                   </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+                  <SelectItem value={String(RequestStatus.Approved)}>
+                    Approved
+                  </SelectItem>
+                  <SelectItem value={String(RequestStatus.Rejected)}>
+                    Rejected
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
-          {/* Status Filter */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Status</label>
-            <Select
-              value={String(selectedStatus)}
-              onValueChange={(value) =>
-                setSelectedStatus(value === "all" ? "all" : parseInt(value))
-              }
+          {hasFilters && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setSelectedTypeId("all");
+                setSelectedStatus("all");
+              }}
             >
-              <SelectTrigger>
-                <SelectValue placeholder="All statuses" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value={String(RequestStatus.Reviewing)}>
-                  Reviewing
-                </SelectItem>
-                <SelectItem value={String(RequestStatus.Approved)}>
-                  Approved
-                </SelectItem>
-                <SelectItem value={String(RequestStatus.Rejected)}>
-                  Rejected
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+              Clear Filters
+            </Button>
+          )}
         </div>
-
-        {hasFilters && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              setSelectedTypeId("all");
-              setSelectedStatus("all");
-            }}
-          >
-            Clear Filters
-          </Button>
-        )}
-      </div>
+      )}
 
       {/* Results Info */}
       <div className="text-sm text-gray-600">
@@ -149,17 +190,26 @@ export function RequestListing({
 
       {filteredRequests.length === 0 ? (
         <div className="text-center py-8 text-gray-500">
-          No requests match the selected filters.
+          {fixedRequestTypeFilter
+            ? "No requests of this type."
+            : "No requests match the selected filters."}
         </div>
       ) : viewMode === "card" ? (
         // Card View
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {filteredRequests.map((request) => (
-            <RequestCard
+            <div
               key={request.id}
-              request={request}
-              onEdit={onEdit}
-            />
+              onClick={() =>
+                isModerator && handleViewRequest(request.id)
+              }
+              className={isModerator ? "cursor-pointer" : ""}
+            >
+              <RequestCard
+                request={request}
+                onEdit={onEdit}
+              />
+            </div>
           ))}
         </div>
       ) : (
@@ -172,14 +222,22 @@ export function RequestListing({
                 <TableHead>Description</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Created</TableHead>
-                <TableHead className="w-20">Actions</TableHead>
+                {isModerator && <TableHead className="w-20">Actions</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredRequests.map((request) => (
-                <TableRow key={request.id}>
+                <TableRow
+                  key={request.id}
+                  onClick={() =>
+                    isModerator && handleViewRequest(request.id)
+                  }
+                  className={
+                    isModerator ? "cursor-pointer hover:bg-gray-50" : ""
+                  }
+                >
                   <TableCell className="font-medium">
-                    <Badge 
+                    <Badge
                       className={`${REQUEST_TYPE_COLORS[requestTypes.find((type) => type.id === request.requestTypeId)?.type || -1] || "bg-gray-100 text-gray-800 border-gray-200"} text-xs border`}
                     >
                       {requestTypes.find((type) => type.id === request.requestTypeId)
@@ -197,22 +255,37 @@ export function RequestListing({
                   <TableCell className="text-sm">
                     {format(new Date(request.createdAt || Date.now()), "PPP")}
                   </TableCell>
-                  <TableCell>
-                    {request.status === RequestStatus.Reviewing && onEdit && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => onEdit(request)}
-                      >
-                        Edit
-                      </Button>
-                    )}
-                  </TableCell>
+                  {isModerator && (
+                    <TableCell>
+                      {request.status === RequestStatus.Reviewing && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleViewRequest(request.id);
+                          }}
+                        >
+                          Review
+                        </Button>
+                      )}
+                    </TableCell>
+                  )}
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </div>
+      )}
+
+      {/* Request Detail Modal */}
+      {isModerator && (
+        <RequestDetailModal
+          isOpen={isDetailModalOpen}
+          onClose={handleCloseModal}
+          request={selectedRequest}
+          isLoading={false}
+        />
       )}
     </div>
   );

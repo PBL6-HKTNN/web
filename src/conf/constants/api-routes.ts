@@ -108,7 +108,7 @@ const API_ROUTES = {
     createRequest: "/Request/create",
     updateRequest: (requestId: UUID) => `/Request/update/${requestId}`,
     deleteRequest: (requestId: UUID) => `/Request/delete/${requestId}`,
-    resolveRequest: (requestId: UUID) => `/Request/resolve/${requestId}`,
+    resolveRequest: "/Request/resolve",
   },
 };
 

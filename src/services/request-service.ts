@@ -100,12 +100,9 @@ class RequestService {
    * Resolve a request (admin/staff only)
    */
   async resolveRequest(data: ResolveRequestReq): Promise<RequestApiRes> {
-    const response = await api.put<RequestApiRes>(
-      API_ROUTES.REQUEST.resolveRequest(data.requestId),
-      {
-        status: data.status,
-        response: data.response,
-      }
+    const response = await api.post<RequestApiRes>(
+      API_ROUTES.REQUEST.resolveRequest,
+      data
     );
     return response.data;
   }
