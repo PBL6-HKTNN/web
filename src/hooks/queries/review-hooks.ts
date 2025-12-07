@@ -2,8 +2,12 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { UUID } from "@/types";
 import type {
+  CheckUserReviewReq,
+  CheckUserReviewRes,
   CreateReviewRequest,
   CreateReviewResponse,
+  DeleteUserReviewReq,
+  DeleteUserReviewRes,
 } from "@/types/db/review";
 import { reviewService } from "@/services/review-service";
 
@@ -58,5 +62,38 @@ export const useGetAverageRatingByCourse = (courseId: UUID | undefined) => {
     queryFn: () => reviewService.getAverageRatingByCourse(courseId as UUID),
     enabled: !!courseId,
     staleTime: 1000 * 60 * 5,
+  });
+};
+
+export const useCheckUserReview = () => {
+  const queryClient = useQueryClient();
+  return useMutation<CheckUserReviewRes, Error, CheckUserReviewReq>({
+    mutationFn: (data) => reviewService.checkUserReview(data),
+    onSuccess: (_, variables) => {
+      const courseId = variables.courseId;
+      if (courseId) {
+        queryClient.invalidateQueries({
+          queryKey: REVIEW_QUERY_KEYS.byCourse(courseId),
+        });
+      }
+    },
+  });
+};
+
+export const useDeleteUserReview = () => {
+  const queryClient = useQueryClient();
+  return useMutation<DeleteUserReviewRes, Error, DeleteUserReviewReq>({
+    mutationFn: (data) => reviewService.deleteUserReview(data),
+    onSuccess: (_, variables) => {
+      const courseId = variables.courseId;
+      if (courseId) {
+        queryClient.invalidateQueries({
+          queryKey: REVIEW_QUERY_KEYS.byCourse(courseId),
+        });
+        queryClient.invalidateQueries({
+          queryKey: REVIEW_QUERY_KEYS.average(courseId),
+        });
+      }
+    },
   });
 };

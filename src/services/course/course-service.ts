@@ -13,6 +13,13 @@ import type {
   UpdateCourseRes,
   ValidateCourseReq,
   ValidateCourseRes,
+  ChangeCourseStatusReq,
+  ChangeCourseStatusRes,
+  ModChangeCourseStatusReq,
+  ModChangeCourseStatusRes,
+  PreSubmitCheckReq,
+  PreSubmitCheckRes,
+  RequestedBanCourseRes,
 } from "@/types/db/course";
 import { createServiceApi, serviceUrls } from "@/utils/api";
 
@@ -74,6 +81,41 @@ export const courseService = {
     const res = await api.post<ValidateCourseRes>(
       API_ROUTES.COURSE.validateCourse,
       validationData
+    );
+    return res.data;
+  },
+  changeCourseStatus: async (
+    data: ChangeCourseStatusReq
+  ): Promise<ChangeCourseStatusRes> => {
+    const res = await api.put<ChangeCourseStatusRes>(
+      API_ROUTES.COURSE.changeCourseStatus,
+      data
+    );
+    return res.data;
+  },
+  modChangeCourseStatus: async (
+    data: ModChangeCourseStatusReq
+  ): Promise<ModChangeCourseStatusRes> => {
+    const res = await api.put<ModChangeCourseStatusRes>(
+      API_ROUTES.COURSE.modChangeCourseStatus,
+      data
+    );
+    return res.data;
+  },
+  requestedBanCourse: async (
+    courseId: UUID
+  ): Promise<RequestedBanCourseRes> => {
+    const res = await api.post<RequestedBanCourseRes>(
+      API_ROUTES.COURSE.requestedBanCourse(courseId)
+    );
+    return res.data;
+  },
+  preSubmitCheck: async (
+    data: PreSubmitCheckReq
+  ): Promise<PreSubmitCheckRes> => {
+    const res = await api.post<PreSubmitCheckRes>(
+      API_ROUTES.COURSE.preSubmitCheck,
+      data
     );
     return res.data;
   },

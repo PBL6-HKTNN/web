@@ -14,6 +14,7 @@ import { useCourseEdit } from "@/contexts/course/use-course-edit";
 import type { Lesson } from "@/types/db/course/lesson";
 import type { UploadFileRes } from "@/types/core/storage";
 import { parseTimespanToSeconds } from "@/utils/time-utils";
+import { isYouTubeUrl, getYouTubeEmbedUrl } from "@/utils/video-utils";
 
 interface VideoLessonRenderProps {
   lesson: Lesson;
@@ -200,14 +201,24 @@ export function VideoLessonRender({ lesson }: VideoLessonRenderProps) {
 
             {lesson.contentUrl && (
               <div className="aspect-video bg-black rounded-lg flex items-center justify-center overflow-hidden">
-                <video
-                  src={lesson.contentUrl}
-                  controls
-                  className="w-full h-full"
-                  preload="metadata"
-                >
-                  Your browser does not support the video tag.
-                </video>
+                {isYouTubeUrl(lesson.contentUrl) ? (
+                  <iframe
+                    src={getYouTubeEmbedUrl(lesson.contentUrl) || ""}
+                    title={lesson.title || "YouTube Video"}
+                    className="w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                ) : (
+                  <video
+                    src={lesson.contentUrl}
+                    controls
+                    className="w-full h-full"
+                    preload="metadata"
+                  >
+                    Your browser does not support the video tag.
+                  </video>
+                )}
               </div>
             )}
           </div>

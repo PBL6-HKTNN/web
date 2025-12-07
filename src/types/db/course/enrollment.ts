@@ -65,6 +65,15 @@ export type EnrolledCourseItem = {
   instructorId: string;
 };
 
+export type GetEnrolledCourseFilterReq = {
+  Page?: number;
+  PageSize?: number;
+  ProgressStatus?: EnrollmentProgressStatus;
+  EnrollmentStatus?: EnrollmentStatus;
+  SortBy?: "Date";
+  SortDescending?: boolean;
+};
+
 export type GetEnrolledCoursesResponse = ApiResponse<EnrolledCourseItem[]>;
 export type UpdateEnrollmentResponse = ApiResponse<Enrollment>;
 export type UpdateEnrollmentProgressResponse = ApiResponse<Enrollment>;
@@ -75,3 +84,11 @@ export type IsEnrolledResponse = ApiResponse<{
   message: string;
   enrollment: Enrollment | null;
 }>;
+
+export type GetCourseEnrolledStudentsResponse = ApiResponse<{
+  success: boolean;
+  message: string;
+  students: string[];
+}>;
+
+export type GetLastDateCourseResponse = ApiResponse<Date | string>;
