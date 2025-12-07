@@ -1,8 +1,29 @@
 import API_ROUTES from "@/conf/constants/api-routes";
 import type { ChangeAvatarReq, UpdateProfileReq } from "@/types/db";
 import api from "@/utils/api";
+import type { User, UserDetailResponse } from "@/types/db/user";
+import type { ApiResponse } from "@/types/core/api";
 
 export const userService = {
+  getAllUsers: async (params?: {
+    Name?: string;
+    Email?: string;
+    Role?: string;
+    Status?: string;
+    EmailVerified?: boolean;
+    SortBy?: string;
+    Page?: number;
+    PageSize?: number;
+  }): Promise<ApiResponse<User[]>> => {
+    const response = await api.get(API_ROUTES.USER.getAllUsers, { params });
+    return response.data;
+  },
+
+  getUserById: async (userId: string): Promise<UserDetailResponse> => {
+    const response = await api.get(API_ROUTES.USER.getById(userId));
+    return response.data;
+  },
+
   changeAvatar: async (userId: string, data: ChangeAvatarReq) => {
     const formData = new FormData();
     formData.append("file", data.file);

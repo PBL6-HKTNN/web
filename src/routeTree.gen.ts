@@ -70,6 +70,7 @@ import { Route as LearnCourseIdModuleIdIndexRouteImport } from './routes/learn/$
 import { Route as AuthMainLayoutRegisterIndexRouteImport } from './routes/auth/_mainLayout/register/index'
 import { Route as AuthMainLayoutLoginIndexRouteImport } from './routes/auth/_mainLayout/login/index'
 import { Route as AdminUsersUserIdIndexRouteImport } from './routes/admin/users/$userId/index'
+import { Route as AdminPermissionsPermissionIdIndexRouteImport } from './routes/admin/permissions/$permissionId/index'
 import { Route as LecturingToolCourseCourseIdEditingRouteRouteImport } from './routes/lecturing-tool/course/$courseId/editing/route'
 import { Route as LearnCourseIdModuleIdLessonIdRouteRouteImport } from './routes/learn/$courseId/$moduleId/$lessonId/route'
 import { Route as LecturingToolCourseCourseIdEditingIndexRouteImport } from './routes/lecturing-tool/course/$courseId/editing/index'
@@ -394,6 +395,12 @@ const AdminUsersUserIdIndexRoute = AdminUsersUserIdIndexRouteImport.update({
   path: '/$userId/',
   getParentRoute: () => AdminUsersRouteRoute,
 } as any)
+const AdminPermissionsPermissionIdIndexRoute =
+  AdminPermissionsPermissionIdIndexRouteImport.update({
+    id: '/$permissionId/',
+    path: '/$permissionId/',
+    getParentRoute: () => AdminPermissionsRouteRoute,
+  } as any)
 const LecturingToolCourseCourseIdEditingRouteRoute =
   LecturingToolCourseCourseIdEditingRouteRouteImport.update({
     id: '/course/$courseId/editing',
@@ -493,6 +500,7 @@ export interface FileRoutesByFullPath {
   '/settings/profile/': typeof SettingsProfileIndexRoute
   '/learn/$courseId/$moduleId/$lessonId': typeof LearnCourseIdModuleIdLessonIdRouteRouteWithChildren
   '/lecturing-tool/course/$courseId/editing': typeof LecturingToolCourseCourseIdEditingRouteRouteWithChildren
+  '/admin/permissions/$permissionId': typeof AdminPermissionsPermissionIdIndexRoute
   '/admin/users/$userId': typeof AdminUsersUserIdIndexRoute
   '/auth/login': typeof AuthMainLayoutLoginIndexRoute
   '/auth/register': typeof AuthMainLayoutRegisterIndexRoute
@@ -539,6 +547,7 @@ export interface FileRoutesByTo {
   '/mod/users': typeof ModUsersIndexRoute
   '/settings/payment': typeof SettingsPaymentIndexRoute
   '/settings/profile': typeof SettingsProfileIndexRoute
+  '/admin/permissions/$permissionId': typeof AdminPermissionsPermissionIdIndexRoute
   '/admin/users/$userId': typeof AdminUsersUserIdIndexRoute
   '/auth/login': typeof AuthMainLayoutLoginIndexRoute
   '/auth/register': typeof AuthMainLayoutRegisterIndexRoute
@@ -609,6 +618,7 @@ export interface FileRoutesById {
   '/settings/profile/': typeof SettingsProfileIndexRoute
   '/learn/$courseId/$moduleId/$lessonId': typeof LearnCourseIdModuleIdLessonIdRouteRouteWithChildren
   '/lecturing-tool/course/$courseId/editing': typeof LecturingToolCourseCourseIdEditingRouteRouteWithChildren
+  '/admin/permissions/$permissionId/': typeof AdminPermissionsPermissionIdIndexRoute
   '/admin/users/$userId/': typeof AdminUsersUserIdIndexRoute
   '/auth/_mainLayout/login/': typeof AuthMainLayoutLoginIndexRoute
   '/auth/_mainLayout/register/': typeof AuthMainLayoutRegisterIndexRoute
@@ -680,6 +690,7 @@ export interface FileRouteTypes {
     | '/settings/profile/'
     | '/learn/$courseId/$moduleId/$lessonId'
     | '/lecturing-tool/course/$courseId/editing'
+    | '/admin/permissions/$permissionId'
     | '/admin/users/$userId'
     | '/auth/login'
     | '/auth/register'
@@ -726,6 +737,7 @@ export interface FileRouteTypes {
     | '/mod/users'
     | '/settings/payment'
     | '/settings/profile'
+    | '/admin/permissions/$permissionId'
     | '/admin/users/$userId'
     | '/auth/login'
     | '/auth/register'
@@ -795,6 +807,7 @@ export interface FileRouteTypes {
     | '/settings/profile/'
     | '/learn/$courseId/$moduleId/$lessonId'
     | '/lecturing-tool/course/$courseId/editing'
+    | '/admin/permissions/$permissionId/'
     | '/admin/users/$userId/'
     | '/auth/_mainLayout/login/'
     | '/auth/_mainLayout/register/'
@@ -1256,6 +1269,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersUserIdIndexRouteImport
       parentRoute: typeof AdminUsersRouteRoute
     }
+    '/admin/permissions/$permissionId/': {
+      id: '/admin/permissions/$permissionId/'
+      path: '/$permissionId'
+      fullPath: '/admin/permissions/$permissionId'
+      preLoaderRoute: typeof AdminPermissionsPermissionIdIndexRouteImport
+      parentRoute: typeof AdminPermissionsRouteRoute
+    }
     '/lecturing-tool/course/$courseId/editing': {
       id: '/lecturing-tool/course/$courseId/editing'
       path: '/course/$courseId/editing'
@@ -1321,10 +1341,13 @@ const AdminCoursesRouteRouteWithChildren =
 
 interface AdminPermissionsRouteRouteChildren {
   AdminPermissionsIndexRoute: typeof AdminPermissionsIndexRoute
+  AdminPermissionsPermissionIdIndexRoute: typeof AdminPermissionsPermissionIdIndexRoute
 }
 
 const AdminPermissionsRouteRouteChildren: AdminPermissionsRouteRouteChildren = {
   AdminPermissionsIndexRoute: AdminPermissionsIndexRoute,
+  AdminPermissionsPermissionIdIndexRoute:
+    AdminPermissionsPermissionIdIndexRoute,
 }
 
 const AdminPermissionsRouteRouteWithChildren =

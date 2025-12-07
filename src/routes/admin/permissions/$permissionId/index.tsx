@@ -11,84 +11,43 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import {
-  Search,
-  Filter,
-  Shield,
-  Mail,
-  Loader2
-} from 'lucide-react'
-import { useUsers } from '@/hooks/queries/user-hooks'
-import { UserStatus, UserRole } from '@/types/db/user'
+import { Search, ArrowLeft, Mail, Shield, Users } from 'lucide-react'
 import { useState, useMemo } from 'react'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+import { useUsersByPermission, usePermission } from '@/hooks/queries/permission-hooks'
+import { UserStatus, UserRole } from '@/types/db/user'
 
-export const Route = createFileRoute('/admin/users/')({
+export const Route = createFileRoute('/admin/permissions/$permissionId/')({
   component: RouteComponent,
 })
 
-const ITEMS_PER_PAGE = 10;
-
 function RouteComponent() {
+  const { permissionId } = Route.useParams()
   const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState('')
   const [roleFilter, setRoleFilter] = useState('all')
 
-  // Build filter params for API
-  const roleFilterMap = {
-    'all': undefined,
-    'student': 'student',
-    'lecturer': 'instructor',
-    'mod': 'moderator',
-    'admin': 'admin'
-  } as const
+  // Fetch permission details
+  const { data: permission, isLoading: permissionLoading } = usePermission(permissionId)
+  
+  // Fetch users by permission
+  const { data: users = [], isLoading: usersLoading } = useUsersByPermission(permissionId)
 
-  const filterParams = useMemo(() => {
-    const params: {
-      Name?: string;
-      Email?: string;
-      Role?: string;
-      PageSize?: number;
-    } = {
-      PageSize: ITEMS_PER_PAGE,
-    };
-
-    if (searchTerm) {
-      // If search term contains @, treat as email, otherwise as name
-      if (searchTerm.includes('@')) {
-        params.Email = searchTerm;
-      } else {
-        params.Name = searchTerm;
-      }
-    }
-
-    if (roleFilter !== 'all') {
-      params.Role = roleFilterMap[roleFilter as keyof typeof roleFilterMap];
-    }
-
-    return params;
-  }, [searchTerm, roleFilter]);
-
-  // API data with infinite query
-  const {
-    data,
-    isLoading,
-    error,
-    isFetching,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useUsers(filterParams);
-
-  // Flatten the infinite query data
-  const users = useMemo(() => {
-    return data?.pages.flatMap(page => page.data || []) || [];
-  }, [data]);
+  // Filter users based on search and role
+  const filteredUsers = useMemo(() => {
+    return users.filter(user => {
+      const matchesSearch = 
+        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchTerm.toLowerCase())
+      
+      const matchesRole = roleFilter === 'all' || 
+        (roleFilter === 'student' && user.role === UserRole.STUDENT) ||
+        (roleFilter === 'lecturer' && user.role === UserRole.INSTRUCTOR) ||
+        (roleFilter === 'mod' && user.role === UserRole.MODERATOR) ||
+        (roleFilter === 'admin' && user.role === UserRole.ADMIN)
+      
+      return matchesSearch && matchesRole
+    })
+  }, [users, searchTerm, roleFilter])
 
   const getStatusBadge = (status: UserStatus) => {
     const statusLabels = {
@@ -124,50 +83,104 @@ function RouteComponent() {
     return <Badge variant={roleColors[role] || 'secondary'}>{roleLabels[role] || 'Unknown'}</Badge>
   }
 
+  if (permissionLoading || usersLoading) {
+    return (
+      <div className="p-6">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-muted-foreground mb-2">Loading...</h2>
+        </div>
+      </div>
+    )
+  }
+
+  // Only show error for actual errors, not for "no users found" case
+  // The service already handles "no users found" case and returns empty array
+  // if (error) {
+  //   const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
+  //   return (
+  //     <div className="p-6">
+  //       <div className="text-center">
+  //         <h2 className="text-2xl font-bold text-red-600 mb-2">Error</h2>
+  //         <p className="text-muted-foreground">Failed to load users: {errorMessage}</p>
+  //         <Button onClick={() => navigate({ to: '/admin/permissions' })} className="mt-4">
+  //           <ArrowLeft className="w-4 h-4 mr-2" />
+  //           Back to Permissions
+  //         </Button>
+  //       </div>
+  //     </div>
+  //   )
+  // }
+
   return (
     <div className="p-6 space-y-6 w-full">
+      {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">User Management</h1>
-        <Button>
-          <Shield className="w-4 h-4 mr-2" />
-          Add New User
-        </Button>
+        <div className="flex items-center gap-4">
+          <Button
+            variant="outline"
+            onClick={() => navigate({ to: '/admin/permissions' })}
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold">Users with Permission</h1>
+            {permission && (
+              <div className="flex items-center gap-2 mt-2">
+                <Shield className="w-5 h-5 text-blue-600" />
+                <span className="text-lg font-semibold text-muted-foreground">
+                  {permission.permissionName}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4">
-            <div className="text-2xl font-bold">{isLoading ? '...' : users.length || 0}</div>
+            <div className="text-2xl font-bold">{users.length}</div>
             <p className="text-sm text-muted-foreground">Total Users</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <div className="text-2xl font-bold">{isLoading ? '...' : users.filter(u => u.status === UserStatus.ACTIVE).length || 0}</div>
+            <div className="text-2xl font-bold">
+              {users.filter(u => u.status === UserStatus.ACTIVE).length}
+            </div>
             <p className="text-sm text-muted-foreground">Active Users</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <div className="text-2xl font-bold">{isLoading ? '...' : users.filter(u => u.role === UserRole.INSTRUCTOR).length || 0}</div>
+            <div className="text-2xl font-bold">
+              {users.filter(u => u.role === UserRole.INSTRUCTOR).length}
+            </div>
             <p className="text-sm text-muted-foreground">Lecturers</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <div className="text-2xl font-bold">{isLoading ? '...' : users.filter(u => u.role === UserRole.MODERATOR).length || 0}</div>
+            <div className="text-2xl font-bold">
+              {users.filter(u => u.role === UserRole.MODERATOR).length}
+            </div>
             <p className="text-sm text-muted-foreground">Mods</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Filters and Search */}
+      {/* Users List */}
       <Card>
         <CardHeader>
-          <CardTitle>User Directory</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="w-5 h-5" />
+            Users List
+          </CardTitle>
         </CardHeader>
         <CardContent>
+          {/* Search and Filter */}
           <div className="flex gap-4 mb-6">
             <div className="flex-1">
               <div className="relative">
@@ -180,20 +193,43 @@ function RouteComponent() {
                 />
               </div>
             </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline">
-                  <Filter className="w-4 h-4 mr-2" />
-                  Role: {roleFilter === 'all' ? 'All' : roleFilter}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => setRoleFilter('all')}>All</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setRoleFilter('student')}>Students</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setRoleFilter('lecturer')}>Lecturers</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setRoleFilter('mod')}>Mods</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="flex gap-2">
+              <Button
+                variant={roleFilter === 'all' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setRoleFilter('all')}
+              >
+                All
+              </Button>
+              <Button
+                variant={roleFilter === 'student' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setRoleFilter('student')}
+              >
+                Students
+              </Button>
+              <Button
+                variant={roleFilter === 'lecturer' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setRoleFilter('lecturer')}
+              >
+                Lecturers
+              </Button>
+              <Button
+                variant={roleFilter === 'mod' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setRoleFilter('mod')}
+              >
+                Mods
+              </Button>
+              <Button
+                variant={roleFilter === 'admin' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setRoleFilter('admin')}
+              >
+                Admins
+              </Button>
+            </div>
           </div>
 
           {/* Users Table */}
@@ -210,20 +246,16 @@ function RouteComponent() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {isLoading ? (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8">
-                      Loading users...
-                    </TableCell>
-                  </TableRow>
-                ) : users.length === 0 ? (
+                {filteredUsers.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                      No users found matching your criteria.
+                      {users.length === 0 
+                        ? 'No users found for this permission.'
+                        : 'No users found matching your criteria.'}
                     </TableCell>
                   </TableRow>
                 ) : (
-                  users.map((user) => (
+                  filteredUsers.map((user) => (
                     <TableRow key={user.id}>
                       <TableCell>
                         <div>
@@ -257,43 +289,6 @@ function RouteComponent() {
               </TableBody>
             </Table>
           </div>
-
-          {error && (
-            <div className="text-center py-8 text-red-600">
-              Error loading users: {error.message}
-            </div>
-          )}
-
-          {/* Load More Button */}
-          {hasNextPage && !isLoading && (
-            <div className="flex justify-center mt-6">
-              <Button
-                onClick={() => fetchNextPage()}
-                disabled={isFetchingNextPage}
-                variant="outline"
-                size="lg"
-              >
-                {isFetchingNextPage ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Loading more...
-                  </>
-                ) : (
-                  'Load More Users'
-                )}
-              </Button>
-            </div>
-          )}
-
-          {/* Loading overlay for filter changes */}
-          {isFetching && !isLoading && (
-            <div className="fixed inset-0 bg-background/50 backdrop-blur-sm z-50 flex items-center justify-center">
-              <div className="text-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
-                <p className="text-sm text-muted-foreground">Loading users...</p>
-              </div>
-            </div>
-          )}
         </CardContent>
       </Card>
     </div>
