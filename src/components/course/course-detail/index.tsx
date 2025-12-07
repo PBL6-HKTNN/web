@@ -1,16 +1,24 @@
 
-import { Star, Clock, Users, Play, BookOpen, Video, FileText, Trophy, Heart } from "lucide-react";
+import { Star, Clock, Users, Play, BookOpen, Video, FileText, Trophy, Heart, MoreVertical, Flag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { AddToCartButton } from "@/components/payment/add-to-cart-button";
 import { useCourseDetail } from "./hook";
 import ModuleAccordion from "@/components/course/module-accordion";
 import { renderLevelLabel } from "@/utils/render-utils";
 import { ReviewList } from "@/components/review";
+import { formatDate } from "@/utils/format";
+import { CourseReportForm } from "@/components/course/course-report-form";
 
 interface CourseDetailProps {
   courseId: string;
@@ -109,9 +117,34 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
 
             {/* Course Title and Basic Info */}
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                {course.title}
-              </h1>
+              <div className="flex items-start justify-between mb-2">
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                  {course.title}
+                </h1>
+                {!isInstructor && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem asChild>
+                        <CourseReportForm 
+                          courseId={courseId} 
+                          course={course}
+                          trigger={
+                            <div className="flex items-center cursor-pointer w-full">
+                              <Flag className="w-4 h-4 mr-2" />
+                              Report Course
+                            </div>
+                          }
+                        />
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
+              </div>
               {course.description && (
                 <p className="text-xl text-gray-600 dark:text-gray-400 mb-4">
                   {course.description}
@@ -139,7 +172,7 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
                 <Badge variant="secondary">{course.language}</Badge>
                 {course.updatedAt && (
                   <span className="text-gray-600 dark:text-gray-400">
-                    Last updated {course.updatedAt.toLocaleString()}
+                    Last updated {formatDate(course.updatedAt)}
                   </span>
                 )}
               </div>
@@ -263,7 +296,7 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
                         <p>No modules found for this course.</p>
                       </div>
                     ) : (
-                      <div className="space-y-4">
+                      <div>
                         {modules.map((module) => (
                           <ModuleAccordion
                             key={module.id}

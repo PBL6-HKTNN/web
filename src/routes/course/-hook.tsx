@@ -10,7 +10,7 @@ export function useCourseList() {
   const [filters, setFilters] = useState<GetCoursesFilterReq>({
     Page: 1,
     PageSize: ITEMS_PER_PAGE,
-    SortBy: 'name',
+    SortBy: 'price',
   });
 
   const {
@@ -26,7 +26,7 @@ export function useCourseList() {
   // Get cart data
   const { data: cartData } = useGetCart();
 
-  // Get enrolled courses
+  // Get enrolled courses (paginated)
   const { data: enrolledCoursesData } = useGetEnrolledCourses();
 
   // Flatten the infinite query data
@@ -40,7 +40,9 @@ export function useCourseList() {
   }, [cartData]);
 
   const enrolledCourseIds = useMemo(() => {
-    return new Set(enrolledCoursesData?.data?.map(item => item.id) || []);
+    const pages = enrolledCoursesData?.pages || [];
+    const items = pages.flatMap((p) => p.data || []);
+    return new Set(items.map(item => item.id));
   }, [enrolledCoursesData]);
 
   // Enhance courses with cart/enrollment status

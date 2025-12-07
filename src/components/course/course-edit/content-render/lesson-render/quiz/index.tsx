@@ -8,9 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Brain, Save, Plus, Wand2 } from "lucide-react";
 import { useQuizLessonRender } from "./hook";
 import { GenerateQuizModal } from "@/components/course/course-edit/modals/generate/quiz";
+import { useGenerateModals } from "@/components/course/course-edit/modals/generate/hooks";
 import { QuestionType } from "@/types/db/course/quiz-question";
 import { QuizQuestionTable } from "./quiz-question-table";
-import { useState } from "react";
 import type { Lesson } from "@/types/db/course/lesson";
 import type { QuizQuestion } from "@/types/db/course/quiz-question";
 
@@ -19,7 +19,16 @@ interface QuizLessonRenderProps {
 }
 
 export function QuizLessonRender({ lesson }: QuizLessonRenderProps) {
-  const [isGenerateModalOpen, setIsGenerateModalOpen] = useState(false);
+  const {
+    isQuizModalOpen,
+    openQuizModal,
+    closeQuizModal,
+    attachedContext,
+    addContextItem,
+    removeContextItem,
+    clearContext,
+  } = useGenerateModals();
+  
   const {
     // Data
     isLoading,
@@ -144,7 +153,7 @@ export function QuizLessonRender({ lesson }: QuizLessonRenderProps) {
                 type="button"
                 size="sm"
                 variant="outline"
-                onClick={() => setIsGenerateModalOpen(true)}
+                onClick={openQuizModal}
               >
                 <Wand2 className="h-4 w-4 mr-2" />
                 Generate Quiz
@@ -204,9 +213,13 @@ export function QuizLessonRender({ lesson }: QuizLessonRenderProps) {
     </form>
 
     <GenerateQuizModal
-      isOpen={isGenerateModalOpen}
-      onClose={() => setIsGenerateModalOpen(false)}
+      isOpen={isQuizModalOpen}
+      onClose={closeQuizModal}
       onApplyQuiz={handleApplyGeneratedQuiz}
+      attachedContext={attachedContext}
+      onAddContext={addContextItem}
+      onRemoveContext={removeContextItem}
+      onClearContext={clearContext}
     />
     </>
   );

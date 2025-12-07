@@ -26,11 +26,35 @@ export function usePaymentSettings() {
     };
   };
 
+  const getMonthlySpendingData = () => {
+    const currentYear = new Date().getFullYear();
+    const monthlyData = Array.from({ length: 12 }, (_, i) => ({
+      month: new Date(currentYear, i).toLocaleString('default', { month: 'short' }),
+      amount: 0,
+      count: 0,
+    }));
+
+    payments
+      .filter((paymentData: PaymentData) => {
+        const paymentDate = new Date(paymentData.payment.paymentDate);
+        return paymentDate.getFullYear() === currentYear && paymentData.payment.orderStatus === 1; // Only completed payments
+      })
+      .forEach((paymentData: PaymentData) => {
+        const paymentDate = new Date(paymentData.payment.paymentDate);
+        const monthIndex = paymentDate.getMonth();
+        monthlyData[monthIndex].amount += paymentData.payment.totalAmount;
+        monthlyData[monthIndex].count += 1;
+      });
+
+    return monthlyData;
+  };
+
   const totalSpent = payments
     .filter((paymentData: PaymentData) => paymentData.payment.orderStatus === 1) // Only completed payments
     .reduce((sum: number, paymentData: PaymentData) => sum + paymentData.payment.totalAmount, 0);
 
   const stats = getStatusStats();
+  const monthlySpendingData = getMonthlySpendingData();
 
   const isLoading = isPaymentsLoading || isCurrentPaymentLoading;
   const error = paymentsError || currentPaymentError;
@@ -42,6 +66,7 @@ export function usePaymentSettings() {
     hasInProgressPayment,
     totalSpent,
     stats,
+    monthlySpendingData,
 
     // State
     viewMode,

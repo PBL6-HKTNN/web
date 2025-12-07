@@ -32,9 +32,11 @@ import { Route as LecturingToolIndexRouteImport } from './routes/lecturing-tool/
 import { Route as CourseIndexRouteImport } from './routes/course/index'
 import { Route as CheckoutIndexRouteImport } from './routes/checkout/index'
 import { Route as CartIndexRouteImport } from './routes/cart/index'
+import { Route as BeAnInstructorIndexRouteImport } from './routes/be-an-instructor/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as UsersUserIdRouteImport } from './routes/users/$userId'
 import { Route as CourseCourseIdRouteImport } from './routes/course/$courseId'
+import { Route as SettingsRequestHistoryRouteRouteImport } from './routes/settings/request-history/route'
 import { Route as SettingsProfileRouteRouteImport } from './routes/settings/profile/route'
 import { Route as SettingsPaymentRouteRouteImport } from './routes/settings/payment/route'
 import { Route as ModUsersRouteRouteImport } from './routes/mod/users/route'
@@ -47,6 +49,7 @@ import { Route as AdminUsersRouteRouteImport } from './routes/admin/users/route'
 import { Route as AdminTransactionsRouteRouteImport } from './routes/admin/transactions/route'
 import { Route as AdminPermissionsRouteRouteImport } from './routes/admin/permissions/route'
 import { Route as AdminCoursesRouteRouteImport } from './routes/admin/courses/route'
+import { Route as SettingsRequestHistoryIndexRouteImport } from './routes/settings/request-history/index'
 import { Route as SettingsProfileIndexRouteImport } from './routes/settings/profile/index'
 import { Route as SettingsPaymentIndexRouteImport } from './routes/settings/payment/index'
 import { Route as ModUsersIndexRouteImport } from './routes/mod/users/index'
@@ -194,6 +197,11 @@ const CartIndexRoute = CartIndexRouteImport.update({
   path: '/',
   getParentRoute: () => CartRouteRoute,
 } as any)
+const BeAnInstructorIndexRoute = BeAnInstructorIndexRouteImport.update({
+  id: '/be-an-instructor/',
+  path: '/be-an-instructor/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -209,6 +217,12 @@ const CourseCourseIdRoute = CourseCourseIdRouteImport.update({
   path: '/$courseId',
   getParentRoute: () => CourseRouteRoute,
 } as any)
+const SettingsRequestHistoryRouteRoute =
+  SettingsRequestHistoryRouteRouteImport.update({
+    id: '/request-history',
+    path: '/request-history',
+    getParentRoute: () => SettingsRouteRoute,
+  } as any)
 const SettingsProfileRouteRoute = SettingsProfileRouteRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -270,6 +284,12 @@ const AdminCoursesRouteRoute = AdminCoursesRouteRouteImport.update({
   path: '/courses',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const SettingsRequestHistoryIndexRoute =
+  SettingsRequestHistoryIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => SettingsRequestHistoryRouteRoute,
+  } as any)
 const SettingsProfileIndexRoute = SettingsProfileIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -471,9 +491,11 @@ export interface FileRoutesByFullPath {
   '/mod/users': typeof ModUsersRouteRouteWithChildren
   '/settings/payment': typeof SettingsPaymentRouteRouteWithChildren
   '/settings/profile': typeof SettingsProfileRouteRouteWithChildren
+  '/settings/request-history': typeof SettingsRequestHistoryRouteRouteWithChildren
   '/course/$courseId': typeof CourseCourseIdRoute
   '/users/$userId': typeof UsersUserIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/be-an-instructor': typeof BeAnInstructorIndexRoute
   '/cart/': typeof CartIndexRoute
   '/checkout/': typeof CheckoutIndexRoute
   '/course/': typeof CourseIndexRoute
@@ -498,6 +520,7 @@ export interface FileRoutesByFullPath {
   '/mod/users/': typeof ModUsersIndexRoute
   '/settings/payment/': typeof SettingsPaymentIndexRoute
   '/settings/profile/': typeof SettingsProfileIndexRoute
+  '/settings/request-history/': typeof SettingsRequestHistoryIndexRoute
   '/learn/$courseId/$moduleId/$lessonId': typeof LearnCourseIdModuleIdLessonIdRouteRouteWithChildren
   '/lecturing-tool/course/$courseId/editing': typeof LecturingToolCourseCourseIdEditingRouteRouteWithChildren
   '/admin/permissions/$permissionId': typeof AdminPermissionsPermissionIdIndexRoute
@@ -524,6 +547,7 @@ export interface FileRoutesByTo {
   '/course/$courseId': typeof CourseCourseIdRoute
   '/users/$userId': typeof UsersUserIdRoute
   '/admin': typeof AdminIndexRoute
+  '/be-an-instructor': typeof BeAnInstructorIndexRoute
   '/cart': typeof CartIndexRoute
   '/checkout': typeof CheckoutIndexRoute
   '/course': typeof CourseIndexRoute
@@ -548,6 +572,7 @@ export interface FileRoutesByTo {
   '/settings/payment': typeof SettingsPaymentIndexRoute
   '/settings/profile': typeof SettingsProfileIndexRoute
   '/admin/permissions/$permissionId': typeof AdminPermissionsPermissionIdIndexRoute
+  '/settings/request-history': typeof SettingsRequestHistoryIndexRoute
   '/admin/users/$userId': typeof AdminUsersUserIdIndexRoute
   '/auth/login': typeof AuthMainLayoutLoginIndexRoute
   '/auth/register': typeof AuthMainLayoutRegisterIndexRoute
@@ -589,9 +614,11 @@ export interface FileRoutesById {
   '/mod/users': typeof ModUsersRouteRouteWithChildren
   '/settings/payment': typeof SettingsPaymentRouteRouteWithChildren
   '/settings/profile': typeof SettingsProfileRouteRouteWithChildren
+  '/settings/request-history': typeof SettingsRequestHistoryRouteRouteWithChildren
   '/course/$courseId': typeof CourseCourseIdRoute
   '/users/$userId': typeof UsersUserIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/be-an-instructor/': typeof BeAnInstructorIndexRoute
   '/cart/': typeof CartIndexRoute
   '/checkout/': typeof CheckoutIndexRoute
   '/course/': typeof CourseIndexRoute
@@ -616,6 +643,7 @@ export interface FileRoutesById {
   '/mod/users/': typeof ModUsersIndexRoute
   '/settings/payment/': typeof SettingsPaymentIndexRoute
   '/settings/profile/': typeof SettingsProfileIndexRoute
+  '/settings/request-history/': typeof SettingsRequestHistoryIndexRoute
   '/learn/$courseId/$moduleId/$lessonId': typeof LearnCourseIdModuleIdLessonIdRouteRouteWithChildren
   '/lecturing-tool/course/$courseId/editing': typeof LecturingToolCourseCourseIdEditingRouteRouteWithChildren
   '/admin/permissions/$permissionId/': typeof AdminPermissionsPermissionIdIndexRoute
@@ -661,9 +689,11 @@ export interface FileRouteTypes {
     | '/mod/users'
     | '/settings/payment'
     | '/settings/profile'
+    | '/settings/request-history'
     | '/course/$courseId'
     | '/users/$userId'
     | '/admin/'
+    | '/be-an-instructor'
     | '/cart/'
     | '/checkout/'
     | '/course/'
@@ -688,6 +718,7 @@ export interface FileRouteTypes {
     | '/mod/users/'
     | '/settings/payment/'
     | '/settings/profile/'
+    | '/settings/request-history/'
     | '/learn/$courseId/$moduleId/$lessonId'
     | '/lecturing-tool/course/$courseId/editing'
     | '/admin/permissions/$permissionId'
@@ -714,6 +745,7 @@ export interface FileRouteTypes {
     | '/course/$courseId'
     | '/users/$userId'
     | '/admin'
+    | '/be-an-instructor'
     | '/cart'
     | '/checkout'
     | '/course'
@@ -738,6 +770,7 @@ export interface FileRouteTypes {
     | '/settings/payment'
     | '/settings/profile'
     | '/admin/permissions/$permissionId'
+    | '/settings/request-history'
     | '/admin/users/$userId'
     | '/auth/login'
     | '/auth/register'
@@ -778,9 +811,11 @@ export interface FileRouteTypes {
     | '/mod/users'
     | '/settings/payment'
     | '/settings/profile'
+    | '/settings/request-history'
     | '/course/$courseId'
     | '/users/$userId'
     | '/admin/'
+    | '/be-an-instructor/'
     | '/cart/'
     | '/checkout/'
     | '/course/'
@@ -805,6 +840,7 @@ export interface FileRouteTypes {
     | '/mod/users/'
     | '/settings/payment/'
     | '/settings/profile/'
+    | '/settings/request-history/'
     | '/learn/$courseId/$moduleId/$lessonId'
     | '/lecturing-tool/course/$courseId/editing'
     | '/admin/permissions/$permissionId/'
@@ -838,6 +874,7 @@ export interface RootRouteChildren {
   R404Route: typeof R404Route
   AboutRoute: typeof AboutRoute
   ContactRoute: typeof ContactRoute
+  BeAnInstructorIndexRoute: typeof BeAnInstructorIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1003,6 +1040,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CartIndexRouteImport
       parentRoute: typeof CartRouteRoute
     }
+    '/be-an-instructor/': {
+      id: '/be-an-instructor/'
+      path: '/be-an-instructor'
+      fullPath: '/be-an-instructor'
+      preLoaderRoute: typeof BeAnInstructorIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/': {
       id: '/admin/'
       path: '/'
@@ -1023,6 +1067,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/course/$courseId'
       preLoaderRoute: typeof CourseCourseIdRouteImport
       parentRoute: typeof CourseRouteRoute
+    }
+    '/settings/request-history': {
+      id: '/settings/request-history'
+      path: '/request-history'
+      fullPath: '/settings/request-history'
+      preLoaderRoute: typeof SettingsRequestHistoryRouteRouteImport
+      parentRoute: typeof SettingsRouteRoute
     }
     '/settings/profile': {
       id: '/settings/profile'
@@ -1107,6 +1158,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/courses'
       preLoaderRoute: typeof AdminCoursesRouteRouteImport
       parentRoute: typeof AdminRouteRoute
+    }
+    '/settings/request-history/': {
+      id: '/settings/request-history/'
+      path: '/'
+      fullPath: '/settings/request-history/'
+      preLoaderRoute: typeof SettingsRequestHistoryIndexRouteImport
+      parentRoute: typeof SettingsRequestHistoryRouteRoute
     }
     '/settings/profile/': {
       id: '/settings/profile/'
@@ -1681,15 +1739,32 @@ const SettingsProfileRouteRouteChildren: SettingsProfileRouteRouteChildren = {
 const SettingsProfileRouteRouteWithChildren =
   SettingsProfileRouteRoute._addFileChildren(SettingsProfileRouteRouteChildren)
 
+interface SettingsRequestHistoryRouteRouteChildren {
+  SettingsRequestHistoryIndexRoute: typeof SettingsRequestHistoryIndexRoute
+}
+
+const SettingsRequestHistoryRouteRouteChildren: SettingsRequestHistoryRouteRouteChildren =
+  {
+    SettingsRequestHistoryIndexRoute: SettingsRequestHistoryIndexRoute,
+  }
+
+const SettingsRequestHistoryRouteRouteWithChildren =
+  SettingsRequestHistoryRouteRoute._addFileChildren(
+    SettingsRequestHistoryRouteRouteChildren,
+  )
+
 interface SettingsRouteRouteChildren {
   SettingsPaymentRouteRoute: typeof SettingsPaymentRouteRouteWithChildren
   SettingsProfileRouteRoute: typeof SettingsProfileRouteRouteWithChildren
+  SettingsRequestHistoryRouteRoute: typeof SettingsRequestHistoryRouteRouteWithChildren
   SettingsIndexRoute: typeof SettingsIndexRoute
 }
 
 const SettingsRouteRouteChildren: SettingsRouteRouteChildren = {
   SettingsPaymentRouteRoute: SettingsPaymentRouteRouteWithChildren,
   SettingsProfileRouteRoute: SettingsProfileRouteRouteWithChildren,
+  SettingsRequestHistoryRouteRoute:
+    SettingsRequestHistoryRouteRouteWithChildren,
   SettingsIndexRoute: SettingsIndexRoute,
 }
 
@@ -1738,6 +1813,7 @@ const rootRouteChildren: RootRouteChildren = {
   R404Route: R404Route,
   AboutRoute: AboutRoute,
   ContactRoute: ContactRoute,
+  BeAnInstructorIndexRoute: BeAnInstructorIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

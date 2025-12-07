@@ -11,6 +11,9 @@ import type {
   GetEnrolledCourseCompletedLessonsResponse,
   UpdateCurrentViewResponse,
   UpdateCurrentViewReq,
+  GetEnrolledCourseFilterReq,
+  GetLastDateCourseResponse,
+  GetCourseEnrolledStudentsResponse,
 } from "@/types/db/course/enrollment";
 import { createServiceApi, serviceUrls } from "@/utils/api";
 
@@ -47,8 +50,12 @@ export const enrollmentService = {
     return response.data;
   },
 
-  getEnrolledCourses: async (): Promise<GetEnrolledCoursesResponse> => {
-    const response = await api.get(API_ROUTES.ENROLLMENT.getEnrolledCourse);
+  getEnrolledCourses: async (
+    filter?: GetEnrolledCourseFilterReq
+  ): Promise<GetEnrolledCoursesResponse> => {
+    const response = await api.get(API_ROUTES.ENROLLMENT.getEnrolledCourse, {
+      params: filter,
+    });
     return response.data;
   },
 
@@ -67,6 +74,24 @@ export const enrollmentService = {
     const response = await api.post(
       API_ROUTES.ENROLLMENT.updateEnrollmentCurrentView,
       data
+    );
+    return response.data;
+  },
+
+  getLastDateCourse: async (
+    courseId: UUID
+  ): Promise<GetLastDateCourseResponse> => {
+    const response = await api.get(
+      API_ROUTES.ENROLLMENT.getLastDateCourse(courseId)
+    );
+    return response.data;
+  },
+
+  getCourseEnrolledStudents: async (
+    courseId: UUID
+  ): Promise<GetCourseEnrolledStudentsResponse> => {
+    const response = await api.get(
+      API_ROUTES.ENROLLMENT.getListStudentsByCourse(courseId)
     );
     return response.data;
   },

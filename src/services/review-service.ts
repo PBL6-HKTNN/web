@@ -6,6 +6,10 @@ import type {
   CreateReviewResponse,
   GetReviewsByCourseResponse,
   GetAverageRatingByCourseResponse,
+  CheckUserReviewReq,
+  CheckUserReviewRes,
+  DeleteUserReviewReq,
+  DeleteUserReviewRes,
 } from "@/types/db/review";
 import { createServiceApi } from "@/utils";
 
@@ -34,6 +38,22 @@ export const reviewService = {
     const response = await api.get(
       API_ROUTES.REVIEW.getAverageRating(courseId)
     );
+    return response.data;
+  },
+
+  checkUserReview: async (
+    data: CheckUserReviewReq
+  ): Promise<CheckUserReviewRes> => {
+    const response = await api.post(API_ROUTES.REVIEW.checkUserReview, data);
+    return response.data;
+  },
+
+  deleteUserReview: async (
+    data: DeleteUserReviewReq
+  ): Promise<DeleteUserReviewRes> => {
+    const response = await api.delete(API_ROUTES.REVIEW.deleteUserReview, {
+      data,
+    });
     return response.data;
   },
 };

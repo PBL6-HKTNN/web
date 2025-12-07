@@ -10,13 +10,11 @@ export const Level = {
 
 export type Level = (typeof Level)[keyof typeof Level];
 
-const CourseStatus = {
+export const CourseStatus = {
   DRAFT: 0,
   PUBLISHED: 1,
   ARCHIVED: 2,
 } as const;
-
-export { CourseStatus };
 
 export type CourseStatus = (typeof CourseStatus)[keyof typeof CourseStatus];
 
@@ -67,8 +65,9 @@ export type GetCourseContentRes = ApiResponse<{
 export type GetCoursesFilterReq = {
   CategoryId?: UUID;
   Level?: Level;
+  InstructorId?: UUID;
   Language?: string;
-  SortBy?: "name" | "date" | "rating";
+  SortBy?: "price" | "rating";
   Page?: number;
   PageSize?: number;
 };
@@ -88,3 +87,26 @@ export type ValidateCourseReq = {
 };
 
 export type ValidateCourseRes = ApiResponse<boolean>;
+
+export type ChangeCourseStatusReq = {
+  courseId: UUID;
+  status: CourseStatus;
+  moderatorId: UUID;
+};
+
+export type ChangeCourseStatusRes = ApiResponse<Course>;
+
+export type ModChangeCourseStatusReq = ChangeCourseStatusReq;
+
+export type ModChangeCourseStatusRes = ChangeCourseStatusRes;
+
+export type PreSubmitCheckReq = {
+  courseId: UUID;
+};
+
+export type PreSubmitCheckRes = ApiResponse<string>;
+
+export type RequestedBanCourseRes = ApiResponse<{
+  success: boolean;
+  message: string;
+}>;

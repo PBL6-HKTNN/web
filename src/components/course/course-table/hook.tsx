@@ -6,10 +6,15 @@ import { useAuthState } from "@/hooks";
 const ITEMS_PER_PAGE = 12;
 
 export function useCourseTable() {
+  const {
+    user
+  } = useAuthState();
+  
   const [filters, setFilters] = useState<GetCoursesFilterReq>({
     Page: 1,
     PageSize: ITEMS_PER_PAGE,
-    SortBy: 'name',
+    SortBy: 'rating',
+    InstructorId: user?.id,
   });
 
   const {
@@ -22,9 +27,7 @@ export function useCourseTable() {
     isFetchingNextPage
   } = useGetCourses(filters);
 
-  const {
-    user
-  } = useAuthState();
+  
 
   // Flatten the infinite query data
   const courses = useMemo(() => {

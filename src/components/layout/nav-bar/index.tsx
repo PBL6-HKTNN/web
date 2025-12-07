@@ -9,12 +9,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Book, Code, LogOut, User, ShoppingCart, PenToolIcon, Cog } from 'lucide-react'
+import { Book, Code, LogOut, User, ShoppingCart, PenToolIcon, Cog, ShieldUserIcon } from 'lucide-react'
 import { useAuthState, useLogout } from '@/hooks/queries/auth-hooks'
 import { useGetCart } from '@/hooks/queries/payment-hooks'
 import { ThemeChanger } from '@/components/shared/theme-changer'
 import RequiredRole from '@/components/user/required-role'
 import { UserRole } from '@/types/db'
+import { BeAnInstructorLine } from '@/components/shared/be-an-instructor-line'
 
 export function NavBar() {
   const { isAuthenticated, user } = useAuthState()
@@ -39,7 +40,9 @@ export function NavBar() {
   }
 
   return (
-    <nav className="border-b bg-white/80 backdrop-blur-sm dark:bg-slate-900/80 dark:border-slate-800 sticky top-0 z-50">
+    <>
+      {user?.role !== UserRole.INSTRUCTOR && <BeAnInstructorLine />}
+      <nav className="border-b bg-white/80 backdrop-blur-sm dark:bg-slate-900/80 dark:border-slate-800 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto sm:px-6">
         <div className="flex justify-between items-center py-4">
           <div className="flex items-center space-x-2">
@@ -112,6 +115,16 @@ export function NavBar() {
                         </Link>
                       </DropdownMenuItem>
                     </RequiredRole>
+                    <RequiredRole
+                      roles={[UserRole.MODERATOR]}
+                    >
+                      <DropdownMenuItem asChild>
+                        <Link to="/mod" className="flex items-center">
+                          <ShieldUserIcon className="mr-2 h-4 w-4" />
+                          Moderator Tools
+                        </Link>
+                      </DropdownMenuItem>
+                    </RequiredRole>
                     <DropdownMenuItem asChild>
                       <Link to="/settings" className="flex items-center">
                         <Cog className="mr-2 h-4 w-4" />
@@ -152,5 +165,6 @@ export function NavBar() {
         </div>
       </div>
     </nav>
+    </>
   )
 }

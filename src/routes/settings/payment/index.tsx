@@ -3,13 +3,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Button } from '@/components/ui/button'
-import { Receipt, LayoutGrid, LayoutList, ArrowRight, ShoppingCart } from 'lucide-react'
+import { Receipt, LayoutGrid, LayoutList, ArrowRight, ShoppingCart, TrendingUp } from 'lucide-react'
 import { PaymentCard } from '@/components/payment/payment-card'
 import { PaymentTable } from '@/components/payment/payment-table'
 import { Link } from '@tanstack/react-router'
 import { formatPrice } from '@/utils/format'
 import type { PaymentData, OrderItem } from '@/types/db/payment'
 import { usePaymentSettings } from './-hook'
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
+import { Bar, BarChart, XAxis, YAxis } from 'recharts'
 
 export const Route = createFileRoute('/settings/payment/')({ 
   component: RouteComponent,
@@ -22,6 +24,7 @@ function RouteComponent() {
     hasInProgressPayment,
     totalSpent,
     stats,
+    monthlySpendingData,
     viewMode,
     setViewMode,
     isLoading,
@@ -179,6 +182,55 @@ function RouteComponent() {
             </CardHeader>
           </Card>
         </div>
+
+        {/* Monthly Spending Chart */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5" />
+              <CardTitle>Monthly Spending - {new Date().getFullYear()}</CardTitle>
+            </div>
+            <CardDescription>
+              Your spending pattern throughout the year
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer
+              config={{
+                amount: {
+                  label: "Amount Spent",
+                  color: "hsl(var(--chart-1))",
+                },
+              }}
+              className="h-[300px]"
+            >
+              <BarChart data={monthlySpendingData}>
+                <XAxis
+                  dataKey="month"
+                  stroke="#888888"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis
+                  stroke="#888888"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={(value) => `$${value}`}
+                />
+                <ChartTooltip
+                  content={<ChartTooltipContent />}
+                />
+                <Bar
+                  dataKey="amount"
+                  fill="var(--color-amount)"
+                  radius={[4, 4, 0, 0]}
+                />
+              </BarChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
         
         {/* Payment List */}
         <div className="space-y-4">
