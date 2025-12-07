@@ -1,9 +1,10 @@
 import { createFileRoute, useParams, useNavigate } from '@tanstack/react-router'
-import { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import  { useState, useEffect, useMemo, useRef } from 'react'
+import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import type { ApiResponse } from '@/types/core/api'
+import type { UserDetailResponse } from '@/types/db/user'
 import {
   Dialog,
   DialogContent,
@@ -20,102 +21,160 @@ import {
 } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   ArrowLeft,
   Mail,
-  Calendar,
-  Clock,
-  UserCheck,
-  UserX,
-  AlertTriangle
+  Shield,
+  Loader2
 } from 'lucide-react'
 
 export const Route = createFileRoute('/admin/users/$userId/')({
   component: RouteComponent,
 })
 
-import { usersData } from '@/mock-data/admin-users'
+import { useUser } from '@/hooks/queries/user-hooks'
+import { UserRole, UserStatus } from '@/types/db/user'
+import type { UserPermission } from '@/types/db/permission'
+import type { Permission } from '@/types/db/permission'
+import { usePermissions, useAssignPermissionToUser, useRemoveUserPermission, useUserPermissions } from '@/hooks/queries/permission-hooks'
+import { toast } from 'sonner'
 
-interface EnrolledCourse {
-  id: string
-  title: string
-  progress: number
-  enrolledDate: string
-  status: 'In Progress' | 'Completed' | 'Dropped'
-}
-
-interface CreatedCourse {
-  id: string
-  title: string
-  status: 'Published' | 'Under Review' | 'Rejected' | 'Draft'
-  students: number
-  rating: number
-  revenue: number
-  createdDate: string
-}
-
-interface ModeratedCourse {
-  id: string
-  title: string
-  status: 'Published' | 'Under Review' | 'Rejected'
-  instructor: string
-  submittedDate: string
-  reviewedDate?: string
-}
-
-interface UserDetail {
-  id: string
-  name: string
-  email: string
-  role: 'Student' | 'Lecturer' | 'Mod' | 'Admin'
-  status: 'Active' | 'Suspended' | 'Inactive'
-  joinDate: string
-  lastLogin: string
-  avatar: string
-  bio: string
-  location: string
-  coursesEnrolled: number
-  coursesCompleted: number
-  totalSpent: number
-  suspensionReason: string
-  averageRating: number
-  specialization: string
-  coursesCreated: number
-  totalEarnings: number
-  studentsTaught: number
-  coursesReviewed: number
-  enrolledCourses?: EnrolledCourse[]
-  createdCourses?: CreatedCourse[]
-  coursesBeingModerated?: ModeratedCourse[]
-  recentActivity: {
-    id: number
-    action: string
-    details: string
-    time: string
-    type: string
-  }[]
-}
 
 function RouteComponent() {
   const { userId } = useParams({ from: '/admin/users/$userId/' })
   const navigate = useNavigate()
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const [isConfirmSuspendOpen, setIsConfirmSuspendOpen] = useState(false)
   const [editForm, setEditForm] = useState({
     email: '',
     password: '',
     confirmPassword: '',
     role: ''
   })
+  const [selectedPermissions, setSelectedPermissions] = useState<Set<string>>(new Set())
+  const [isSaving, setIsSaving] = useState(false)
+  const hasInitializedPermissions = useRef(false)
 
-  const user: UserDetail = usersData[userId as keyof typeof usersData] as UserDetail
+  const { data: apiResponse, isLoading, error } = useUser(userId)
+  const userResponse = (apiResponse as unknown as ApiResponse<UserDetailResponse>)?.data
+  const user = userResponse?.user || null
 
-  if (!user) {
+  const { data: userPermissionsRaw = [], isLoading: permissionsLoading } = useUserPermissions(userId)
+  const { data: allPermissionsResponse } = usePermissions()
+  const allPermissions = allPermissionsResponse || []
+
+  // Map userPermissionsRaw to include permissionName from allPermissions
+  // Use useMemo to prevent recreating array on every render
+  const permissions = useMemo(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return userPermissionsRaw.map((up: any) => {
+      const permission = allPermissions.find((p: Permission) => p.id === up.permissionId)
+      return {
+        ...up,
+        permissionName: permission?.permissionName || '',
+      } as UserPermission & { permissionId: string }
+    })
+  }, [userPermissionsRaw, allPermissions])
+
+  // Mutations for permission management
+  const assignPermissionMutation = useAssignPermissionToUser()
+  const removePermissionMutation = useRemoveUserPermission()
+
+  // Initialize selected permissions when edit modal opens for the first time
+  useEffect(() => {
+    if (isEditModalOpen && permissions.length > 0 && allPermissions.length > 0 && !hasInitializedPermissions.current) {
+      // Use permissionId for comparison, not userPermission id
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const permissionIds = new Set(permissions.map((p: any) => p.permissionId || p.id))
+      setSelectedPermissions(permissionIds)
+      hasInitializedPermissions.current = true
+    } else if (!isEditModalOpen) {
+      // Reset when modal closes
+      hasInitializedPermissions.current = false
+      setSelectedPermissions(new Set())
+    }
+  }, [isEditModalOpen, permissions, allPermissions])
+
+  // Handle permission checkbox changes (only update local state)
+  const handlePermissionChange = (permissionId: string, checked: boolean) => {
+    setSelectedPermissions(prev => {
+      const newSet = new Set(prev)
+      if (checked) {
+        newSet.add(permissionId)
+      } else {
+        newSet.delete(permissionId)
+      }
+      return newSet
+    })
+  }
+
+  // Calculate permissions to assign and remove
+  const getPermissionChanges = () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const currentPermissionIds = new Set(permissions.map((p: any) => p.permissionId || p.id))
+    const selectedPermissionIds = selectedPermissions
+
+    const toAssign = Array.from(selectedPermissionIds).filter(id => !currentPermissionIds.has(id))
+    const toRemove = Array.from(currentPermissionIds).filter(id => !selectedPermissionIds.has(id))
+
+    return { toAssign, toRemove }
+  }
+
+  const handleSaveChanges = async () => {
+    const { toAssign, toRemove } = getPermissionChanges()
+    if (toAssign.length === 0 && toRemove.length === 0) {
+      setIsEditModalOpen(false)
+      return
+    }
+
+    setIsSaving(true)
+    try {
+      // Perform assign operations
+      const assignPromises = toAssign.map(permissionId =>
+        assignPermissionMutation.mutateAsync({
+          userId: userId,
+          permissionId: permissionId
+        })
+      )
+
+      const removePromises = toRemove.map(permissionId => {
+        // Find userPermission by permissionId (not by userPermission id)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const userPermission = permissions.find((p: any) => (p.permissionId || p.id) === permissionId)
+        // Use userPermission.id (which is UserPermissionGroup ID) for removal
+        return userPermission ? removePermissionMutation.mutateAsync(userPermission.id) : Promise.resolve()
+      })
+      await Promise.all([...assignPromises, ...removePromises])
+      setIsEditModalOpen(false)
+      toast.success('Permissions updated successfully')
+    } catch (error) {
+      console.error('Failed to update permissions:', error)
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  if (isLoading || permissionsLoading) {
+    return (
+      <div className="p-6">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-muted-foreground mb-2">Loading User...</h2>
+          <p className="text-muted-foreground">Please wait while we fetch user data.</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error || !apiResponse || apiResponse.success === false || !user) {
     return (
       <div className="p-6">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-muted-foreground mb-2">User Not Found</h2>
-          <p className="text-muted-foreground">The requested user could not be found.</p>
+          <p className="text-muted-foreground">
+            {error ? `Error loading user: ${error.message}` :
+             apiResponse?.message ? apiResponse.message :
+             'The requested user could not be found.'}
+          </p>
           <Button onClick={() => navigate({ to: '/admin/users' })} className="mt-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Users
@@ -125,29 +184,38 @@ function RouteComponent() {
     )
   }
 
-  const getStatusBadge = (status: string) => {
-    const variants = {
-      'Active': 'default',
-      'Suspended': 'destructive',
-      'Inactive': 'secondary'
+  const getStatusBadge = (status: UserStatus) => {
+    const statusLabels = {
+      [UserStatus.ACTIVE]: 'Active',
+      [UserStatus.INACTIVE]: 'Inactive',
+      [UserStatus.PENDING]: 'Pending'
     } as const
-    return <Badge variant={variants[status as keyof typeof variants] || 'secondary'}>{status}</Badge>
+
+    const statusColors = {
+      [UserStatus.ACTIVE]: 'default',
+      [UserStatus.INACTIVE]: 'secondary',
+      [UserStatus.PENDING]: 'outline'
+    } as const
+
+    return <Badge variant={statusColors[status] || 'secondary'}>{statusLabels[status] || 'Unknown'}</Badge>
   }
 
-  const getRoleBadge = (role: string) => {
-    const variants = {
-      'Student': 'secondary',
-      'Lecturer': 'default',
-      'Mod': 'outline'
+  const getRoleBadge = (role: UserRole) => {
+    const roleLabels = {
+      [UserRole.STUDENT]: 'Student',
+      [UserRole.INSTRUCTOR]: 'Lecturer',
+      [UserRole.MODERATOR]: 'Mod',
+      [UserRole.ADMIN]: 'Admin'
     } as const
-    return <Badge variant={variants[role as keyof typeof variants] || 'secondary'}>{role}</Badge>
-  }
 
-  const handleSuspendUser = () => {
-    // In a real app, this would call an API to suspend the user
-    alert(`User ${user.name} has been successfully suspended!`)
-    setIsConfirmSuspendOpen(false)
-    // Optionally refresh the page or update user status
+    const roleColors = {
+      [UserRole.STUDENT]: 'secondary',
+      [UserRole.INSTRUCTOR]: 'default',
+      [UserRole.MODERATOR]: 'outline',
+      [UserRole.ADMIN]: 'destructive'
+    } as const
+
+    return <Badge variant={roleColors[role] || 'secondary'}>{roleLabels[role] || 'Unknown'}</Badge>
   }
 
 
@@ -167,7 +235,7 @@ function RouteComponent() {
                   email: user.email,
                   password: '',
                   confirmPassword: '',
-                  role: user.role
+                  role: user.role.toString()
                 })
               }}>
                 Edit
@@ -217,7 +285,7 @@ function RouteComponent() {
                   </Label>
                   <Select value={editForm.role} onValueChange={(value) => setEditForm(prev => ({ ...prev, role: value }))}>
                     <SelectTrigger className="col-span-3">
-                      <SelectValue placeholder="Select a role" />
+                      <SelectValue placeholder="Select a role"  />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Student">Student</SelectItem>
@@ -226,65 +294,52 @@ function RouteComponent() {
                     </SelectContent>
                   </Select>
                 </div>
+
+                {/* Permissions Section */}
+                <div className="grid grid-cols-4 items-start gap-4">
+                  <Label className="text-right pt-2">
+                    Permissions
+                  </Label>
+                  <div className="col-span-3 space-y-2 max-h-48 overflow-y-auto border rounded-md p-3">
+                    {allPermissions.map((permission) => (
+                      <div key={permission.id} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`permission-${permission.id}`}
+                          checked={selectedPermissions.has(permission.id)}
+                          onCheckedChange={(checked) =>
+                            handlePermissionChange(permission.id, checked as boolean)
+                          }
+                          disabled={isSaving}
+                        />
+                        <Label
+                          htmlFor={`permission-${permission.id}`}
+                          className="text-sm font-normal cursor-pointer"
+                        >
+                          {permission.permissionName}
+                        </Label>
+                      </div>
+                    ))}
+                    {allPermissions.length === 0 && (
+                      <p className="text-sm text-muted-foreground">Loading permissions...</p>
+                    )}
+                  </div>
+                </div>
               </div>
               <div className="flex justify-end gap-2">
                 <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>
                   Cancel
                 </Button>
-                <Button onClick={() => {
-                  // Handle save logic here
-                  console.log('Saving user data:', editForm)
-                  setIsEditModalOpen(false)
-                  // Show success message
-                }}>
-                  Save Changes
+                <Button
+                  onClick={handleSaveChanges}
+                  disabled={isSaving}
+                >
+                  {isSaving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                  {isSaving ? 'Saving...' : 'Save Changes'}
                 </Button>
               </div>
             </DialogContent>
           </Dialog>
-
-          <Dialog open={isConfirmSuspendOpen} onOpenChange={setIsConfirmSuspendOpen}>
-            <DialogTrigger asChild>
-              {user.status === 'Active' ? (
-                <Button variant="outline">
-                  <UserX className="w-4 h-4 mr-2" />
-                  Suspend User
-                </Button>
-              ) : (
-                <Button variant="outline">
-                  <UserCheck className="w-4 h-4 mr-2" />
-                  Activate User
-                </Button>
-              )}
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Confirm User Suspension</DialogTitle>
-              </DialogHeader>
-              <div className="grid gap-4 py-2">
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                  <div className="flex items-start gap-3">
-                    <AlertTriangle className="w-5 h-5 text-red-600 mt-0.5" />
-                    <div>
-                      <h4 className="font-semibold text-red-800 mb-1">Warning</h4>
-                      <p className="text-red-700 text-sm">
-                      Are you sure you want to suspend {user.name}? This action will restrict their access to the platform.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setIsConfirmSuspendOpen(false)}>
-                  Cancel
-                </Button>
-                <Button variant="destructive" onClick={handleSuspendUser}>
-                  <UserX className="w-4 h-4 mr-2" />
-                  Confirm Suspension
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
+    
         </div>
       </div>
 
@@ -295,7 +350,7 @@ function RouteComponent() {
             <CardContent className="p-6">
               <div className="flex items-start gap-6">
                 <img
-                  src={user.avatar}
+                  src={user.profilePicture || '/placeholder-avatar.png'}
                   alt={user.name}
                   className="w-24 h-24 rounded-full object-cover"
                 />
@@ -311,18 +366,16 @@ function RouteComponent() {
                       {user.email}
                     </div>
                     <div className="flex items-center gap-1">
-                      <Calendar className="w-4 h-4" />
-                      Joined {user.joinDate}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Clock className="w-4 h-4" />
-                      Last login {user.lastLogin}
+                      <Badge variant={user.emailVerified ? "default" : "outline"}>
+                        {user.emailVerified ? "Email Verified" : "Email Not Verified"}
+                      </Badge>
                     </div>
                   </div>
                   {user.bio && (
                     <p className="text-muted-foreground mb-3">{user.bio}</p>
                   )}
-                  {user.suspensionReason && (
+                  {/* Suspension reason not available in API */}
+                  {/* {user.suspensionReason && (
                     <div className="bg-red-50 border border-red-200 rounded-lg p-3">
                       <div className="flex items-start gap-2">
                         <AlertTriangle className="w-5 h-5 text-red-600 mt-0.5" />
@@ -332,7 +385,7 @@ function RouteComponent() {
                         </div>
                       </div>
                     </div>
-                  )}
+                  )} */}
                 </div>
               </div>
             </CardContent>
@@ -340,211 +393,61 @@ function RouteComponent() {
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {user.role === 'Student' ? (
-              <>
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="text-2xl font-bold">{user.coursesEnrolled || 0}</div>
-                    <p className="text-sm text-muted-foreground">Courses Enrolled</p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="text-2xl font-bold">{user.coursesCompleted || 0}</div>
-                    <p className="text-sm text-muted-foreground">Courses Completed</p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="text-2xl font-bold">${user.totalSpent || 0}</div>
-                    <p className="text-sm text-muted-foreground">Total Spent</p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="text-2xl font-bold">{user.averageRating || 0}/5.0</div>
-                    <p className="text-sm text-muted-foreground">Average Rating</p>
-                  </CardContent>
-                </Card>
-              </>
-            ) : user.role === 'Lecturer' ? (
-              <>
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="text-2xl font-bold">{user.coursesCreated || 0}</div>
-                    <p className="text-sm text-muted-foreground">Courses Created</p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="text-2xl font-bold">${user.totalEarnings || 0}</div>
-                    <p className="text-sm text-muted-foreground">Total Earnings</p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="text-2xl font-bold">{user.studentsTaught || 0}</div>
-                    <p className="text-sm text-muted-foreground">Students Taught</p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="text-2xl font-bold">{user.averageRating || 0}/5.0</div>
-                    <p className="text-sm text-muted-foreground">Average Rating</p>
-                  </CardContent>
-                </Card>
-              </>
-            ) : (
-              <>
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="text-2xl font-bold">{user.coursesReviewed || 0}</div>
-                    <p className="text-sm text-muted-foreground">Courses Reviewed</p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="text-2xl font-bold">{user.coursesBeingModerated?.length || 0}</div>
-                    <p className="text-sm text-muted-foreground">Courses Moderating</p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="text-2xl font-bold">{user.specialization || 'N/A'}</div>
-                    <p className="text-sm text-muted-foreground">Specialization</p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="text-2xl font-bold">{user.averageRating || 0}/5.0</div>
-                    <p className="text-sm text-muted-foreground">Average Rating</p>
-                  </CardContent>
-                </Card>
-              </>
-            )}
-          </div>
-        </div>
-
-        {/* Courses Section */}
-        <div className="space-y-6">
-          {user.role === 'Student' ? (
-            /* Student: Only Enrolled Courses */
             <Card>
-              <CardHeader>
-                <CardTitle>Enrolled Courses</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {user.enrolledCourses?.map((course) => (
-                    <div key={course.id} className="border rounded-lg p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-semibold">{course.title}</h3>
-                        <Badge variant={course.status === 'Completed' ? 'default' : 'secondary'}>
-                          {course.status}
-                        </Badge>
-                      </div>
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                        <span>Progress: {course.progress}%</span>
-                        <span>Enrolled: {course.enrolledDate}</span>
-                      </div>
-                    </div>
-                  )) || (
-                    <div className="text-center py-8 text-muted-foreground">
-                      No enrolled courses found.
-                    </div>
-                  )}
-                </div>
+              <CardContent className="p-4">
+                <div className="text-2xl font-bold">{user.totalCourses}</div>
+                <p className="text-sm text-muted-foreground">Total Courses</p>
               </CardContent>
             </Card>
-          ) : (
-            /* Lecturer/Mod: Use nested tabs for courses */
-            <Tabs defaultValue="enrolled" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="enrolled">Enrolled Courses</TabsTrigger>
-                <TabsTrigger value={user.role === 'Lecturer' ? 'created' : 'managed'}>
-                  {user.role === 'Lecturer' ? 'Created Courses' : 'Managed Courses'}
-                </TabsTrigger>
-              </TabsList>
+            <Card>
+              <CardContent className="p-4">
+                <div className="text-2xl font-bold">{user.rating ? user.rating.toFixed(1) : 'N/A'}</div>
+                <p className="text-sm text-muted-foreground">Rating</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4">
+                <div className="text-2xl font-bold">{user.emailVerified ? 'Yes' : 'No'}</div>
+                <p className="text-sm text-muted-foreground">Email Verified</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4">
+                <div className="text-2xl font-bold">{getRoleBadge(user.role).props.children}</div>
+                <p className="text-sm text-muted-foreground">Role</p>
+              </CardContent>
+            </Card>
+          </div>
 
-              <TabsContent value="enrolled" className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Enrolled Courses</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {user.enrolledCourses?.map((course) => (
-                        <div key={course.id} className="border rounded-lg p-4">
-                          <div className="flex items-center justify-between mb-2">
-                            <h3 className="font-semibold">{course.title}</h3>
-                            <Badge variant={course.status === 'Completed' ? 'default' : 'secondary'}>
-                              {course.status}
-                            </Badge>
-                          </div>
-                          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                            <span>Progress: {course.progress}%</span>
-                            <span>Enrolled: {course.enrolledDate}</span>
-                          </div>
-                        </div>
-                      )) || (
-                        <div className="text-center py-8 text-muted-foreground">
-                          No enrolled courses found.
-                        </div>
-                      )}
+          {/* Permissions Section */}
+          {permissions.length > 0 && (
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <Shield className="w-5 h-5 text-muted-foreground" />
+                  <h3 className="text-lg font-semibold">Permissions</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {permissions.map((permission: UserPermission) => (
+                    <div
+                      key={permission.id}
+                      className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg"
+                    >
+                      <Shield className="w-4 h-4 text-primary flex-shrink-0" />
+                      <div>
+                        <p className="font-medium text-sm">{permission.permissionName}</p>
+                      </div>
                     </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value={user.role === 'Lecturer' ? 'created' : 'managed'} className="space-y-6">
-                {user.role === 'Lecturer' ? (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Created Courses</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        {user.createdCourses?.map((course) => (
-                          <div key={course.id} className="border rounded-lg p-4">
-                            <div className="flex items-center justify-between mb-2">
-                              <h3 className="font-semibold">{course.title}</h3>
-                              <Badge variant={course.status === 'Published' ? 'default' : 'secondary'}>
-                                {course.status}
-                              </Badge>
-                            </div>
-                            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                              <span>{course.students} students</span>
-                              <span>Rating: {course.rating}/5.0</span>
-                              <span>Revenue: ${course.revenue}</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ) : (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Courses Being Managed</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        {user.coursesBeingModerated?.map((course) => (
-                          <div key={course.id} className="border rounded-lg p-4">
-                            <div className="mb-2">
-                              <h3 className="font-semibold">{course.title}</h3>
-                              <p className="text-sm text-muted-foreground">by {course.instructor}</p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-              </TabsContent>
-            </Tabs>
+                  ))}
+                </div>
+                <p className="text-sm text-muted-foreground mt-3">
+                  Total permissions: {permissions.length}
+                </p>
+              </CardContent>
+            </Card>
           )}
         </div>
+
     </div>
   )
 }

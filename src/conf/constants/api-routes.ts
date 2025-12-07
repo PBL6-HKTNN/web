@@ -13,8 +13,21 @@ const API_ROUTES = {
     logout: "/Auth/logout",
   },
   USER: {
-    changeAvatar: (userId: UUID) => `/User/${userId}/avatar`,
-    updateProfile: (userId: UUID) => `/User/${userId}/profile`,
+    getAllUsers: "/User",
+    getById: (userId: string) => `/User/${userId}`,
+    changeAvatar: (userId: string) => `/User/${userId}/avatar`,
+    updateProfile: (userId: string) => `/User/${userId}/profile`,
+    getPermissions: (userId: string) => `/Permission/user-permission/${userId}`,
+  },
+  PERMISSION: {
+    list: "/Permission/",
+    getById: (id: string) => `/Permission/get/${id}`,
+    create: "/Permission/create",
+    update: (id: string) => `/Permission/update/${id}`,
+    delete: (id: string) => `/Permission/delete/${id}`,
+    assign: "/Permission/assign",
+    removeUserPermission: (id: string) => `/Permission/delete/user-permission/${id}`,
+    getUserInPermission: (permissionId: string) => `/Permission/users/${permissionId}`,
   },
   STORAGE: {
     uploadFile: (type: FileType) => `/api/files/${type}`,

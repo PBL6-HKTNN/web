@@ -1,5 +1,5 @@
 import { type Base } from "../core";
-
+import type { UserPermission } from "@/types/db/permission";
 export const UserRole = {
   ADMIN: 0,
   MODERATOR: 1,
@@ -37,3 +37,10 @@ export type ChangeAvatarReq = {
 };
 
 export type UpdateProfileReq = Partial<Pick<User, "name" | "bio">>;
+
+export type UserDetailResponse = {
+  success: boolean;
+  message: string | null;
+  user: User;
+  permissions: UserPermission[];
+};
