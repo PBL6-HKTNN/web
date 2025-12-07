@@ -19,13 +19,13 @@ export function ReviewCard({ review }: ReviewCardProps) {
         <Avatar className="w-10 h-10">
           <AvatarImage src={review.user?.profilePicture} />
           <AvatarFallback>
-            {review.user?.name?.substring(0, 2).toUpperCase() || "U"}
+            {review.name?.substring(0, 2).toUpperCase() || "U"}
           </AvatarFallback>
         </Avatar>
         <div className="flex-1">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <span className="font-medium">{review.user?.name || "Anonymous"}</span>
+              <span className="font-medium">{review?.name || "Anonymous"}</span>
               <div className="flex">
                 {[...Array(5)].map((_, i) => (
                   <Star

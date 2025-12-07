@@ -23,6 +23,9 @@ const API_ROUTES = {
   CATEGORY: {
     getCategories: "/Category",
     createCategory: "/Category/create",
+    getCategoryById: (categoryId: UUID) => `/Category/get/${categoryId}`,
+    updateCategory: (categoryId: UUID) => `/Category/update/${categoryId}`,
+    deleteCategory: (categoryId: UUID) => `/Category/delete/${categoryId}`,
   },
   COURSE: {
     getCourses: "/Course",
@@ -34,6 +37,11 @@ const API_ROUTES = {
     updateCourse: (courseId: UUID) => `/Course/update/${courseId}`,
     deleteCourse: (courseId: UUID) => `/Course/${courseId}`,
     validateCourse: "/Course/validate",
+    changeCourseStatus: "/Course/change-status",
+    modChangeCourseStatus: "/Course/mod-change-status",
+    requestedBanCourse: (courseId: UUID) =>
+      `/Course/requested-ban-course/${courseId}`,
+    preSubmitCheck: "/Course/auto-check-before-submit",
   },
   MODULE: {
     getModules: "/Module",
@@ -78,11 +86,19 @@ const API_ROUTES = {
     updateEnrollmentProgress: "/Enrollment/updateProgress",
     updateEnrollmentCurrentView: "/Enrollment/update-current-view",
     getEnrolledCourse: "/Enrollment/my-courses",
+    getLastDateCourse: (courseId: UUID) =>
+      `/Enrollment/get-last-date-Course/${courseId}`,
+    getListStudentsByCourse: (courseId: UUID) =>
+      `/Enrollment/get-list-students/${courseId}`,
   },
   REVIEW: {
     createReview: "/Review",
     getReviewsByCourse: (courseId: UUID) => `/Review/course/${courseId}`,
+    checkUserReview: "/Review/check-user-review",
+    deleteUserReview: "/Review/user-review",
     getAverageRating: (courseId: UUID) => `/Review/course/${courseId}/average`,
+    replyReview: (courseId: UUID, reviewId: UUID) =>
+      `/Review/course/${courseId}/reviews/${reviewId}/reply`,
   },
   PAYMENT: {
     getCart: "/Payment/getCart",

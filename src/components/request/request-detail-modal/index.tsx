@@ -89,47 +89,47 @@ export function RequestDetailModal({
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <p className="text-sm font-medium text-gray-600 mb-1">
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
                     Description
                   </p>
-                  <p className="text-sm text-gray-700">{request.description}</p>
+                  <p className="text-sm text-gray-700 dark:text-gray-200">{request.description}</p>
                 </div>
 
                 {request.courseId && (
                   <div>
-                    <p className="text-sm font-medium text-gray-600 mb-1">
+                    <p className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
                       Course ID
                     </p>
-                    <p className="text-sm text-gray-700 font-mono">
+                    <p className="text-sm text-gray-700 dark:text-gray-200 font-mono">
                       {request.courseId}
                     </p>
                   </div>
                 )}
 
                 <div>
-                  <p className="text-sm font-medium text-gray-600 mb-1">
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
                     Submitted By
                   </p>
-                  <p className="text-sm text-gray-700 font-mono">
+                  <p className="text-sm text-gray-700 dark:text-gray-200 font-mono">
                     {request.userId}
                   </p>
                 </div>
 
                 <div>
-                  <p className="text-sm font-medium text-gray-600 mb-1">
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
                     Created Date
                   </p>
-                  <p className="text-sm text-gray-700">
+                  <p className="text-sm text-gray-700 dark:text-gray-200">
                     {formatDate(request.createdAt as string)}
                   </p>
                 </div>
 
                 {request.response && (
                   <div className="border-t pt-4">
-                    <p className="text-sm font-medium text-gray-600 mb-1">
+                    <p className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
                       Response
                     </p>
-                    <p className="text-sm text-gray-700">{request.response}</p>
+                    <p className="text-sm text-gray-700 dark:text-gray-200">{request.response}</p>
                   </div>
                 )}
               </CardContent>
@@ -151,7 +151,7 @@ export function RequestDetailModal({
             )}
           </div>
         ) : (
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
             Request not found
           </div>
         )}

@@ -296,7 +296,7 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
                         <p>No modules found for this course.</p>
                       </div>
                     ) : (
-                      <div className="space-y-4">
+                      <div>
                         {modules.map((module) => (
                           <ModuleAccordion
                             key={module.id}

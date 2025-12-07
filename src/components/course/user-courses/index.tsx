@@ -1,13 +1,12 @@
 import { useState } from "react";
-import { BookOpen, Heart } from "lucide-react";
+import { BookOpen, Heart, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useNavigate } from "@tanstack/react-router";
 import { EnrolledCourseCard } from "./enrolled-course-card";
 import { WishlistCourseCard } from "./wishlist-course-card";
-import { useGetEnrolledCourses } from "@/hooks/queries/course/enrollment-hooks";
-import { useGetWishlist, useRemoveFromWishlist } from "@/hooks/queries/course/wishlist-hooks";
+import { useUserCourses } from "./hook";
+import { EnrolledCoursesFilter } from './enrolled-courses-filter'
 import type { WishlistedCourseItem } from "@/types/db/course/wishlist";
 import type { EnrolledCourseItem } from "@/types/db/course/enrollment";
 
@@ -16,73 +15,90 @@ export function UserCourses() {
 
   const [activeTab, setActiveTab] = useState("enrolled");
 
-  const { data: enrolledData, isLoading: enrolledLoading, error: enrolledError } = useGetEnrolledCourses();
-  const { data: wishlistData, isLoading: wishlistLoading, error: wishlistError } = useGetWishlist();
-  const removeFromWishlistMutation = useRemoveFromWishlist();
-
-  const enrolledCourses = enrolledData?.data || [];
-  const wishlistItems: WishlistedCourseItem[] = wishlistData?.data || [];
-
-  // console.log("Enrolled courses count:", enrolledCourses.length); // Debug log
-  // console.log("Wishlist items count:", wishlistItems.length); // Debug log
-  // console.log("Wishlist data:", wishlistItems); // Debug log
-
-  // Debug: log when wishlist data changes
-  // React.useEffect(() => {
-  //   console.log("Wishlist data updated:", wishlistData);
-  //   console.log("Wishlist items:", wishlistItems);
-  // }, [wishlistData, wishlistItems]);
+  const { filters, setFilter, enrolledCourses, enrolledLoading, enrolledHasNextPage, enrolledFetchNextPage, enrolledFetchingNextPage, wishlistItems, wishlistLoading, wishlistError, removeFromWishlist } = useUserCourses();
 
   const renderEnrolledCourses = () => {
+    // Always render the header and filter first so the controls are visible
+    // even when the enrolled list is empty or loading.
     if (enrolledLoading) {
       return (
-        <div className="space-y-4">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="animate-pulse">
-              <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+        <div className="space-y-8">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-blue-600" />
+              <h2 className="text-xl font-semibold">My Enrolled Courses ({enrolledCourses.length})</h2>
             </div>
-          ))}
+            <div>
+              <EnrolledCoursesFilter filters={filters} onChange={(f) => setFilter(f)} />
+            </div>
+          </div>
+          <div className="space-y-4">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="animate-pulse">
+                <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+              </div>
+            ))}
+          </div>
         </div>
       );
     }
 
-    if (enrolledError) {
-      return (
-        <Alert variant="destructive">
-          <AlertDescription>
-            Failed to load your enrolled courses. Please try again later.
-          </AlertDescription>
-        </Alert>
-      );
-    }
-
-    if (enrolledCourses.length === 0) {
-      return (
-        <div className="text-center py-12">
-          <BookOpen className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-          <h3 className="text-xl font-semibold mb-2">No enrolled courses</h3>
-          <p className="text-muted-foreground mb-4">
-            You haven't enrolled in any courses yet. Browse our course catalog to get started!
-          </p>
-          <Button onClick={() => navigate({ to: '/course' })}>
-            Browse Courses
-          </Button>
-        </div>
-      );
-    }
-
+    // Don’t early return on enrolled error — always render header and filters.
+    // Show an inline alert in the content area so users can adjust filters or retry without losing context.
+    // Render header + either placeholder or the list
     return (
       <div className="space-y-8">
         <div>
-          {/* <div className="flex items-center gap-2 mb-4">
-            <BookOpen className="w-5 h-5 text-blue-600" />
-            <h2 className="text-xl font-semibold">My Enrolled Courses ({enrolledCourses.length})</h2>
-          </div> */}
-          <div className="grid grid-cols-1 gap-6">
-            {enrolledCourses.map((course: EnrolledCourseItem) => (
-              <EnrolledCourseCard key={course.id} course={course} />
-            ))}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-blue-600" />
+              <h2 className="text-xl font-semibold">My Enrolled Courses ({enrolledCourses.length})</h2>
+            </div>
+            <div>
+              <EnrolledCoursesFilter filters={filters} onChange={(f) => setFilter(f)} />
+            </div>
           </div>
+
+          {enrolledCourses.length === 0 ? (
+            <div className="text-center py-12">
+              <BookOpen className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+              <h3 className="text-xl font-semibold mb-2">No enrolled courses</h3>
+              <p className="text-muted-foreground mb-4">
+                You haven't enrolled in any courses yet. Browse our course catalog to get started!
+              </p>
+              <Button onClick={() => navigate({ to: '/course' })}>
+                Browse Courses
+              </Button>
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 gap-6">
+                {enrolledCourses.map((course: EnrolledCourseItem) => (
+                  <EnrolledCourseCard key={course.id} course={course} />
+                ))}
+              </div>
+              {/* Load More Button */}
+              {enrolledHasNextPage && (
+                <div className="flex justify-center mt-6">
+                  <Button
+                    onClick={() => enrolledFetchNextPage?.()}
+                    disabled={enrolledFetchingNextPage}
+                    variant="outline"
+                    size="lg"
+                  >
+                    {enrolledFetchingNextPage ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Loading more...
+                      </>
+                    ) : (
+                      'Load More Courses'
+                    )}
+                  </Button>
+                </div>
+              )}
+            </>
+          )}
         </div>
       </div>
     );
@@ -101,17 +117,7 @@ export function UserCourses() {
       );
     }
 
-    if (wishlistError) {
-      return (
-        <Alert variant="destructive">
-          <AlertDescription>
-            Failed to load your wishlist. Please try again later.
-          </AlertDescription>
-        </Alert>
-      );
-    }
-
-    if (wishlistItems.length === 0) {
+    if (wishlistError || wishlistItems.length === 0) {
       return (
         <div className="text-center py-12">
           <Heart className="w-16 h-16 mx-auto text-gray-400 mb-4" />
@@ -140,8 +146,8 @@ export function UserCourses() {
             <WishlistCourseCard
               key={item.courseId}
               wishlistItem={item}
-              onRemove={(courseId) => removeFromWishlistMutation.mutate(courseId)}
-              isRemoving={removeFromWishlistMutation.isPending}
+              onRemove={(courseId) => removeFromWishlist.mutate(courseId)}
+              isRemoving={removeFromWishlist.isPending}
             />
           ))}
         </div>

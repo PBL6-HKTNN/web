@@ -38,7 +38,7 @@ export function RequestCard({ request, onEdit }: RequestCardProps) {
                 {requestTypeName}
               </Badge>
             </div>
-            <CardDescription className="mt-1">
+            <CardDescription className="mt-1 text-sm text-muted-foreground">
               {format(new Date(request.createdAt || Date.now()), "PPP")}
             </CardDescription>
           </div>
@@ -49,14 +49,14 @@ export function RequestCard({ request, onEdit }: RequestCardProps) {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <h4 className="text-sm font-semibold text-gray-600">Description</h4>
-          <p className="text-sm text-gray-700 line-clamp-3">{request.description}</p>
+          <h4 className="text-sm font-semibold text-gray-600 dark:text-gray-300">Description</h4>
+          <p className="text-sm text-gray-700 dark:text-gray-200 line-clamp-3">{request.description}</p>
         </div>
 
         {request.response && (
           <div className="space-y-2 border-t pt-4">
-            <h4 className="text-sm font-semibold text-gray-600">Response</h4>
-            <p className="text-sm text-gray-700">{request.response}</p>
+            <h4 className="text-sm font-semibold text-gray-600 dark:text-gray-300">Response</h4>
+            <p className="text-sm text-gray-700 dark:text-gray-200">{request.response}</p>
           </div>
         )}
 

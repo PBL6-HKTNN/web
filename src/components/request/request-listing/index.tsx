@@ -93,7 +93,7 @@ export function RequestListing({
   if (isLoading) {
     return (
       <div className="flex justify-center items-center py-12">
-        <div className="text-gray-500">Loading requests...</div>
+        <div className="text-gray-500 dark:text-gray-400">Loading requests...</div>
       </div>
     );
   }
@@ -101,8 +101,8 @@ export function RequestListing({
   if (requests.length === 0) {
     return (
       <div className="flex flex-col justify-center items-center py-12">
-        <div className="text-gray-500 text-lg mb-2">No requests yet</div>
-        <p className="text-sm text-gray-400">
+        <div className="text-gray-500 dark:text-gray-400 text-lg mb-2">No requests yet</div>
+        <p className="text-sm text-gray-400 dark:text-gray-400">
           You haven't submitted any requests. Create one to get started.
         </p>
       </div>
@@ -113,12 +113,12 @@ export function RequestListing({
     <div className="space-y-6">
       {/* Filters - Only show if not fixed */}
       {!fixedRequestTypeFilter && (
-        <div className="bg-white p-4 rounded-lg border space-y-4">
-          <h3 className="font-semibold text-sm">Filter</h3>
+        <div className="bg-white p-4 rounded-lg border space-y-4 dark:bg-slate-900 dark:border-slate-700">
+          <h3 className="font-semibold text-sm text-gray-700 dark:text-gray-200">Filter</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Request Type Filter */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">Request Type</label>
+              <label className="text-sm font-medium text-gray-600 dark:text-gray-300">Request Type</label>
               <Select
                 value={String(selectedTypeId)}
                 onValueChange={(value) =>
@@ -141,7 +141,7 @@ export function RequestListing({
 
             {/* Status Filter */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">Status</label>
+              <label className="text-sm font-medium text-gray-600 dark:text-gray-300">Status</label>
               <Select
                 value={String(selectedStatus)}
                 onValueChange={(value) =>
@@ -183,13 +183,13 @@ export function RequestListing({
       )}
 
       {/* Results Info */}
-      <div className="text-sm text-gray-600">
+      <div className="text-sm text-gray-600 dark:text-gray-300">
         Showing {filteredRequests.length} of {requests.length} request
         {requests.length !== 1 ? "s" : ""}
       </div>
 
       {filteredRequests.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">
+        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
           {fixedRequestTypeFilter
             ? "No requests of this type."
             : "No requests match the selected filters."}
@@ -232,9 +232,7 @@ export function RequestListing({
                   onClick={() =>
                     isModerator && handleViewRequest(request.id)
                   }
-                  className={
-                    isModerator ? "cursor-pointer hover:bg-gray-50" : ""
-                  }
+                  className={isModerator ? "cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800" : ""}
                 >
                   <TableCell className="font-medium">
                     <Badge
@@ -244,7 +242,7 @@ export function RequestListing({
                         ?.description || "Unknown"}
                     </Badge>
                   </TableCell>
-                  <TableCell className="max-w-xs truncate">
+                  <TableCell className="max-w-xs truncate text-sm text-gray-700 dark:text-gray-200">
                     {request.description}
                   </TableCell>
                   <TableCell>
@@ -252,7 +250,7 @@ export function RequestListing({
                       {STATUS_LABELS[request.status]}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-sm">
+                  <TableCell className="text-sm text-gray-700 dark:text-gray-200">
                     {format(new Date(request.createdAt || Date.now()), "PPP")}
                   </TableCell>
                   {isModerator && (

@@ -10,6 +10,7 @@ export const wishlistQueryKeys = {
 export const useGetWishlist = () => {
   return useQuery({
     queryKey: wishlistQueryKeys.wishlistLists(),
+    retry: 1,
     queryFn: () => {
       return wishlistService.getWishlist();
     },

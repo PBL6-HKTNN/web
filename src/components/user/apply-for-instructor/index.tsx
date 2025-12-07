@@ -8,11 +8,17 @@ import { Loader2, AlertCircle, CheckCircle } from 'lucide-react'
 import type { CreateRequestReq, RequestType } from '@/types/db/request'
 import { RequestTypeEnum } from '@/types/db/request'
 import { Label } from '@/components/ui/label'
+import { UserRole } from '@/types/db'
+import { useAuthState } from '@/hooks'
 
 export function ApplyForInstructorComponent() {
   const [description, setDescription] = useState('')
   const [error, setError] = useState<string | null>(null)
 
+  const {
+    user
+  } = useAuthState()
+  
   // Fetch request types
   const { data: requestTypesData, isLoading: isLoadingTypes } = useGetRequestTypes()
   const requestTypes = requestTypesData?.data || []
@@ -71,6 +77,27 @@ export function ApplyForInstructorComponent() {
       <div className="flex items-center justify-center p-8">
         <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
       </div>
+    )
+  }
+
+  // If user already has INSTRUCTOR role, do not render the form
+  const isAlreadyInstructor = user?.role === UserRole.INSTRUCTOR
+
+  if (isAlreadyInstructor) {
+    return (
+      <Card className="border-blue-200 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-800">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
+            <CheckCircle className="h-5 w-5" />
+            Already an Instructor
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-blue-700 dark:text-blue-300">
+            You're already an instructor on CodeMy — there's no need to submit another application.
+          </p>
+        </CardContent>
+      </Card>
     )
   }
 

@@ -28,10 +28,8 @@ function Home() {
       {/* Hero Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center">
-            <Badge variant="secondary" className="mb-4 dark:bg-slate-800 dark:text-slate-300">
-              🚀 Now in Beta
-            </Badge>
+          <div className="text-center space-y-4">
+            <Badge variant="secondary" className="mb-4 dark:bg-slate-800 dark:text-slate-300">🚀 Now in Beta</Badge>
             <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
               Master Programming with
               <span className="text-indigo-600 dark:text-indigo-400 block">Interactive Learning</span>
@@ -50,40 +48,35 @@ function Home() {
               </Button>
             </div>
           </div>
-
-          {/* Hero Image/Illustration */}
           <div className="mt-16 relative">
-            <div className="bg-gradient-to-r from-indigo-500 to-purple-600 dark:from-indigo-600 dark:to-purple-700 rounded-2xl p-8 text-white">
-              <div className="grid md:grid-cols-2 gap-8 items-center">
-                <div>
-                  <h3 className="text-2xl font-bold mb-4">Interactive Code Editor</h3>
-                  <p className="text-indigo-100 mb-6">
-                    Write, run, and debug code directly in your browser with our powerful
-                    integrated development environment.
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
-                      JavaScript
-                    </Badge>
-                    <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
-                      Python
-                    </Badge>
-                    <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
-                      React
-                    </Badge>
+            <Card className="bg-gradient-to-r from-indigo-500 to-purple-600 dark:from-indigo-600 dark:to-purple-700 rounded-2xl p-8 text-white border-0">
+              <CardContent className="p-6">
+                <div className="grid md:grid-cols-2 gap-8 items-center">
+                  <div>
+                    <h3 className="text-2xl font-bold mb-4">Interactive Code Editor</h3>
+                    <p className="text-indigo-100 mb-6">
+                      Write, run, and debug code directly in your browser with our powerful
+                      integrated development environment.
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      <Badge variant="secondary" className="bg-white/20 text-white border-white/30">JavaScript</Badge>
+                      <Badge variant="secondary" className="bg-white/20 text-white border-white/30">Python</Badge>
+                      <Badge variant="secondary" className="bg-white/20 text-white border-white/30">React</Badge>
+                    </div>
                   </div>
+                  <Card className="bg-slate-900 dark:bg-slate-800 rounded-lg p-0 border-0">
+                    <CardContent className="p-4 font-mono text-sm text-gray-200 dark:text-gray-200">
+                      <div className="text-green-400 mb-2">// Welcome to CodeMy</div>
+                      <div className="text-blue-400 inline-block mr-1">function</div>
+                      <span className="text-yellow-400">greetUser</span>() {'{'}
+                      <div className="ml-4 text-gray-300">console.log("Hello, Developer!");</div>
+                      {'}'}
+                      <div className="mt-2 text-green-400">// Start coding now!</div>
+                    </CardContent>
+                  </Card>
                 </div>
-                <div className="bg-slate-900 dark:bg-slate-800 rounded-lg p-4 font-mono text-sm">
-                  <div className="text-green-400 mb-2">// Welcome to CodeMy</div>
-                  <div className="text-blue-400">function</div> <span className="text-yellow-400">greetUser</span>() {'{'}
-                  <div className="ml-4 text-gray-300">
-                    console.log("Hello, Developer!");
-                  </div>
-                  {'}'}
-                  <div className="mt-2 text-green-400">// Start coding now!</div>
-                </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>

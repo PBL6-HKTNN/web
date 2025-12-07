@@ -4,18 +4,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Progress } from '@/components/ui/progress'
 import { CheckCircle2, XCircle, AlertCircle, Loader2 } from 'lucide-react'
+import type { PreSubmitCheckRes } from '@/types/db/course'
 
 interface CoursePublicCheckModalProps {
   isOpen: boolean
   isChecking: boolean
   isSubmitting: boolean
-  checkResults: {
-    hasModules: boolean
-    hasLessons: boolean
-    hasValidPrice: boolean
-    hasThumbnail: boolean
-    isPublishable: boolean
-  } | null
+  checkResults: PreSubmitCheckRes | null
   onClose: () => void
   onPerformCheck: () => void
   onSubmitPublication: () => void
@@ -37,14 +32,6 @@ export function CoursePublicCheckModal({
     { key: 'hasValidPrice', label: 'Valid Price', description: 'Course price must be set correctly' },
   ] as const
 
-  const passedChecks = checkResults
-    ? Object.entries(checkResults)
-        .filter(([key]) => key !== 'isPublishable')
-        .filter(([, value]) => value === true).length
-    : 0
-
-  const totalChecks = checks.length
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl">
@@ -56,7 +43,7 @@ export function CoursePublicCheckModal({
         </DialogHeader>
 
         <div className="space-y-6 py-4">
-          {/* Check Results or Initial State */}
+          {/* Initial state: show the required checks */}
           {!checkResults && !isChecking && (
             <Card>
               <CardHeader>
@@ -81,7 +68,7 @@ export function CoursePublicCheckModal({
             </Card>
           )}
 
-          {/* Loading State */}
+          {/* Loading state */}
           {isChecking && (
             <Card>
               <CardHeader>
@@ -91,11 +78,9 @@ export function CoursePublicCheckModal({
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">Verification Progress</span>
-                    <span className="text-sm text-muted-foreground">
-                      {passedChecks}/{totalChecks}
-                    </span>
+                    <span className="text-sm text-muted-foreground">Checking…</span>
                   </div>
-                  <Progress value={(passedChecks / totalChecks) * 100} className="h-2" />
+                  <Progress className="h-2" />
                 </div>
                 <div className="flex items-center justify-center py-8">
                   <Loader2 className="size-8 text-primary animate-spin" />
@@ -112,29 +97,11 @@ export function CoursePublicCheckModal({
                   <CardTitle className="text-base">Verification Results</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  {checks.map((check) => {
-                    const passed = checkResults[check.key as keyof typeof checkResults]
-                    return (
-                      <div key={check.key} className="flex items-start gap-3 p-3 rounded-lg border">
-                        {passed ? (
-                          <CheckCircle2 className="size-5 text-green-600 flex-shrink-0 mt-0.5" />
-                        ) : (
-                          <XCircle className="size-5 text-destructive flex-shrink-0 mt-0.5" />
-                        )}
-                        <div className="flex-1">
-                          <p className="font-medium">{check.label}</p>
-                          <p className="text-sm text-muted-foreground">{check.description}</p>
-                        </div>
-                        <span className={`text-sm font-medium ${passed ? 'text-green-600' : 'text-destructive'}`}>
-                          {passed ? 'Pass' : 'Fail'}
-                        </span>
-                      </div>
-                    )
-                  })}
+                  <p className="text-sm text-muted-foreground">{checkResults.data ?? 'No details provided.'}</p>
                 </CardContent>
               </Card>
 
-              {checkResults.isPublishable ? (
+              {checkResults.isSuccess ? (
                 <Alert className="border-green-200 bg-green-50">
                   <CheckCircle2 className="h-4 w-4 text-green-600" />
                   <AlertDescription className="text-green-800">
@@ -145,7 +112,7 @@ export function CoursePublicCheckModal({
                 <Alert className="border-destructive/50 bg-destructive/5">
                   <XCircle className="h-4 w-4 text-destructive" />
                   <AlertDescription className="text-destructive">
-                    Your course does not meet all requirements. Please fix the failing items and try again.
+                    {checkResults.data ?? 'Your course does not meet all requirements. Please fix the failing items and try again.'}
                   </AlertDescription>
                 </Alert>
               )}
@@ -177,7 +144,7 @@ export function CoursePublicCheckModal({
               </Button>
               <Button 
                 onClick={onSubmitPublication} 
-                disabled={isSubmitting || !checkResults?.isPublishable}
+                disabled={isSubmitting || !checkResults?.isSuccess}
               >
                 {isSubmitting ? (
                   <>
