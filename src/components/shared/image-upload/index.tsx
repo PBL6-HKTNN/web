@@ -85,7 +85,7 @@ const MediaUploadDialog: React.FC<MediaUploadDialogProps> = ({
   };
 
   return (
-    <DialogContent className="sm:max-w-md">
+    <DialogContent className="sm:max-w-lg">
       <DialogHeader>
         <DialogTitle>{title}</DialogTitle>
         <DialogDescription>{description}</DialogDescription>

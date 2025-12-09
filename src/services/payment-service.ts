@@ -14,6 +14,11 @@ import type {
   PaymentIntentRequest,
   PaymentIntentResponse,
   WebhookResponse,
+  GetRevenueResponse,
+  GetMyPaymentsResponse,
+  GetAnalyticsResponse,
+  GetAnalyticsRequest,
+  GetRevenueRequest,
 } from "@/types/db/payment";
 
 export const paymentService = {
@@ -79,5 +84,30 @@ export const paymentService = {
   processWebhook: async (webhookData: unknown): Promise<WebhookResponse> => {
     const response = await api.post(API_ROUTES.PAYMENT.webhook, webhookData);
     return response.data;
+  },
+
+  getRevenue: async (data: GetRevenueRequest): Promise<GetRevenueResponse> => {
+    const res = await api.post<GetRevenueResponse>(
+      API_ROUTES.PAYMENT.revenue,
+      data
+    );
+    return res.data;
+  },
+
+  getAnalytics: async (
+    data: GetAnalyticsRequest
+  ): Promise<GetAnalyticsResponse> => {
+    const res = await api.post<GetAnalyticsResponse>(
+      API_ROUTES.PAYMENT.analytics,
+      data
+    );
+    return res.data;
+  },
+
+  myPayments: async (): Promise<GetMyPaymentsResponse> => {
+    const res = await api.get<GetMyPaymentsResponse>(
+      API_ROUTES.PAYMENT.myPayments
+    );
+    return res.data;
   },
 };

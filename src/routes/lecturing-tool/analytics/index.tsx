@@ -12,12 +12,19 @@ import {
   Line,
 } from 'recharts'
 import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
+import { useAnalytics } from './-hook'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { AlertCircle } from 'lucide-react'
+import type { Course } from '@/types/db/course'
 
 export const Route = createFileRoute('/lecturing-tool/analytics/')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
+  const { analytics, revenue, isLoading, error } = useAnalytics()
+  
   // Chart filters
   const [yearFilter, setYearFilter] = useState<number>(2025)
 
@@ -95,63 +102,111 @@ function RouteComponent() {
 
   const yearData = useMemo(() => {
     return months.map((_, monthIdx) => {
-      let enrollments = 0
-      let revenue = 0
-      mockCourses.forEach((c) => {
-        const m = c.monthly[yearFilter] || []
-        const enroll = m?.[monthIdx] ?? 0
-        enrollments += enroll
-        revenue += enroll * c.price
-      })
-      return { month: months[monthIdx], enrollments, revenue }
+      // Use real monthly enrollments from API if available
+      const enrollments = analytics?.monthlyNewEnrollments?.[monthIdx] ?? (() => {
+        // Fallback to mock data calculation
+        let total = 0
+        mockCourses.forEach((c) => {
+          const m = c.monthly[yearFilter] || []
+          const enroll = m?.[monthIdx] ?? 0
+          total += enroll
+        })
+        return total
+      })()
+
+      // Use real monthly revenue from API if available
+      const revenueAmount = revenue?.monthlyRevenue?.[monthIdx] ?? (() => {
+        // Fallback to mock data calculation
+        let total = 0
+        mockCourses.forEach((c) => {
+          const m = c.monthly[yearFilter] || []
+          const enroll = m?.[monthIdx] ?? 0
+          total += enroll * c.price
+        })
+        return total
+      })()
+
+      return { month: months[monthIdx], enrollments, revenue: revenueAmount }
     })
-  }, [yearFilter, mockCourses, months])
+  }, [yearFilter, mockCourses, months, analytics, revenue])
 
   // Compute top 5 courses by year
   const topCoursesByEnroll = useMemo(() => {
+    // Use real analytics top courses if available
+    if (analytics?.top5Courses && analytics.top5Courses.length > 0) {
+      return analytics.top5Courses.slice(0, 5).map((course) => ({
+        id: course.id,
+        name: course.title,
+        enrollments: course.totalEnrollments, // Using numberOfReviews as proxy for enrollments
+      }))
+    }
+    // Fallback to mock data
     const arr = mockCourses.map((c) => {
       const monthsArr: number[] = c.monthly[yearFilter] || []
-      // Top 5 charts: aggregate by year only (ignore month filter)
       const sum = monthsArr.reduce((a: number, b: number) => a + b, 0)
       return { id: c.id, name: c.name, enrollments: sum }
     })
     return arr.sort((a, b) => b.enrollments - a.enrollments).slice(0, 5)
-  }, [yearFilter, mockCourses])
+  }, [analytics, yearFilter, mockCourses])
 
   const topCoursesByRevenue = useMemo(() => {
+    // Use real analytics top courses by revenue if available
+    if (revenue?.top5CourseRevenue && revenue.top5CourseRevenue.length > 0) {
+      return revenue.top5CourseRevenue.slice(0, 5).map((course: Course) => ({
+        id: course.id,
+        name: course.title,
+        revenue: course.price || 0, // Using price as revenue proxy since Course doesn't have direct revenue field
+      }))
+    }
+    // Fallback to mock data
     const arr = mockCourses.map((c) => {
       const monthsArr: number[] = c.monthly[yearFilter] || []
-      // Top 5 charts: aggregate by year only (ignore month filter)
       const sumEnroll = monthsArr.reduce((a: number, b: number) => a + b, 0)
       return { id: c.id, name: c.name, revenue: sumEnroll * c.price }
     })
     return arr.sort((a, b) => b.revenue - a.revenue).slice(0, 5)
-  }, [yearFilter, mockCourses])
+  }, [yearFilter, mockCourses, revenue])
 
   const totalRevenue = useMemo(() => {
+    // Use real total revenue from API if available
+    if (revenue?.totalRevenue !== undefined) {
+      return revenue.totalRevenue
+    }
+    // Fallback to mock data calculation
     return mockCourses.reduce((acc, c) => {
       const monthsArr: number[] = c.monthly[yearFilter] || []
       const enrollSum = monthsArr.reduce((a: number, b: number) => a + b, 0)
       return acc + enrollSum * c.price
     }, 0)
-  }, [yearFilter, mockCourses])
+  }, [yearFilter, mockCourses, revenue])
 
-  const totalEnrollments = useMemo(() => {
-    return mockCourses.reduce((acc, c) => {
-      const monthsArr: number[] = c.monthly[yearFilter] || []
-      const enrollSum = monthsArr.reduce((a: number, b: number) => a + b, 0)
-      return acc + enrollSum
-    }, 0)
-  }, [yearFilter, mockCourses])
+  // Use real analytics data if available, otherwise fall back to mock data
+  const totalEnrollments = analytics?.totalEnrollments ?? mockCourses.reduce((acc, c) => {
+    const monthsArr: number[] = c.monthly[yearFilter] || []
+    const enrollSum = monthsArr.reduce((a: number, b: number) => a + b, 0)
+    return acc + enrollSum
+  }, 0)
+
+  const totalCoursesCount = analytics?.totalCourses ?? mockCourses.length
 
   const courseMostEnroll = useMemo(() => {
+    // Use real analytics top course if available
+    if (analytics?.top5Courses && analytics.top5Courses.length > 0) {
+      const topCourse = analytics.top5Courses[0]
+      return {
+        id: topCourse.id,
+        name: topCourse.title,
+        total: topCourse.numberOfReviews || 0, // Using numberOfReviews as proxy for students
+      }
+    }
+    // Fallback to mock data
     const arr = mockCourses.map((c) => ({
       id: c.id,
       name: c.name,
       total: (c.monthly[yearFilter] || []).reduce((a: number, b: number) => a + b, 0),
     }))
     return arr.reduce((prev, cur) => (cur.total > prev.total ? cur : prev), arr[0])
-  }, [yearFilter, mockCourses])
+  }, [analytics, yearFilter, mockCourses])
 
   const chartConfig = useMemo(
     () => ({
@@ -174,6 +229,43 @@ function RouteComponent() {
     return `$${n}`
   }
 
+  if (isLoading) {
+    return (
+      <div className="w-full min-h-screen p-6 space-y-6">
+        <div className="text-left space-y-2">
+          <Skeleton className="h-9 w-48" />
+          <Skeleton className="h-5 w-96" />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[...Array(4)].map((_, i) => (
+            <Card key={i}>
+              <CardHeader>
+                <Skeleton className="h-6 w-32" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-8 w-20 mb-2" />
+                <Skeleton className="h-4 w-24" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="w-full min-h-screen p-6">
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Failed to load analytics data. Please try again later.
+          </AlertDescription>
+        </Alert>
+      </div>
+    )
+  }
+
   return (
     <div className="w-full min-h-screen p-6 space-y-6">
       <div className="text-left space-y-2">
@@ -189,7 +281,7 @@ function RouteComponent() {
             <CardTitle>Total Courses</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{mockCourses.length}</div>
+            <div className="text-2xl font-bold">{totalCoursesCount}</div>
             <div className="text-sm text-muted-foreground">Available Courses</div>
           </CardContent>
         </Card>

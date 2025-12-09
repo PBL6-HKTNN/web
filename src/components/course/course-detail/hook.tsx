@@ -1,5 +1,5 @@
 import { useGetCourseContentById } from "@/hooks/queries/course/course-hooks";
-import { useAddToWishlist, useIsInWishlist } from "@/hooks/queries/course/wishlist-hooks";
+import { useAddToWishlist, useIsInWishlist, useRemoveFromWishlist } from "@/hooks/queries/course/wishlist-hooks";
 import { useEnroll, useIsEnrolled } from "@/hooks/queries/course/enrollment-hooks";
 import { useGetReviewsByCourse, useGetAverageRatingByCourse } from "@/hooks/queries/review-hooks";
 import { useGetCart, useAddToCart } from "@/hooks/queries/payment-hooks";
@@ -19,17 +19,15 @@ export const useCourseDetail = (courseId: string) => {
   
   // Wishlist hooks
   const { data: isInWishlist } = useIsInWishlist(courseId);
-  const addToWishlistMutation = useAddToWishlist();
-
+  const addToWishlistMutation = useAddToWishlist(courseId);
+  const removeFromWishlistMutation = useRemoveFromWishlist(courseId);
   // Enrollment hooks
   const enrollMutation = useEnroll();
   const { data: isEnrolledResponse } = useIsEnrolled(courseId);
   const isEnrolled = !!isEnrolledResponse?.data;
-  
   // Review hooks
   const { data: reviewsData, isLoading: reviewsLoading } = useGetReviewsByCourse(courseId);
   const { data: averageData, isLoading: averageLoading } = useGetAverageRatingByCourse(courseId);
-  
   // Report hook
   const reportForm = useCourseReportForm(courseId);
   
@@ -39,9 +37,13 @@ export const useCourseDetail = (courseId: string) => {
   // Check if current user is the instructor
   const isInstructor = user?.id === data?.data?.course?.instructorId;
   
-  const handleWishlistClick = () => {
-    addToWishlistMutation.mutate(courseId);
-  };
+  const handleWishlistClick = async () => {
+    if (isInWishlist && isInWishlist.data !== null && isInWishlist?.data?.courseId) {
+      await removeFromWishlistMutation.mutateAsync();
+    } else {
+      await addToWishlistMutation.mutateAsync();
+    }
+  }
   
   const formatPrice = (price: number) => {
     if (price === 0) return "Free";
@@ -67,6 +69,7 @@ export const useCourseDetail = (courseId: string) => {
     // Wishlist
     isInWishlist,
     addToWishlistMutation,
+    removeFromWishlistMutation,
     handleWishlistClick,
     // Enrollment
     enrollMutation,

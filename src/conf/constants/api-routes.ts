@@ -26,8 +26,10 @@ const API_ROUTES = {
     update: (id: string) => `/Permission/update/${id}`,
     delete: (id: string) => `/Permission/delete/${id}`,
     assign: "/Permission/assign",
-    removeUserPermission: (id: string) => `/Permission/delete/user-permission/${id}`,
-    getUserInPermission: (permissionId: string) => `/Permission/users/${permissionId}`,
+    removeUserPermission: (id: string) =>
+      `/Permission/delete/user-permission/${id}`,
+    getUserInPermission: (permissionId: string) =>
+      `/Permission/users/${permissionId}`,
   },
   STORAGE: {
     uploadFile: (type: FileType) => `/api/files/${type}`,
@@ -55,6 +57,7 @@ const API_ROUTES = {
     requestedBanCourse: (courseId: UUID) =>
       `/Course/requested-ban-course/${courseId}`,
     preSubmitCheck: "/Course/auto-check-before-submit",
+    analytics: "/Course/statistical",
   },
   MODULE: {
     getModules: "/Module",
@@ -123,6 +126,9 @@ const API_ROUTES = {
     updatePayment: "/Payment/update-payment",
     createPaymentIntent: "/Payment/create-payment-intent",
     webhook: "/Payment/webhook",
+    revenue: "/Payment/revenue",
+    analytics: "/Payment/statistical",
+    myPayments: "/Payment/my-payments",
   },
   AUTOMATION: {
     generateQuiz: "/Automation/generate-quiz",

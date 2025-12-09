@@ -1,5 +1,6 @@
 import { type Base } from "../core";
 import type { UserPermission } from "@/types/db/permission";
+import type { ApiResponse } from "../core/api";
 export const UserRole = {
   ADMIN: 0,
   MODERATOR: 1,
@@ -38,9 +39,9 @@ export type ChangeAvatarReq = {
 
 export type UpdateProfileReq = Partial<Pick<User, "name" | "bio">>;
 
-export type UserDetailResponse = {
+export type UserDetailResponse = ApiResponse<{
   success: boolean;
   message: string | null;
   user: User;
   permissions: UserPermission[];
-};
+}>;

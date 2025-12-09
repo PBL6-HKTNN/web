@@ -22,6 +22,10 @@ export interface CourseProgressContextType {
   
   // Current view tracking
   updateCurrentView: (courseId: UUID, currentLessonId: UUID) => void;
+  updateCurrentViewWithWatchedSeconds: (courseId: UUID, currentLessonId: UUID, watchedSeconds: number) => void;
+  
+  // Get current enrollment
+  getCurrentEnrollment: () => { currentView: UUID | null; lessonId: UUID | null } | null;
   
   // Completion status checking
   isLessonCompleted: (lessonId: UUID) => boolean;

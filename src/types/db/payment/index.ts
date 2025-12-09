@@ -1,5 +1,6 @@
 import type { Base, UUID } from "@/types/core";
 import type { ApiResponse } from "@/types/core/api";
+import type { Course } from "../course";
 export * from "./cart";
 // Enums from swagger - using const assertions instead of enum
 export const MethodPayment = {
@@ -73,3 +74,31 @@ export type PaymentListResponse = ApiResponse<PaymentData[]>;
 export type UpdatePaymentResponse = ApiResponse<PaymentData>;
 export type PaymentIntentResponse = ApiResponse<PaymentIntentData>;
 export type WebhookResponse = ApiResponse<null>;
+
+export type GetRevenueRequest = {
+  startDate: string;
+  endDate: string;
+};
+
+export type GetRevenueResponse = ApiResponse<{
+  totalRevenue: number;
+  totalOrders: number;
+  paymentDtos: {
+    payment: Payment;
+    orderItems: OrderItem[];
+  }[];
+}>;
+
+export type GetAnalyticsRequest = Partial<GetRevenueRequest> & {
+  instructorId: UUID;
+  courseId?: UUID;
+};
+
+export type GetAnalyticsResponse = ApiResponse<{
+  totalRevenue: number;
+  totalOrders: number;
+  monthlyRevenue: number[];
+  top5CourseRevenue: Course[];
+}>;
+
+export type GetMyPaymentsResponse = GetRevenueResponse;

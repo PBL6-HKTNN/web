@@ -6,6 +6,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AlertCircle, Loader2, Star, Eye } from "lucide-react";
+import { CourseStatus } from "@/types/db/course";
+import { getCourseStatusBadgeProps } from '@/utils/render-utils'
 import { useCourseTable } from "./hook";
 import type { Course } from "@/types/db/course";
 
@@ -38,8 +40,15 @@ export function CourseTable({ onCourseClick }: CourseTableProps) {
                 <div className="flex items-center space-x-3">
                   <Skeleton className="w-12 h-12 rounded" />
                   <div className="space-y-2">
-                    <Skeleton className="h-4 w-48" />
+                    <div className="flex items-center gap-2">
+                      <Skeleton className="h-3 w-3 rounded-full" />
+                      <Skeleton className="h-4 w-48" />
+                    </div>
                     <Skeleton className="h-3 w-32" />
+                    <div className="flex items-center gap-2">
+                      <Skeleton className="h-3 w-16 rounded" />
+                      <Skeleton className="h-3 w-20 rounded" />
+                    </div>
                   </div>
                 </div>
               </TableCell>
@@ -100,7 +109,11 @@ export function CourseTable({ onCourseClick }: CourseTableProps) {
 
     return (
       <TableBody>
-        {courses.map((course) => (
+          {courses.map((course) => {
+          const statusProps = getCourseStatusBadgeProps(course.status);
+          const statusDotClass = statusProps.dotClass;
+
+          return (
           <TableRow
             key={course.id}
             className="cursor-pointer hover:bg-muted/50"
@@ -115,9 +128,21 @@ export function CourseTable({ onCourseClick }: CourseTableProps) {
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <div className="font-medium">{course.title}</div>
-                  <div className="text-sm text-muted-foreground">
-                    Instructor ID: {course.instructorId}
+                  <div className="flex items-center gap-2">
+                    <span className={`h-2 w-2 rounded-full ${statusDotClass}`} aria-hidden />
+                    <div className="font-medium">{course.title}</div>
+                  </div>
+                  <div className="text-sm text-muted-foreground">Instructor ID: {course.instructorId}</div>
+
+                  {/* Status and Ban badges */}
+                  <div className="flex items-center gap-2 mt-1">
+                    <Badge className="text-xs" title={statusProps.label} variant={statusProps.variant}>
+                      {statusProps.label}
+                    </Badge>
+
+                    {(course.isRequestedBanned && course.status !== CourseStatus.ARCHIVED) && (
+                      <Badge variant="destructive" className="text-xs" title="Ban requested">Ban requested</Badge>
+                    )}
                   </div>
                 </div>
               </div>
@@ -165,7 +190,8 @@ export function CourseTable({ onCourseClick }: CourseTableProps) {
               </Button>
             </TableCell>
           </TableRow>
-        ))}
+        );
+        })}
 
         {/* Load More Button */}
         {hasNextPage && (

@@ -2,6 +2,7 @@ import API_ROUTES from "@/conf/constants/api-routes";
 import type { UUID } from "@/types";
 import type {
   GetWishlistResponse,
+  WishlistCheckResponse,
   WishlistItem,
 } from "@/types/db/course/wishlist";
 import { createServiceApi, serviceUrls } from "@/utils/api";
@@ -25,7 +26,7 @@ export const wishlistService = {
     );
     return response.data;
   },
-  wishlistCheck: async (courseId: UUID): Promise<WishlistItem> => {
+  wishlistCheck: async (courseId: UUID): Promise<WishlistCheckResponse> => {
     const response = await api.get(API_ROUTES.WISHLIST.wishlistCheck(courseId));
     return response.data;
   },

@@ -28,6 +28,9 @@ export const courseQueryKeys = {
     [...courseQueryKeys.courseDetail(id), "content"] as const,
   courseModules: (courseId: UUID) =>
     [...courseQueryKeys.allCourses, "modules", courseId] as const,
+  courseAnalytics: ["course", "analytics"] as const,
+  requestBanCourse: (courseId: UUID) =>
+    ["course", "requested-ban", courseId] as const,
 };
 
 export const useGetCourses = (filters: GetCoursesFilterReq) => {
@@ -151,7 +154,7 @@ export const useModChangeCourseStatus = () => {
 
 export const useRequestBanCourse = (courseId?: UUID) => {
   return useQuery({
-    queryKey: ["course", "requested-ban", courseId],
+    queryKey: courseQueryKeys.requestBanCourse(courseId as UUID),
     queryFn: () => courseService.requestedBanCourse(courseId as UUID),
     enabled: !!courseId,
   });
@@ -160,5 +163,12 @@ export const useRequestBanCourse = (courseId?: UUID) => {
 export const usePreSubmitCheck = () => {
   return useMutation({
     mutationFn: (data: PreSubmitCheckReq) => courseService.preSubmitCheck(data),
+  });
+};
+
+export const useInstructorCourseAnalytics = () => {
+  return useQuery({
+    queryKey: courseQueryKeys.courseAnalytics,
+    queryFn: () => courseService.analytics(),
   });
 };

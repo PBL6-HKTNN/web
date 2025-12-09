@@ -20,6 +20,7 @@ import type {
   PreSubmitCheckReq,
   PreSubmitCheckRes,
   RequestedBanCourseRes,
+  CourseAnalyticsRes,
 } from "@/types/db/course";
 import { createServiceApi, serviceUrls } from "@/utils/api";
 
@@ -117,6 +118,10 @@ export const courseService = {
       API_ROUTES.COURSE.preSubmitCheck,
       data
     );
+    return res.data;
+  },
+  analytics: async (): Promise<CourseAnalyticsRes> => {
+    const res = await api.get<CourseAnalyticsRes>(API_ROUTES.COURSE.analytics);
     return res.data;
   },
 };

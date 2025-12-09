@@ -10,7 +10,6 @@ import { formatPriceSimple } from "@/utils/format";
 interface CourseCardProps {
   course: Course & {
     isInCart?: boolean;
-    isEnrolled?: boolean;
   };
 }
 
@@ -73,9 +72,9 @@ export function CourseCard({ course }: CourseCardProps) {
           </h3>
 
           {/* Instructor */}
-          {course.instructorId && (
+          {course.description && (
             <p className="text-sm text-muted-foreground">
-              By {course.instructorId}
+              {course.description}
             </p>
           )}
 

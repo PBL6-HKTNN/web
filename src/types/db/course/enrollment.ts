@@ -52,6 +52,7 @@ export type UpdateEnrollmentProgressReq = {
 export type UpdateCurrentViewReq = {
   courseId: UUID;
   currentLessonId: UUID;
+  watchedSeconds?: number;
 };
 
 export type EnrollResponse = ApiResponse<Enrollment>;

@@ -571,8 +571,8 @@ export interface FileRoutesByTo {
   '/mod/users': typeof ModUsersIndexRoute
   '/settings/payment': typeof SettingsPaymentIndexRoute
   '/settings/profile': typeof SettingsProfileIndexRoute
-  '/admin/permissions/$permissionId': typeof AdminPermissionsPermissionIdIndexRoute
   '/settings/request-history': typeof SettingsRequestHistoryIndexRoute
+  '/admin/permissions/$permissionId': typeof AdminPermissionsPermissionIdIndexRoute
   '/admin/users/$userId': typeof AdminUsersUserIdIndexRoute
   '/auth/login': typeof AuthMainLayoutLoginIndexRoute
   '/auth/register': typeof AuthMainLayoutRegisterIndexRoute
@@ -769,8 +769,8 @@ export interface FileRouteTypes {
     | '/mod/users'
     | '/settings/payment'
     | '/settings/profile'
-    | '/admin/permissions/$permissionId'
     | '/settings/request-history'
+    | '/admin/permissions/$permissionId'
     | '/admin/users/$userId'
     | '/auth/login'
     | '/auth/register'

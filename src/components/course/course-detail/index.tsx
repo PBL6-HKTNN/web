@@ -1,9 +1,27 @@
-
-import { Star, Clock, Users, Play, BookOpen, Video, FileText, Trophy, Heart, MoreVertical, Flag } from "lucide-react";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@/components/ui/alert";
+import { CourseStatus } from "@/types/db/course";
+import {
+  AlertCircle,
+  Clock,
+  FileText,
+  Flag,
+  Heart,
+  MoreVertical,
+  Play,
+  ShoppingCart,
+  Star,
+  Trophy,
+  Users,
+  Video,
+} from "lucide-react";
+import { AddToCartButton } from "@/components/payment/add-to-cart-button";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -12,13 +30,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { AddToCartButton } from "@/components/payment/add-to-cart-button";
-import { useCourseDetail } from "./hook";
-import ModuleAccordion from "@/components/course/module-accordion";
-import { renderLevelLabel } from "@/utils/render-utils";
-import { ReviewList } from "@/components/review";
-import { formatDate } from "@/utils/format";
 import { CourseReportForm } from "@/components/course/course-report-form";
+import CourseTabs from "./tabs";
+import { cn } from "@/lib/utils";
+import { useCourseDetail } from "./hook";
+import { renderLevelLabel } from "@/utils/render-utils";
+import { formatDate } from "@/utils/format";
 
 interface CourseDetailProps {
   courseId: string;
@@ -35,6 +52,7 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
     addToCartMutation,
     isInWishlist,
     addToWishlistMutation,
+    removeFromWishlistMutation,
     handleWishlistClick,
     enrollMutation,
     isEnrolled,
@@ -42,8 +60,7 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
     averageRating,
     reviewsLoading,
     averageLoading,
-    formatPrice,
-    formatNumber
+    formatPrice
   } = useCourseDetail(courseId);
 
   if (isLoading) {
@@ -83,6 +100,159 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
     );
   }
 
+  const isDraft = course.status === CourseStatus.DRAFT;
+  const isArchived = course.status === CourseStatus.ARCHIVED;
+  const isBanned = course.isRequestedBanned;
+
+  const renderActionButtons = () => {
+    // Instructor view
+    if (isInstructor) {
+      return (
+        <Button
+          className="w-full"
+          size="lg"
+          variant="outline"
+          onClick={() => {
+            window.location.href = `/lecturing-tool/course/${courseId}`;
+          }}
+        >
+          Edit Course
+        </Button>
+      );
+    }
+
+    // Enrolled user view (except draft courses)
+    if (isEnrolled && !isDraft) {
+      return (
+        <Button
+          className="w-full"
+          size="lg"
+          onClick={() => {
+            window.location.href = `/learn/${courseId}`;
+          }}
+        >
+          Go to course
+        </Button>
+      );
+    }
+
+    // Non-enrolled, non-instructor view (only for published courses)
+    if (!isEnrolled && !isInstructor && !isDraft && !isArchived) {
+      if (course.price === 0) {
+        // Free course
+        return (
+          <div className="flex gap-3">
+            <Button
+              className="flex-1"
+              size="lg"
+              onClick={() => enrollMutation.mutate(courseId)}
+              disabled={enrollMutation.isPending}
+            >
+              {enrollMutation.isPending ? "Enrolling..." : "Enroll for free"}
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
+              className="h-auto"
+              onClick={handleWishlistClick}
+              disabled={addToWishlistMutation.isPending || removeFromWishlistMutation.isPending}
+            >
+              <Heart
+                className={cn(
+                  "w-5 h-5",  
+                  isInWishlist?.isSuccess && "fill-red-500 text-red-500",
+                )}
+              />
+            </Button>
+          </div>
+        );
+      }
+
+      // Paid course
+      if (isInCart) {
+        return (
+          <div className="space-y-3">
+            <Button
+              className="w-full"
+              size="lg"
+              variant="outline"
+              onClick={() => {
+                window.location.href = "/cart";
+              }}
+            >
+              Go to cart
+            </Button>
+            <div className="flex items-center justify-center gap-2">
+              <Button
+                variant="link"
+                className="p-0 h-auto gap-2"
+                onClick={() => addToCartMutation.mutate(courseId)}
+                disabled={addToCartMutation.isPending}
+              >
+                Remove from cart
+              </Button>
+              <Separator orientation="vertical" className="h-4" />
+              <Button
+                variant="link"
+                className="p-0 h-auto gap-2"
+                onClick={handleWishlistClick}
+                disabled={addToWishlistMutation.isPending || removeFromWishlistMutation.isPending}
+              >
+                <Heart
+                  className={cn(
+                    "w-4 h-4",
+                    isInWishlist?.isSuccess && "fill-red-500 text-red-500",
+                  )}
+                />
+                {isInWishlist?.isSuccess ? "Remove from wishlist" : "Add to wishlist"}
+              </Button>
+            </div>
+          </div>
+        );
+      }
+
+      // Paid course, not in cart
+      return (
+        <div className="space-y-3">
+          <AddToCartButton
+            courseId={courseId}
+            size="lg"
+            className="w-full"
+          />
+          <div className="flex items-center justify-center gap-2">
+            <Button
+              variant="link"
+              className="p-0 h-auto gap-2"
+              onClick={() => {
+                /* Implement Buy Now */
+              }}
+            >
+              <ShoppingCart className="w-4 h-4" />
+              Buy now
+            </Button>
+            <Separator orientation="vertical" className="h-4" />
+             <Button
+                variant="link"
+                className="p-0 h-auto gap-2"
+                onClick={handleWishlistClick}
+                disabled={addToWishlistMutation.isPending || removeFromWishlistMutation.isPending}
+              >
+                <Heart
+                  className={cn(
+                    "w-4 h-4",
+                    isInWishlist?.isSuccess && "fill-red-500 text-red-500",
+                  )}
+                />
+                {isInWishlist?.isSuccess ? "Remove from wishlist" : "Add to wishlist"}
+              </Button>
+          </div>
+        </div>
+      );
+    }
+
+    // No buttons for draft/archived courses or other states
+    return null;
+  };
 
 
   return (
@@ -114,7 +284,40 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
 
           {/* Left Content */}
           <div className="lg:col-span-2 space-y-8">
-
+            {/* Alerts */}
+              {(isDraft || isArchived || isBanned) && (
+                <div className="mb-6 space-y-4">
+                  {isDraft && (
+                    <Alert variant="destructive">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertTitle>Draft Course</AlertTitle>
+                      <AlertDescription>
+                        This is a draft course and is not visible to students. Only
+                        you can see this page.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                  {isArchived && (
+                    <Alert>
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertTitle>Archived Course</AlertTitle>
+                      <AlertDescription>
+                        This course is archived and can no longer be purchased.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                  {isBanned && !isArchived && (
+                    <Alert variant="destructive">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertTitle>Under Review</AlertTitle>
+                      <AlertDescription>
+                        This course is under review due to reports and may be
+                        archived soon.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                </div>
+              )}
             {/* Course Title and Basic Info */}
             <div>
               <div className="flex items-start justify-between mb-2">
@@ -197,166 +400,15 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
             </div>
 
             {/* Course Content Tabs */}
-            <Tabs defaultValue="overview" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="curriculum">Curriculum</TabsTrigger>
-                <TabsTrigger value="instructor">Instructor</TabsTrigger>
-                <TabsTrigger value="reviews">Reviews</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="overview" className="space-y-6 mt-6">
-                {/* Description */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>About this course</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                      {course.description}
-                    </p>
-                  </CardContent>
-                </Card>
-
-                {/* What you'll learn */}
-                {/* {course.whatYouWillLearn && course.whatYouWillLearn.length > 0 && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>What you'll learn</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {course.whatYouWillLearn.map((item, index) => (
-                          <div key={index} className="flex items-start gap-3">
-                            <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-                            <span className="text-gray-700 dark:text-gray-300">{item}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                )} */}
-
-                {/* Requirements */}
-                {/* {course.requirements && course.requirements.length > 0 && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Requirements</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300">
-                        {course.requirements.map((req, index) => (
-                          <li key={index}>{req}</li>
-                        ))}
-                      </ul>
-                    </CardContent>
-                  </Card>
-                )} */}
-
-                {/* Target Audience */}
-                {/* {course.targetAudience && course.targetAudience.length > 0 && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Who this course is for</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300">
-                        {course.targetAudience.map((audience, index) => (
-                          <li key={index}>{audience}</li>
-                        ))}
-                      </ul>
-                    </CardContent>
-                  </Card>
-                )} */}
-              </TabsContent>
-
-              <TabsContent value="curriculum" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <BookOpen className="w-5 h-5" />
-                      Course content
-                    </CardTitle>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {modules.length} modules • {modules.reduce((total, module) => total + (module.lessons?.length || 0), 0)} lessons
-                    </p>
-                  </CardHeader>
-                  <CardContent>
-                    {isLoading ? (
-                      <div className="space-y-4">
-                        <div className="animate-pulse">
-                          <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded mb-4"></div>
-                          <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded mb-4"></div>
-                          <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded"></div>
-                        </div>
-                      </div>
-                    ) : modules.length === 0 ? (
-                      <div className="text-center py-8 text-muted-foreground">
-                        <BookOpen className="size-12 mx-auto mb-4 opacity-50" />
-                        <p>No modules found for this course.</p>
-                      </div>
-                    ) : (
-                      <div>
-                        {modules.map((module) => (
-                          <ModuleAccordion
-                            key={module.id}
-                            data={module}
-                            defaultExpanded={false}
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="instructor" className="mt-6">
-                {/* <Card>
-                  <CardHeader>
-                    <CardTitle>Your instructor</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex gap-4">
-                      <Avatar className="w-20 h-20">
-                        <AvatarImage src={course.instructor?.profilePicture} />
-                        <AvatarFallback className="text-lg">
-                          {course.instructor?.name?.substring(0, 2).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1">
-                        <h3 className="text-xl font-semibold mb-2">{course.instructor?.name}</h3>
-                        <div className="flex items-center gap-4 mb-3">
-                          <div className="flex items-center gap-1">
-                            <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                            <span className="font-medium">{course.instructor?.rating}</span>
-                            <span className="text-gray-600 dark:text-gray-400">Instructor Rating</span>
-                          </div>
-                          <div className="text-gray-600 dark:text-gray-400">
-                            {formatNumber(course.instructor?.studentsCount || 0)} students
-                          </div>
-                          <div className="text-gray-600 dark:text-gray-400">
-                            {course.instructor?.coursesCount} courses
-                          </div>
-                        </div>
-                        <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                          {course.instructor?.bio}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card> */}
-              </TabsContent>
-
-              <TabsContent value="reviews" className="mt-6">
-                <ReviewList 
-                  courseId={courseId}
-                  reviews={reviews}
-                  averageRating={averageRating}
-                  isLoading={reviewsLoading || averageLoading}
-                  formatNumber={formatNumber}
-                />
-              </TabsContent>
-            </Tabs>
+            <CourseTabs
+              course={course}
+              modules={modules}
+              courseId={courseId}
+              reviews={reviews}
+              averageRating={averageRating}
+              reviewsLoading={reviewsLoading}
+              averageRatingLoading={averageLoading}
+            />
           </div>
 
           {/* Right Sidebar */}
@@ -382,198 +434,7 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
 
                 {/* Enroll, Cart, and Wishlist Buttons */}
                 <div className="space-y-3 mb-4">
-                  {isInstructor && (
-                    <Button
-                      className="w-full"
-                      size="lg"
-                      variant="outline"
-                      onClick={() => {
-                        window.location.href = `/lecturing-tool/course/${courseId}`;
-                      }}
-                    >
-                      Edit Course
-                    </Button>
-                  )}
-                  {course.price === 0 ? (
-                    /* Free Course - Direct Enrollment */
-                    <div className="flex gap-3">
-                      <Button
-                        className="flex-1"
-                        size="lg"
-                        onClick={() => {
-                          if (!isEnrolled) {
-                            enrollMutation.mutate(courseId);
-                          }
-                        }}
-                        disabled={enrollMutation.isPending || isEnrolled}
-                      >
-                        {isEnrolled
-                          ? "Enrolled"
-                          : enrollMutation.isPending
-                          ? "Enrolling..."
-                          : "Enroll for Free"}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="lg"
-                        className={`w-12 h-12 p-0 border-2 transition-all duration-200 ${
-                          isInWishlist
-                            ? 'border-red-500 bg-red-50 text-red-500 hover:bg-red-100'
-                            : 'border-gray-300 text-gray-400 hover:border-red-300 hover:text-red-400 hover:bg-red-50'
-                        }`}
-                        onClick={handleWishlistClick}
-                        disabled={addToWishlistMutation.isPending}
-                        title={isInWishlist ? 'Already in wishlist' : 'Add to wishlist'}
-                      >
-                        {addToWishlistMutation.isPending ? (
-                          <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                        ) : (
-                          <Heart
-                            className={`w-5 h-5 transition-all duration-200 ${
-                              isInWishlist ? 'fill-current' : ''
-                            }`}
-                          />
-                        )}
-                      </Button>
-                    </div>
-                  ) : isEnrolled ? (
-                    /* Paid Course - Already Enrolled */
-                    <div className="space-y-3">
-                      <Button
-                        className="w-full"
-                        size="lg"
-                        onClick={() => {
-                          // Navigate to learning page
-                          window.location.href = `/learn/${courseId}`;
-                        }}
-                      >
-                        Continue Learning
-                      </Button>
-                      <div className="flex justify-end">
-                        <Button
-                          variant="outline"
-                          size="lg"
-                          className={`w-12 h-12 p-0 border-2 transition-all duration-200 ${
-                            isInWishlist
-                              ? 'border-red-500 bg-red-50 text-red-500 hover:bg-red-100'
-                              : 'border-gray-300 text-gray-400 hover:border-red-300 hover:text-red-400 hover:bg-red-50'
-                          }`}
-                          onClick={handleWishlistClick}
-                          disabled={addToWishlistMutation.isPending}
-                          title={isInWishlist ? 'Already in wishlist' : 'Add to wishlist'}
-                        >
-                          {addToWishlistMutation.isPending ? (
-                            <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                          ) : (
-                            <Heart
-                              className={`w-5 h-5 transition-all duration-200 ${
-                                isInWishlist ? 'fill-current' : ''
-                              }`}
-                            />
-                          )}
-                        </Button>
-                      </div>
-                    </div>
-                  ) : isInCart ? (
-                    /* Paid Course - Already in Cart */
-                    <div className="space-y-3">
-                      <Button
-                        className="w-full"
-                        size="lg"
-                        variant="outline"
-                        onClick={() => {
-                          // Navigate to cart
-                          window.location.href = '/cart';
-                        }}
-                      >
-                        View Cart
-                      </Button>
-                      <div className="flex gap-3">
-                        <Button
-                          variant="outline"
-                          className="flex-1"
-                          size="lg"
-                          onClick={() => {
-                            // Navigate to cart (already in cart)
-                            window.location.href = '/cart';
-                          }}
-                        >
-                          Buy Now
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="lg"
-                          className={`w-12 h-12 p-0 border-2 transition-all duration-200 ${
-                            isInWishlist
-                              ? 'border-red-500 bg-red-50 text-red-500 hover:bg-red-100'
-                              : 'border-gray-300 text-gray-400 hover:border-red-300 hover:text-red-400 hover:bg-red-50'
-                          }`}
-                          onClick={handleWishlistClick}
-                          disabled={addToWishlistMutation.isPending}
-                          title={isInWishlist ? 'Already in wishlist' : 'Add to wishlist'}
-                        >
-                          {addToWishlistMutation.isPending ? (
-                            <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                          ) : (
-                            <Heart
-                              className={`w-5 h-5 transition-all duration-200 ${
-                                isInWishlist ? 'fill-current' : ''
-                              }`}
-                            />
-                          )}
-                        </Button>
-                      </div>
-                    </div>
-                  ) : (
-                    /* Paid Course - Cart and Wishlist */
-                    <div className="space-y-3">
-                      <AddToCartButton
-                        courseId={courseId}
-                        size="lg"
-                        className="w-full"
-                      />
-                      <div className="flex gap-3">
-                        <Button
-                          variant="outline"
-                          className="flex-1"
-                          size="lg"
-                          onClick={() => {
-                            addToCartMutation.mutate(courseId, {
-                              onSuccess: () => {
-                                // Navigate to cart after adding to cart
-                                window.location.href = '/cart';
-                              }
-                            });
-                          }}
-                          disabled={addToCartMutation.isPending}
-                        >
-                          {addToCartMutation.isPending ? 'Adding...' : 'Buy Now'}
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="lg"
-                          className={`w-12 h-12 p-0 border-2 transition-all duration-200 ${
-                            isInWishlist
-                              ? 'border-red-500 bg-red-50 text-red-500 hover:bg-red-100'
-                              : 'border-gray-300 text-gray-400 hover:border-red-300 hover:text-red-400 hover:bg-red-50'
-                          }`}
-                          onClick={handleWishlistClick}
-                          disabled={addToWishlistMutation.isPending}
-                          title={isInWishlist ? 'Already in wishlist' : 'Add to wishlist'}
-                        >
-                          {addToWishlistMutation.isPending ? (
-                            <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                          ) : (
-                            <Heart
-                              className={`w-5 h-5 transition-all duration-200 ${
-                                isInWishlist ? 'fill-current' : ''
-                              }`}
-                            />
-                          )}
-                        </Button>
-                      </div>
-                    </div>
-                  )}
+                  {renderActionButtons()}
                 </div>
 
                 {/* Course includes */}

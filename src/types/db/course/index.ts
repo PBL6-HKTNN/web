@@ -29,10 +29,13 @@ export type Course = Base & {
   price: number;
   level: Level;
   language: string;
+  totalEnrollments: number;
   numberOfModules: number;
   numberOfReviews: number;
   averageRating: number;
   modules?: Module[];
+  isEnrolled?: boolean;
+  isRequestedBanned?: boolean;
 };
 
 export type CreateCourseReq = {
@@ -109,4 +112,14 @@ export type PreSubmitCheckRes = ApiResponse<string>;
 export type RequestedBanCourseRes = ApiResponse<{
   success: boolean;
   message: string;
+}>;
+
+export type CourseAnalyticsRes = ApiResponse<{
+  totalCourses: number;
+  publishedCourses: number;
+  draftCourses: number;
+  archivedCourses: number;
+  totalEnrollments: number;
+  monthlyNewEnrollments: number[];
+  top5Courses: Course[];
 }>;

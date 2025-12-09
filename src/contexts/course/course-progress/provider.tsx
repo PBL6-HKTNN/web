@@ -22,9 +22,18 @@ export const CourseProgressProvider: React.FC<CourseProgressProviderProps> = ({ 
   const { data: enrollmentResponse } = useIsEnrolled(courseId || '')
   const enrollment = enrollmentResponse?.data?.enrollment
   
+  // Memoize enrollment ID to prevent unnecessary re-renders
+  const enrollmentId = useMemo(() => enrollment?.id || '', [enrollment?.id])
+  
+  // Memoize enrollment current view data to prevent infinite loops
+  const enrollmentCurrentView = useMemo(() => ({
+    currentView: enrollment?.currentView || null,
+    lessonId: enrollment?.lessonId || null
+  }), [enrollment?.currentView, enrollment?.lessonId])
+  
   // Get completed lessons from API
   const { data: completedLessonsResponse } = useGetEnrolledCourseCompletedLessons(
-    enrollment?.id || ''
+    enrollmentId
   )
   const apiCompletedLessons = useMemo(() => {
     return completedLessonsResponse?.data || []
@@ -163,6 +172,14 @@ export const CourseProgressProvider: React.FC<CourseProgressProviderProps> = ({ 
       currentLessonId
     })
   }, [updateCurrentViewMutation])
+
+  const updateCurrentViewWithWatchedSeconds = useCallback((courseId: UUID, currentLessonId: UUID, watchedSeconds: number) => {
+    updateCurrentViewMutation.mutate({
+      courseId,
+      currentLessonId,
+      watchedSeconds
+    })
+  }, [updateCurrentViewMutation])
   
   const isLessonCompleted = useCallback((lessonId: UUID) => {
     return completedLessonsSet.has(lessonId)
@@ -172,16 +189,34 @@ export const CourseProgressProvider: React.FC<CourseProgressProviderProps> = ({ 
     return apiCompletedLessons
   }, [apiCompletedLessons])
 
-  const value: CourseProgressContextType = {
+  const getCurrentEnrollment = useCallback(() => {
+    if (!enrollmentCurrentView.currentView && !enrollmentCurrentView.lessonId) return null
+    return enrollmentCurrentView
+  }, [enrollmentCurrentView])
+
+  const value: CourseProgressContextType = useMemo(() => ({
     trackMarkdownScroll,
     markMarkdownComplete,
     trackVideoProgress,
     markQuizComplete,
     markLessonComplete,
     updateCurrentView,
+    updateCurrentViewWithWatchedSeconds,
     isLessonCompleted,
     getCompletedLessons,
-  }
+    getCurrentEnrollment,
+  }), [
+    trackMarkdownScroll,
+    markMarkdownComplete,
+    trackVideoProgress,
+    markQuizComplete,
+    markLessonComplete,
+    updateCurrentView,
+    updateCurrentViewWithWatchedSeconds,
+    isLessonCompleted,
+    getCompletedLessons,
+    getCurrentEnrollment,
+  ])
 
   return (
     <CourseProgressContext.Provider value={value}>

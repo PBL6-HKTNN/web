@@ -34,7 +34,8 @@
       "@utils/*": ["src/utils/*"],
       "@types/*": ["src/types/*"],
       "@contexts/*": ["src/contexts/*"],
-      "@services/*": ["src/services/*"]
+      "@services/*": ["src/services/*"],
+      "@mock-data/*": ["src/mock-data/*"]
     }
   },
   "include": ["src"]
