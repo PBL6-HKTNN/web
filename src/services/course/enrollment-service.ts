@@ -16,11 +16,11 @@ import type {
   GetLastDateCourseResponse,
   GetCourseEnrolledStudentsResponse,
 } from "@/types/db/course/enrollment";
-import { createServiceApi, serviceUrls } from "@/utils/api";
+import { createServiceApi, serviceUrls, createApiService } from "@/utils/api";
 
 const api = createServiceApi(serviceUrls.COURSE_SERVICE_URL);
 
-export const enrollmentService = {
+const _enrollmentService = {
   isEnrolled: async (courseId: UUID): Promise<IsEnrolledResponse> => {
     try {
       const response = await api.post(
@@ -110,3 +110,9 @@ export const enrollmentService = {
     return response.data;
   },
 };
+
+// Export service with comprehensive error handling
+export const enrollmentService = createApiService(
+  _enrollmentService,
+  "EnrollmentService"
+);

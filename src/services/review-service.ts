@@ -11,11 +11,11 @@ import type {
   DeleteUserReviewReq,
   DeleteUserReviewRes,
 } from "@/types/db/review";
-import { createServiceApi } from "@/utils";
+import { createServiceApi, createApiService } from "@/utils/api";
 
 const api = createServiceApi(reviewApiUrl);
 
-export const reviewService = {
+const _reviewService = {
   createReview: async (
     payload: CreateReviewRequest
   ): Promise<CreateReviewResponse> => {
@@ -57,3 +57,6 @@ export const reviewService = {
     return response.data;
   },
 };
+
+// Export service with comprehensive error handling
+export const reviewService = createApiService(_reviewService, "ReviewService");

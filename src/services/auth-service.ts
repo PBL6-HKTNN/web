@@ -1,4 +1,4 @@
-import api from "@/utils/api";
+import api, { createApiService } from "@/utils/api";
 import API_ROUTES from "@/conf/constants/api-routes";
 import type {
   LoginReq,
@@ -12,7 +12,7 @@ import type {
   ChangePasswordReq,
 } from "@/types/core/auth";
 
-export const authService = {
+const _authService = {
   async login(data: LoginReq): Promise<AuthRes> {
     const response = await api.post<AuthRes>(API_ROUTES.AUTH.login, data);
     return response.data;
@@ -62,3 +62,6 @@ export const authService = {
     return response.data;
   },
 };
+
+// Export service with comprehensive error handling
+export const authService = createApiService(_authService, "AuthService");

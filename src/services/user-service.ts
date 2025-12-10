@@ -1,10 +1,10 @@
 import API_ROUTES from "@/conf/constants/api-routes";
 import type { ChangeAvatarReq, UpdateProfileReq } from "@/types/db";
-import api from "@/utils/api";
+import api, { createApiService } from "@/utils/api";
 import type { User, UserDetailResponse } from "@/types/db/user";
 import type { ApiResponse } from "@/types/core/api";
 
-export const userService = {
+const _userService = {
   getAllUsers: async (params?: {
     Name?: string;
     Email?: string;
@@ -40,3 +40,6 @@ export const userService = {
     return response.data;
   },
 };
+
+// Export service with comprehensive error handling
+export const userService = createApiService(_userService, "UserService");

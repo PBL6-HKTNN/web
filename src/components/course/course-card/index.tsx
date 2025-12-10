@@ -5,7 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AddToCartButton } from "@/components/payment/add-to-cart-button";
 import type { Course } from "@/types/db/course";
+import { CourseStatus } from "@/types/db/course";
 import { formatPriceSimple } from "@/utils/format";
+import { getAuthState } from "@/hooks";
 
 interface CourseCardProps {
   course: Course & {
@@ -19,7 +21,9 @@ export function CourseCard({ course }: CourseCardProps) {
   // const handleClick = () => {
   //   navigate({ to: `/course/${course.id}` });
   // };
-
+  const {
+    user
+  } = getAuthState();
   const handleCardClick = (e: React.MouseEvent) => {
     // Don't navigate if clicking on buttons
     if ((e.target as HTMLElement).closest('button')) {
@@ -28,6 +32,8 @@ export function CourseCard({ course }: CourseCardProps) {
     }
     navigate({ to: `/course/${course.id}` });
   };
+
+  const isDraft = course?.status === CourseStatus.DRAFT && user?.id === course.instructorId;
 
   const formatPrice = (price: number) => {
     if (price === 0) return "Free";
@@ -59,6 +65,7 @@ export function CourseCard({ course }: CourseCardProps) {
         {course.isInCart && !course.isEnrolled && (
           <Badge className="absolute top-2 left-2 bg-orange-600">
             <ShoppingCart className="w-3 h-3 mr-1" />
+            
             In Cart
           </Badge>
         )}
@@ -109,7 +116,17 @@ export function CourseCard({ course }: CourseCardProps) {
               {formatPrice(course.price)}
             </div>
             <div className="flex gap-2">
-              {course.isEnrolled ? (
+              {isDraft ? (
+                <Button
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate({ to: `/lecturing-tool/course/${course.id}` });
+                  }}
+                >
+                  Edit Course
+                </Button>
+              ) : course.isEnrolled ? (
                 <Button
                   size="sm"
                   onClick={(e) => {

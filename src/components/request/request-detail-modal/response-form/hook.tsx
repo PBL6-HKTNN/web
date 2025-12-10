@@ -18,18 +18,14 @@ export const useResponseForm = (requestId: UUID) => {
 
   const onSubmit = async (data: ResponseFormData) => {
     const status = parseInt(data.status) as RequestStatus;
-    resolveRequest.mutate(
-      {
-        requestId,
-        status,
-        response: data.response,
-      },
-      {
-        onSuccess: () => {
-          form.reset();
-        },
-      }
-    );
+    // Use mutateAsync so the caller can await the result and only proceed after API returns
+    const res = await resolveRequest.mutateAsync({
+      requestId,
+      status,
+      response: data.response,
+    });
+    form.reset();
+    return res;
   };
 
   return {

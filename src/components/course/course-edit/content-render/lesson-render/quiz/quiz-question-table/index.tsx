@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { ChevronUp, Edit, Trash2, Copy } from "lucide-react";
 import { QuestionType } from "@/types/db/course/quiz-question";
 import { QuizQuestionEditForm } from "./edit-form";
+import { truncate } from "@/utils/render-utils";
 
 interface QuizQuestionTableProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -81,7 +82,7 @@ export function QuizQuestionTable({
               <TableRow key={question.id || index}>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell className="font-medium">
-                  {question.questionText || <span className="text-muted-foreground italic">No question text</span>}
+                  {truncate(question.questionText) || <span className="text-muted-foreground italic">No question text</span>}
                 </TableCell>
                 <TableCell>{getQuestionTypeBadge(question.questionType)}</TableCell>
                 <TableCell>{question.marks}</TableCell>

@@ -5,11 +5,11 @@ import type {
   WishlistCheckResponse,
   WishlistItem,
 } from "@/types/db/course/wishlist";
-import { createServiceApi, serviceUrls } from "@/utils/api";
+import { createServiceApi, serviceUrls, createApiService } from "@/utils/api";
 
 const api = createServiceApi(serviceUrls.COURSE_SERVICE_URL);
 
-export const wishlistService = {
+const _wishlistService = {
   getWishlist: async (): Promise<GetWishlistResponse> => {
     const response = await api.get(API_ROUTES.WISHLIST.getWishlist);
     return response.data;
@@ -31,3 +31,9 @@ export const wishlistService = {
     return response.data;
   },
 };
+
+// Export service with comprehensive error handling
+export const wishlistService = createApiService(
+  _wishlistService,
+  "WishlistService"
+);

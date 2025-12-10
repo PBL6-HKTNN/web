@@ -4,11 +4,11 @@ import type {
   CreateCategoryRes,
   GetCategoriesRes,
 } from "@/types/db/course/category";
-import { createServiceApi, serviceUrls } from "@/utils/api";
+import { createServiceApi, serviceUrls, createApiService } from "@/utils/api";
 
 const api = createServiceApi(serviceUrls.COURSE_SERVICE_URL);
 
-export const categoryService = {
+const _categoryService = {
   getCategories: async (): Promise<GetCategoriesRes> => {
     const res = await api.get<GetCategoriesRes>(
       API_ROUTES.CATEGORY.getCategories
@@ -22,3 +22,9 @@ export const categoryService = {
     return res.data;
   },
 };
+
+// Export service with comprehensive error handling
+export const categoryService = createApiService(
+  _categoryService,
+  "CategoryService"
+);

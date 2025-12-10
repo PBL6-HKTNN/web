@@ -145,3 +145,10 @@ export function getUserStatusBadgeProps(status: number): UserRoleBadgeProps {
       };
   }
 }
+
+export const truncate = (string: string, length: number = 50) => {
+  if (string.length <= length) {
+    return string;
+  }
+  return string.slice(0, length) + "...";
+};

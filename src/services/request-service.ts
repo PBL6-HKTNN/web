@@ -7,10 +7,10 @@ import type {
   ResolveRequestReq,
   UpdateRequestReq,
 } from "@/types/db/request";
-import api from "@/utils/api";
+import api, { createApiService } from "@/utils/api";
 import API_ROUTES from "@/conf/constants/api-routes";
 
-class RequestService {
+const _requestService = {
   /**
    * Get all requests (admin/staff only)
    */
@@ -19,7 +19,7 @@ class RequestService {
       API_ROUTES.REQUEST.getRequests
     );
     return response.data;
-  }
+  },
 
   /**
    * Get current user's requests
@@ -29,7 +29,7 @@ class RequestService {
       API_ROUTES.REQUEST.getUserRequest
     );
     return response.data;
-  }
+  },
 
   /**
    * Get requests resolved by the current user (admin/staff only)
@@ -39,7 +39,7 @@ class RequestService {
       API_ROUTES.REQUEST.getResolvedRequests
     );
     return response.data;
-  }
+  },
 
   /**
    * Get all available request types
@@ -49,7 +49,7 @@ class RequestService {
       API_ROUTES.REQUEST.getRequestTypes
     );
     return response.data;
-  }
+  },
 
   /**
    * Get a specific request by ID
@@ -59,7 +59,7 @@ class RequestService {
       API_ROUTES.REQUEST.getRequestById(requestId)
     );
     return response.data;
-  }
+  },
 
   /**
    * Create a new request
@@ -70,7 +70,7 @@ class RequestService {
       data
     );
     return response.data;
-  }
+  },
 
   /**
    * Update an existing request
@@ -84,8 +84,7 @@ class RequestService {
       data
     );
     return response.data;
-  }
-
+  },
   /**
    * Delete a request
    */
@@ -94,7 +93,7 @@ class RequestService {
       API_ROUTES.REQUEST.deleteRequest(requestId)
     );
     return response.data;
-  }
+  },
 
   /**
    * Resolve a request (admin/staff only)
@@ -105,7 +104,11 @@ class RequestService {
       data
     );
     return response.data;
-  }
-}
+  },
+};
 
-export const requestService = new RequestService();
+// Export service with comprehensive error handling
+export const requestService = createApiService(
+  _requestService,
+  "RequestService"
+);

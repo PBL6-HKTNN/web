@@ -1,11 +1,11 @@
 import { storageApiUrl } from "@/conf";
 import API_ROUTES from "@/conf/constants/api-routes";
 import type { UploadFileReq, UploadFileRes } from "@/types/core/storage";
-import { createServiceApi } from "@/utils";
+import { createServiceApi, createApiService } from "@/utils/api";
 
 const api = createServiceApi(storageApiUrl);
 
-export const storageService = {
+const _storageService = {
   uploadFile: async (req: UploadFileReq): Promise<UploadFileRes> => {
     const formData = new FormData();
     formData.append("file", req.file);
@@ -21,3 +21,9 @@ export const storageService = {
     return response.data;
   },
 };
+
+// Export service with comprehensive error handling
+export const storageService = createApiService(
+  _storageService,
+  "StorageService"
+);

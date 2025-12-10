@@ -1,4 +1,4 @@
-import api from "@/utils/api";
+import api, { createApiService } from "@/utils/api";
 import API_ROUTES from "@/conf/constants/api-routes";
 import type { UUID } from "@/types";
 import type {
@@ -21,7 +21,7 @@ import type {
   GetRevenueRequest,
 } from "@/types/db/payment";
 
-export const paymentService = {
+const _paymentService = {
   // Cart services
   getCart: async (): Promise<GetCartResponse> => {
     const response = await api.get(API_ROUTES.PAYMENT.getCart);
@@ -111,3 +111,9 @@ export const paymentService = {
     return res.data;
   },
 };
+
+// Export service with comprehensive error handling
+export const paymentService = createApiService(
+  _paymentService,
+  "PaymentService"
+);

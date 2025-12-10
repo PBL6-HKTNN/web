@@ -4,12 +4,15 @@ import { useGetRequestTypes, useCreateRequest } from '@/hooks/queries/request-ho
 import { RequestTypeEnum } from '@/types/db/request'
 import { usePreSubmitCheck } from '@/hooks'
 import type { PreSubmitCheckRes } from '@/types/db/course'
+import { getQueryErrorMessage } from '@/utils/api'
 
 export const useCoursePublicCheck = (courseId: UUID) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isChecking, setIsChecking] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [checkResults, setCheckResults] = useState<PreSubmitCheckRes | null>(null)
+  const [checkError, setCheckError] = useState<string | null>(null)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   const { data: requestTypesRes } = useGetRequestTypes()
   const preSubmitCheck = usePreSubmitCheck()
@@ -18,6 +21,8 @@ export const useCoursePublicCheck = (courseId: UUID) => {
   const openModal = () => {
     setIsOpen(true)
     setCheckResults(null)
+    setCheckError(null)
+    setSubmitError(null)
   }
 
   const closeModal = () => {
@@ -31,6 +36,7 @@ export const useCoursePublicCheck = (courseId: UUID) => {
 
     // Simulate checking process with delays
     try {
+      setCheckError(null)
       // Perform the pre-submit check via the API
       const results = await preSubmitCheck.mutateAsync({
         courseId,
@@ -38,6 +44,10 @@ export const useCoursePublicCheck = (courseId: UUID) => {
 
       // results: ApiResponse<string>
       setCheckResults(results)
+    } catch (error) {
+      // Convert to user friendly message and expose to UI
+      setCheckResults(null)
+      setCheckError(getQueryErrorMessage(error, 'Failed to check course requirements'))
     } finally {
       setIsChecking(false)
     }
@@ -48,6 +58,7 @@ export const useCoursePublicCheck = (courseId: UUID) => {
     setIsSubmitting(true)
 
     try {
+      setSubmitError(null)
       // Find the PUBLIC_A_COURSE request type
       const publicCourseType = requestTypesRes?.data?.find(
         (type) => type.type === RequestTypeEnum.PUBLIC_A_COURSE
@@ -72,7 +83,9 @@ export const useCoursePublicCheck = (courseId: UUID) => {
       closeModal()
     } catch (error) {
       console.error('Failed to submit publication request:', error)
-      throw error
+      // Convert to user friendly message and expose to UI
+      setSubmitError(getQueryErrorMessage(error, 'Failed to submit publication request'))
+      // Do not rethrow here to avoid unhandled rejection in the UI — we show error state
     } finally {
       setIsSubmitting(false)
     }
@@ -83,6 +96,8 @@ export const useCoursePublicCheck = (courseId: UUID) => {
     isChecking,
     isSubmitting,
     checkResults,
+    checkError,
+    submitError,
     openModal,
     closeModal,
     performCheck,
