@@ -16,8 +16,13 @@ function LessonContent() {
 
   // Update current view when lesson is accessed
   useEffect(() => {
-    if (courseId && lessonId) {
-      updateCurrentView(courseId, lessonId)
+    // if (courseId && lessonId) {
+    //   updateCurrentView(courseId, lessonId)
+    // }
+    return () => {
+      if (courseId && lessonId) {
+        updateCurrentView(courseId, lessonId)
+      }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courseId, lessonId])

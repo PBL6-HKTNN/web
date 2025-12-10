@@ -23,6 +23,7 @@ export type Enrollment = Base & {
   courseId: UUID;
   progressStatus: EnrollmentProgressStatus;
   currentView: UUID | null;
+  watchedSeconds: number | null;
   lessonId: UUID | null;
   enrollmentStatus: EnrollmentStatus;
   enrollmentDate: string | Date;

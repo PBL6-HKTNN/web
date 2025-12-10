@@ -1,4 +1,5 @@
 import API_ROUTES from "@/conf/constants/api-routes";
+import type { AxiosError } from "axios";
 import type { UUID } from "@/types";
 import type {
   EnrollResponse,
@@ -21,8 +22,16 @@ const api = createServiceApi(serviceUrls.COURSE_SERVICE_URL);
 
 export const enrollmentService = {
   isEnrolled: async (courseId: UUID): Promise<IsEnrolledResponse> => {
-    const response = await api.post(API_ROUTES.ENROLLMENT.isEnrolled(courseId));
-    return response.data;
+    try {
+      const response = await api.post(
+        API_ROUTES.ENROLLMENT.isEnrolled(courseId)
+      );
+      return response.data;
+    } catch (e) {
+      // Normalize error for hooks: if axios error then return the response data
+      const err = (e as AxiosError)?.response?.data ?? e;
+      throw err;
+    }
   },
 
   enroll: async (courseId: UUID): Promise<EnrollResponse> => {
@@ -71,11 +80,16 @@ export const enrollmentService = {
   updateEnrollmentCurrentView: async (
     data: UpdateCurrentViewReq
   ): Promise<UpdateCurrentViewResponse> => {
-    const response = await api.post(
-      API_ROUTES.ENROLLMENT.updateEnrollmentCurrentView,
-      data
-    );
-    return response.data;
+    try {
+      const response = await api.post(
+        API_ROUTES.ENROLLMENT.updateEnrollmentCurrentView,
+        data
+      );
+      return response.data;
+    } catch (e) {
+      const err = (e as AxiosError)?.response?.data ?? e;
+      throw err;
+    }
   },
 
   getLastDateCourse: async (

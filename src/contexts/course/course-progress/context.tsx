@@ -26,6 +26,8 @@ export interface CourseProgressContextType {
   
   // Get current enrollment
   getCurrentEnrollment: () => { currentView: UUID | null; lessonId: UUID | null } | null;
+  // Get watched seconds from enrollment metadata (if any)
+  getWatchedSecondsForCurrentView: () => number | null;
   
   // Completion status checking
   isLessonCompleted: (lessonId: UUID) => boolean;

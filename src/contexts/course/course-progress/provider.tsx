@@ -194,6 +194,10 @@ export const CourseProgressProvider: React.FC<CourseProgressProviderProps> = ({ 
     return enrollmentCurrentView
   }, [enrollmentCurrentView])
 
+  const getWatchedSecondsForCurrentView = useCallback(() => {
+    return typeof enrollment?.watchedSeconds === 'number' ? enrollment.watchedSeconds : null
+  }, [enrollment])
+
   const value: CourseProgressContextType = useMemo(() => ({
     trackMarkdownScroll,
     markMarkdownComplete,
@@ -205,6 +209,7 @@ export const CourseProgressProvider: React.FC<CourseProgressProviderProps> = ({ 
     isLessonCompleted,
     getCompletedLessons,
     getCurrentEnrollment,
+    getWatchedSecondsForCurrentView,
   }), [
     trackMarkdownScroll,
     markMarkdownComplete,
@@ -216,6 +221,7 @@ export const CourseProgressProvider: React.FC<CourseProgressProviderProps> = ({ 
     isLessonCompleted,
     getCompletedLessons,
     getCurrentEnrollment,
+    getWatchedSecondsForCurrentView,
   ])
 
   return (

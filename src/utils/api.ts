@@ -41,7 +41,8 @@ api.interceptors.response.use(
       if (window.location.pathname !== "/auth/login")
         window.location.href = "/auth/login";
     }
-    return Promise.reject(error.response);
+    // Reject the full axios error so callers (and react-query) can inspect error.response and error.message
+    return Promise.reject(error);
   }
 );
 
