@@ -67,7 +67,8 @@ export default function VideoContent({ lesson, courseId }: VideoContentProps) {
         }
       }
     }
-  }, [updateCurrentViewWithWatchedSeconds, courseId, lesson.id])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [courseId, lesson.id])
 
   if (!lesson.contentUrl) {
     return (
