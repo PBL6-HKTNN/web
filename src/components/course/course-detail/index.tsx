@@ -36,6 +36,7 @@ import { cn } from "@/lib/utils";
 import { useCourseDetail } from "./hook";
 import { renderLevelLabel } from "@/utils/render-utils";
 import { formatDate } from "@/utils/format";
+import { useRouter } from "@tanstack/react-router";
 
 interface CourseDetailProps {
   courseId: string;
@@ -62,6 +63,8 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
     averageLoading,
     formatPrice
   } = useCourseDetail(courseId);
+
+  const router = useRouter();
 
   if (isLoading) {
     return (
@@ -176,9 +179,9 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
               className="w-full"
               size="lg"
               variant="outline"
-              onClick={() => {
-                window.location.href = "/cart";
-              }}
+              onClick={() => router.navigate({
+                to: "/cart",
+              })}
             >
               Go to cart
             </Button>

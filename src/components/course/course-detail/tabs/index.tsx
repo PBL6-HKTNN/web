@@ -54,7 +54,7 @@ export default function CourseTabs({ course, modules, courseId, reviews, average
       </TabsContent>
 
       <TabsContent value="reviews" className="mt-6">
-          <ReviewTab courseId={courseId} reviews={reviews} averageRating={averageRating} isLoading={reviewsLoading || averageRatingLoading} />
+          <ReviewTab courseId={courseId} instructorId={course.instructorId} reviews={reviews} averageRating={averageRating} isLoading={reviewsLoading || averageRatingLoading} />
       </TabsContent>
     </Tabs>
   )

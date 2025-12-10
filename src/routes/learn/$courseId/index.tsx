@@ -7,6 +7,7 @@ import { Separator } from '@/components/ui/separator'
 import { Clock, BookOpen, Star, Loader2, Play, CheckCircle, Clock3, Circle } from 'lucide-react'
 import { parseTimespanToMinutes } from '@/utils/time-utils'
 import { LearningNavBar } from '@/components/layout/nav-bar-2'
+import { useNavigate } from '@tanstack/react-router'
 import ModuleAccordion from '@/components/course/module-accordion'
 import { useCourseOverview } from './-hook'
 import { EnrollmentProgressStatus } from '@/types/db/course/enrollment'
@@ -17,6 +18,7 @@ export const Route = createFileRoute('/learn/$courseId/')({
 })
 
 function CourseOverview() {
+  const navigate = useNavigate();
   const { 
     course, 
     modules, 
@@ -161,6 +163,15 @@ function CourseOverview() {
                         ${course.price}
                       </span>
                       <Badge variant="outline">{course.status}</Badge>
+                    </div>
+                    <div className="flex items-center gap-2 ml-auto">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => navigate({ to: `/course/${course.id}` })}
+                      >
+                        View Course
+                      </Button>
                     </div>
                   </div>
                 </div>

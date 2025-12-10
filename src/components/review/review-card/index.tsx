@@ -1,7 +1,11 @@
 import { Star } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ReviewReportForm } from "../review-report-form";
+import { ReviewReply } from "../review-reply";
+import { ReviewReplyForm } from "../review-reply-form";
+import { useAuthState } from "@/hooks/queries/auth-hooks";
 import type { Review } from "@/types/db/review";
+import type { UUID } from "@/types";
 
 interface ReviewCardProps {
   review: Review & {
@@ -10,9 +14,14 @@ interface ReviewCardProps {
       profilePicture?: string;
     };
   };
+  courseId: UUID;
+  instructorId: UUID;
 }
 
-export function ReviewCard({ review }: ReviewCardProps) {
+export function ReviewCard({ review, courseId, instructorId }: ReviewCardProps) {
+  const authState = useAuthState();
+  const canReply = authState.user?.id === instructorId;
+
   return (
     <div className="border-b border-gray-200 dark:border-gray-700 pb-6 last:border-0">
       <div className="flex items-start gap-3">
@@ -53,6 +62,16 @@ export function ReviewCard({ review }: ReviewCardProps) {
               })}
             </p>
           )}
+
+          {/* Instructor Reply */}
+          <ReviewReply review={review} instructorId={instructorId} />
+          
+          {/* Reply Form (only for course instructor) */}
+          <ReviewReplyForm 
+            review={review} 
+            courseId={courseId} 
+            canReply={canReply} 
+          />
         </div>
       </div>
     </div>

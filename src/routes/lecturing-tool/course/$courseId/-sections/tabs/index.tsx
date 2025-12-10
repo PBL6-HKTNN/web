@@ -64,7 +64,7 @@ export default function CourseTabs({ course, modules, courseId, reviews, average
       <TabsContent value="reviews" className="space-y-6 mt-6">
         <Card>
           {isPublished ? (
-            <ReviewTab courseId={courseId} reviews={reviews} averageRating={averageRating} isLoading={reviewsLoading || averageRatingLoading} />
+            <ReviewTab courseId={courseId} instructorId={course.instructorId} reviews={reviews} averageRating={averageRating} isLoading={reviewsLoading || averageRatingLoading} />
           ) : (
             <CardContent className="p-6 text-center">
               <p className="text-muted-foreground">Reviews are not available for draft courses. Publish the course to enable reviews.</p>

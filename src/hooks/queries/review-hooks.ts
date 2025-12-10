@@ -8,6 +8,8 @@ import type {
   CreateReviewResponse,
   DeleteUserReviewReq,
   DeleteUserReviewRes,
+  ReplyReviewReq,
+  ReplyReviewRes,
 } from "@/types/db/review";
 import { reviewService } from "@/services/review-service";
 
@@ -94,6 +96,33 @@ export const useDeleteUserReview = () => {
           queryKey: REVIEW_QUERY_KEYS.average(courseId),
         });
       }
+    },
+  });
+};
+
+export const useReplyToReview = () => {
+  const queryClient = useQueryClient();
+  return useMutation<
+    ReplyReviewRes,
+    Error,
+    { courseId: UUID; reviewId: UUID; data: ReplyReviewReq }
+  >({
+    mutationFn: ({ courseId, reviewId, data }) =>
+      reviewService.replyToReview(courseId, reviewId, data),
+    onSuccess: (response, variables) => {
+      if (response.isSuccess) {
+        const courseId = variables.courseId;
+        // Invalidate course reviews to refetch with updated reply
+        queryClient.invalidateQueries({
+          queryKey: REVIEW_QUERY_KEYS.byCourse(courseId),
+        });
+        toast.success("Reply added successfully");
+      } else {
+        toast.error("Failed to add reply");
+      }
+    },
+    onError: () => {
+      toast.error("Failed to add reply");
     },
   });
 };

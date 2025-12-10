@@ -11,6 +11,7 @@ import type { Review } from "@/types/db/review";
 
 interface ReviewListProps {
   courseId: UUID;
+  instructorId: UUID;
   reviews: Review[];
   averageRating: number;
   isLoading: boolean;
@@ -20,6 +21,7 @@ interface ReviewListProps {
 
 export function ReviewList({ 
   courseId, 
+  instructorId,
   reviews, 
   averageRating, 
   isLoading, 
@@ -70,7 +72,12 @@ export function ReviewList({
           {reviews.length > 0 ? (
             <div className="space-y-6">
               {reviews.map((review) => (
-                <ReviewCard key={review.id} review={review} />
+                <ReviewCard 
+                  key={review.id} 
+                  review={review} 
+                  courseId={courseId}
+                  instructorId={instructorId}
+                />
               ))}
             </div>
           ) : (

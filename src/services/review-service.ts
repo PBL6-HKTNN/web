@@ -10,6 +10,8 @@ import type {
   CheckUserReviewRes,
   DeleteUserReviewReq,
   DeleteUserReviewRes,
+  ReplyReviewReq,
+  ReplyReviewRes,
 } from "@/types/db/review";
 import { createServiceApi, createApiService } from "@/utils/api";
 
@@ -54,6 +56,18 @@ const _reviewService = {
     const response = await api.delete(API_ROUTES.REVIEW.deleteUserReview, {
       data,
     });
+    return response.data;
+  },
+
+  replyToReview: async (
+    courseId: UUID,
+    reviewId: UUID,
+    data: ReplyReviewReq
+  ): Promise<ReplyReviewRes> => {
+    const response = await api.post(
+      API_ROUTES.REVIEW.replyReview(courseId, reviewId),
+      data
+    );
     return response.data;
   },
 };

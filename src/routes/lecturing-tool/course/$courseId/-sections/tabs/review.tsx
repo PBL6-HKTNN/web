@@ -6,12 +6,13 @@ import type { Review } from '@/types/db/review'
 
 interface ReviewTabProps {
   courseId: string
+  instructorId: string
   reviews: Review[]
   averageRating: number
   isLoading: boolean
 }
 
-export default function ReviewTab({ courseId, reviews, averageRating, isLoading }: ReviewTabProps) {
+export default function ReviewTab({ courseId, instructorId, reviews, averageRating, isLoading }: ReviewTabProps) {
   return (
     <>
       <CardHeader>
@@ -21,6 +22,7 @@ export default function ReviewTab({ courseId, reviews, averageRating, isLoading 
       <CardContent>
         <ReviewList
           courseId={courseId}
+          instructorId={instructorId}
           reviews={reviews}
           averageRating={averageRating}
           isLoading={isLoading}
