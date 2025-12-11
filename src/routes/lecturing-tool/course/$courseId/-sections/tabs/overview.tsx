@@ -2,7 +2,9 @@
 import { CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import type { Course } from '@/types/db/course'
-import { ImageIcon, Info, BarChart3 } from 'lucide-react'
+import { ImageIcon, Info, BarChart3, AlertTriangle } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
+import { getCourseStatusBadgeProps } from '@/utils/render-utils'
 
 interface OverviewTabProps {
   course: Course
@@ -60,6 +62,30 @@ export default function OverviewTab({ course }: OverviewTabProps) {
                   <span className="text-sm text-muted-foreground">Price</span>
                   <span className="text-sm font-medium">${course.price}</span>
                 </div>
+                <Separator />
+                <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">Status</span>
+                    {(() => {
+                      const status = getCourseStatusBadgeProps(course.status);
+                      return (
+                        <Badge className={`px-2 py-0.5 font-medium ${status.className}`} title={status.label}>
+                          {status.label}
+                        </Badge>
+                      );
+                    })()}
+                  </div>
+                {course.isRequestedBanned && (
+                  <>
+                    <Separator />
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Ban Request</span>
+                      <Badge variant="destructive" className="flex items-center gap-2 px-2 py-0.5">
+                        <AlertTriangle className="size-4" />
+                        Requested
+                      </Badge>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>

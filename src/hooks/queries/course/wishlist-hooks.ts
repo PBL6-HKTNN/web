@@ -17,11 +17,11 @@ export const useGetWishlist = () => {
   });
 };
 
-export const useAddToWishlist = () => {
+export const useAddToWishlist = (courseId: UUID) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (courseId: UUID) => wishlistService.addToWishlist(courseId),
+    mutationFn: () => wishlistService.addToWishlist(courseId),
     onSuccess: () => {
       // Invalidate all wishlist queries including individual checks
       queryClient.invalidateQueries({
@@ -34,20 +34,22 @@ export const useAddToWishlist = () => {
   });
 };
 
-export const useRemoveFromWishlist = () => {
+export const useRemoveFromWishlist = (courseId: UUID) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (courseId: UUID) =>
-      wishlistService.removeFromWishlist(courseId),
+    mutationFn: () => wishlistService.removeFromWishlist(courseId),
     onSuccess: () => {
       // Invalidate wishlist queries to refresh the list
       queryClient.invalidateQueries({
-        queryKey: wishlistQueryKeys.allWishlist,
+        queryKey: [...wishlistQueryKeys.allWishlist, "check", courseId],
       });
     },
     onError: (error) => {
       console.error("Remove from wishlist failed:", error);
+      queryClient.invalidateQueries({
+        queryKey: [...wishlistQueryKeys.allWishlist, "check", courseId],
+      });
     },
   });
 };

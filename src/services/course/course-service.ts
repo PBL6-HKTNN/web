@@ -20,12 +20,13 @@ import type {
   PreSubmitCheckReq,
   PreSubmitCheckRes,
   RequestedBanCourseRes,
+  CourseAnalyticsRes,
 } from "@/types/db/course";
-import { createServiceApi, serviceUrls } from "@/utils/api";
+import { createServiceApi, serviceUrls, createApiService } from "@/utils/api";
 
 const api = createServiceApi(serviceUrls.COURSE_SERVICE_URL);
 
-export const courseService = {
+const _courseService = {
   getCourses: async (filters: GetCoursesFilterReq): Promise<GetCoursesRes> => {
     const res = await api.get<GetCoursesRes>(API_ROUTES.COURSE.getCourses, {
       params: filters,
@@ -119,4 +120,11 @@ export const courseService = {
     );
     return res.data;
   },
+  analytics: async (): Promise<CourseAnalyticsRes> => {
+    const res = await api.get<CourseAnalyticsRes>(API_ROUTES.COURSE.analytics);
+    return res.data;
+  },
 };
+
+// Export service with comprehensive error handling
+export const courseService = createApiService(_courseService, "CourseService");

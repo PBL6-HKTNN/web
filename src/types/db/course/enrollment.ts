@@ -23,6 +23,7 @@ export type Enrollment = Base & {
   courseId: UUID;
   progressStatus: EnrollmentProgressStatus;
   currentView: UUID | null;
+  watchedSeconds: number | null;
   lessonId: UUID | null;
   enrollmentStatus: EnrollmentStatus;
   enrollmentDate: string | Date;
@@ -52,6 +53,7 @@ export type UpdateEnrollmentProgressReq = {
 export type UpdateCurrentViewReq = {
   courseId: UUID;
   currentLessonId: UUID;
+  watchedSeconds?: number;
 };
 
 export type EnrollResponse = ApiResponse<Enrollment>;

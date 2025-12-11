@@ -5,11 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Star } from "lucide-react";
 import { useState } from "react";
+import { useIsEnrolled } from '@/hooks/queries/course/enrollment-hooks'
 import type { UUID } from "@/types";
 import type { Review } from "@/types/db/review";
 
 interface ReviewListProps {
   courseId: UUID;
+  instructorId: UUID;
   reviews: Review[];
   averageRating: number;
   isLoading: boolean;
@@ -19,6 +21,7 @@ interface ReviewListProps {
 
 export function ReviewList({ 
   courseId, 
+  instructorId,
   reviews, 
   averageRating, 
   isLoading, 
@@ -27,6 +30,8 @@ export function ReviewList({
 }: ReviewListProps) {
   const reviewCount = reviews.length;
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { data: isEnrolledResponse, isLoading: isEnrolledLoading } = useIsEnrolled(courseId)
+  const isEnrolled = !!isEnrolledResponse?.data?.enrollment
 
   if (isLoading) {
     return (
@@ -67,7 +72,12 @@ export function ReviewList({
           {reviews.length > 0 ? (
             <div className="space-y-6">
               {reviews.map((review) => (
-                <ReviewCard key={review.id} review={review} />
+                <ReviewCard 
+                  key={review.id} 
+                  review={review} 
+                  courseId={courseId}
+                  instructorId={instructorId}
+                />
               ))}
             </div>
           ) : (
@@ -79,20 +89,31 @@ export function ReviewList({
       </Card>
 
       {showForm && (
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="w-full">Write a Review</Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Write a Review</DialogTitle>
-            </DialogHeader>
-            <ReviewForm 
-              courseId={courseId} 
-              onSuccess={() => setIsDialogOpen(false)} 
-            />
-          </DialogContent>
-        </Dialog>
+        <>
+          {isEnrolled ? (
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="w-full">Write a Review</Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Write a Review</DialogTitle>
+                </DialogHeader>
+                <ReviewForm 
+                  courseId={courseId} 
+                  onSuccess={() => setIsDialogOpen(false)} 
+                />
+              </DialogContent>
+            </Dialog>
+          ) : (
+            <div className="space-y-2">
+              <Button className="w-full" disabled={true}>{isEnrolledLoading ? 'Checking enrollment...' : 'Write a Review'}</Button>
+              {!isEnrolledLoading && (
+                <p className="text-center text-sm text-muted-foreground">You must join the course to submit a review.</p>
+              )}
+            </div>
+          )}
+        </>
       )}
     </div>
   );

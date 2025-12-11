@@ -7,6 +7,9 @@ export type Review = Base & {
   name: string;
   rating: number;
   comment: string;
+  reply?: string;
+  replyAt?: string | Date;
+  replyBy?: UUID;
 };
 
 export type CreateReviewRequest = {

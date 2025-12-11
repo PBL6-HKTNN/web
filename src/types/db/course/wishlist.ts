@@ -14,5 +14,6 @@ export type WishlistedCourseItem = {
   description: string;
   thumbnail: string | null;
 };
-export type GetWishlistResponse = ApiResponse<
-  WishlistedCourseItem[]>;
+export type GetWishlistResponse = ApiResponse<WishlistedCourseItem[]>;
+
+export type WishlistCheckResponse = ApiResponse<WishlistItem>;

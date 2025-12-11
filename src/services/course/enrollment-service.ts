@@ -1,4 +1,5 @@
 import API_ROUTES from "@/conf/constants/api-routes";
+import type { AxiosError } from "axios";
 import type { UUID } from "@/types";
 import type {
   EnrollResponse,
@@ -15,14 +16,22 @@ import type {
   GetLastDateCourseResponse,
   GetCourseEnrolledStudentsResponse,
 } from "@/types/db/course/enrollment";
-import { createServiceApi, serviceUrls } from "@/utils/api";
+import { createServiceApi, serviceUrls, createApiService } from "@/utils/api";
 
 const api = createServiceApi(serviceUrls.COURSE_SERVICE_URL);
 
-export const enrollmentService = {
+const _enrollmentService = {
   isEnrolled: async (courseId: UUID): Promise<IsEnrolledResponse> => {
-    const response = await api.post(API_ROUTES.ENROLLMENT.isEnrolled(courseId));
-    return response.data;
+    try {
+      const response = await api.post(
+        API_ROUTES.ENROLLMENT.isEnrolled(courseId)
+      );
+      return response.data;
+    } catch (e) {
+      // Normalize error for hooks: if axios error then return the response data
+      const err = (e as AxiosError)?.response?.data ?? e;
+      throw err;
+    }
   },
 
   enroll: async (courseId: UUID): Promise<EnrollResponse> => {
@@ -71,11 +80,16 @@ export const enrollmentService = {
   updateEnrollmentCurrentView: async (
     data: UpdateCurrentViewReq
   ): Promise<UpdateCurrentViewResponse> => {
-    const response = await api.post(
-      API_ROUTES.ENROLLMENT.updateEnrollmentCurrentView,
-      data
-    );
-    return response.data;
+    try {
+      const response = await api.post(
+        API_ROUTES.ENROLLMENT.updateEnrollmentCurrentView,
+        data
+      );
+      return response.data;
+    } catch (e) {
+      const err = (e as AxiosError)?.response?.data ?? e;
+      throw err;
+    }
   },
 
   getLastDateCourse: async (
@@ -96,3 +110,9 @@ export const enrollmentService = {
     return response.data;
   },
 };
+
+// Export service with comprehensive error handling
+export const enrollmentService = createApiService(
+  _enrollmentService,
+  "EnrollmentService"
+);

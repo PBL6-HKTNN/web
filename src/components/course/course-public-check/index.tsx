@@ -11,6 +11,8 @@ interface CoursePublicCheckModalProps {
   isChecking: boolean
   isSubmitting: boolean
   checkResults: PreSubmitCheckRes | null
+  checkError?: string | null
+  submitError?: string | null
   onClose: () => void
   onPerformCheck: () => void
   onSubmitPublication: () => void
@@ -21,6 +23,8 @@ export function CoursePublicCheckModal({
   isChecking,
   isSubmitting,
   checkResults,
+  checkError,
+  submitError,
   onClose,
   onPerformCheck,
   onSubmitPublication,
@@ -43,6 +47,13 @@ export function CoursePublicCheckModal({
         </DialogHeader>
 
         <div className="space-y-6 py-4">
+          {/* Check error state */}
+          {checkError && (
+            <Alert className="border-destructive/50 bg-destructive/5">
+              <XCircle className="h-4 w-4 text-destructive" />
+                  <AlertDescription className="text-destructive">{checkError}</AlertDescription>
+            </Alert>
+          )}
           {/* Initial state: show the required checks */}
           {!checkResults && !isChecking && (
             <Card>
@@ -119,6 +130,16 @@ export function CoursePublicCheckModal({
             </>
           )}
         </div>
+
+        {/* Submission error state */}
+        {submitError && (
+          <div className="mb-3">
+            <Alert className="border-destructive/50 bg-destructive/5">
+              <XCircle className="h-4 w-4 text-destructive" />
+              <AlertDescription className="text-destructive">{submitError}</AlertDescription>
+            </Alert>
+          </div>
+        )}
 
         {/* Footer Actions */}
         <div className="flex gap-3 justify-end pt-4 border-t">

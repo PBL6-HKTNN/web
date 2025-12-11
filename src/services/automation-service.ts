@@ -6,11 +6,11 @@ import type {
   QuizGenerationReq,
   QuizGenerationRes,
 } from "@/types/ai";
-import { createServiceApi } from "@/utils";
+import { createServiceApi, createApiService } from "@/utils/api";
 
 const api = createServiceApi(automationApiUrl);
 
-export const automationService = {
+const _automationService = {
   generateQuiz: async (data: QuizGenerationReq) => {
     const response = await api.post<Promise<QuizGenerationRes>>(
       API_ROUTES.AUTOMATION.generateQuiz,
@@ -26,3 +26,9 @@ export const automationService = {
     return response.data;
   },
 };
+
+// Export service with comprehensive error handling
+export const automationService = createApiService(
+  _automationService,
+  "AutomationService"
+);

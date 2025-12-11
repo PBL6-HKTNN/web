@@ -4,10 +4,11 @@ import OverviewTab from './overview'
 import ContentTab from './content'
 import ReviewTab from './review'
 import StudentsTab from './students'
-import { Card } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { LayoutDashboard, BookOpen, MessageSquare, Users } from 'lucide-react'
 
 import type { Course } from '@/types/db/course'
+import { CourseStatus } from '@/types/db/course'
 import type { Module } from '@/types/db/course/module'
 import type { Review } from '@/types/db/review'
 
@@ -22,6 +23,7 @@ interface CourseTabsProps {
 }
 
 export default function CourseTabs({ course, modules, courseId, reviews, averageRating, reviewsLoading, averageRatingLoading }: CourseTabsProps) {
+  const isPublished = course?.status === CourseStatus.PUBLISHED
   return (
     <Tabs defaultValue="overview" className="w-full">
       <TabsList className="grid w-full grid-cols-4">
@@ -33,14 +35,18 @@ export default function CourseTabs({ course, modules, courseId, reviews, average
           <BookOpen className="size-4" />
           <span className="hidden sm:inline">Content</span>
         </TabsTrigger>
-        <TabsTrigger value="reviews" className="flex items-center gap-2">
-          <MessageSquare className="size-4" />
-          <span className="hidden sm:inline">Reviews</span>
-        </TabsTrigger>
-        <TabsTrigger value="students" className="flex items-center gap-2">
-          <Users className="size-4" />
-          <span className="hidden sm:inline">Students</span>
-        </TabsTrigger>
+        {isPublished && (
+          <>
+            <TabsTrigger value="reviews" className="flex items-center gap-2">
+              <MessageSquare className="size-4" />
+              <span className="hidden sm:inline">Reviews</span>
+            </TabsTrigger>
+            <TabsTrigger value="students" className="flex items-center gap-2">
+              <Users className="size-4" />
+              <span className="hidden sm:inline">Students</span>
+            </TabsTrigger>
+          </>
+        )}
       </TabsList>
 
       <TabsContent value="overview" className="space-y-6 mt-6">
@@ -57,13 +63,25 @@ export default function CourseTabs({ course, modules, courseId, reviews, average
 
       <TabsContent value="reviews" className="space-y-6 mt-6">
         <Card>
-          <ReviewTab courseId={courseId} reviews={reviews} averageRating={averageRating} isLoading={reviewsLoading || averageRatingLoading} />
+          {isPublished ? (
+            <ReviewTab courseId={courseId} instructorId={course.instructorId} reviews={reviews} averageRating={averageRating} isLoading={reviewsLoading || averageRatingLoading} />
+          ) : (
+            <CardContent className="p-6 text-center">
+              <p className="text-muted-foreground">Reviews are not available for draft courses. Publish the course to enable reviews.</p>
+            </CardContent>
+          )}
         </Card>
       </TabsContent>
 
       <TabsContent value="students" className="space-y-6 mt-6">
         <Card>
-          <StudentsTab courseId={courseId} />
+          {isPublished ? (
+            <StudentsTab courseId={courseId} />
+          ) : (
+            <CardContent className="p-6 text-center">
+              <p className="text-muted-foreground">Student list is not visible until the course is published.</p>
+            </CardContent>
+          )}
         </Card>
       </TabsContent>
     </Tabs>

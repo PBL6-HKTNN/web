@@ -10,11 +10,11 @@ import type {
   UpdateModuleReq,
   UpdateModuleRes,
 } from "@/types/db/course/module";
-import { createServiceApi, serviceUrls } from "@/utils/api";
+import { createServiceApi, serviceUrls, createApiService } from "@/utils/api";
 
 const api = createServiceApi(serviceUrls.COURSE_SERVICE_URL);
 
-export const moduleService = {
+const _moduleService = {
   getModules: async (): Promise<GetModulesRes> => {
     const response = await api.get<GetModulesRes>(API_ROUTES.MODULE.getModules);
     return response.data;
@@ -59,3 +59,6 @@ export const moduleService = {
     return response.data;
   },
 };
+
+// Export service with comprehensive error handling
+export const moduleService = createApiService(_moduleService, "ModuleService");

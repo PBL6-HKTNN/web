@@ -5,8 +5,12 @@ import { LessonProgressWrapper } from '@/components/course/course-learn/lesson-p
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle, CheckCircle, LockIcon } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { useState, useEffect } from 'react'
+import { useCourseProgress } from '@/contexts/course/course-progress/hook'
 import type { UUID } from '@/types';
-import type { LessonType } from '@/types/db/course/lesson';
+import { LessonType } from '@/types/db/course/lesson';
 import { parseTimespanToMinutes } from '@/utils/time-utils';
 
 interface LessonContentLoaderProps {
@@ -32,6 +36,26 @@ export function LessonContentLoader({
     data: moduleLessonsData,
     isLoading: moduleLessonsLoading,
   } = useGetLessonsByModule(moduleId);
+
+  // Enrollment data for current course
+  
+
+  const { getWatchedSecondsForCurrentView, getCurrentEnrollment, updateCurrentViewWithWatchedSeconds } = useCourseProgress()
+  const [showResumeDialog, setShowResumeDialog] = useState(false)
+  const [resumeSeconds, setResumeSeconds] = useState<number | undefined>(undefined)
+
+  useEffect(() => {
+    const lessonLocal = lessonData?.data
+    if (!lessonLocal || lessonLocal.lessonType !== LessonType.VIDEO) return
+    const enrolledWatch = getWatchedSecondsForCurrentView()
+    const currentEnrollment = getCurrentEnrollment()
+    if (!enrolledWatch) return
+    if (!currentEnrollment) return
+    if (currentEnrollment.currentView !== lessonId) return
+
+    setResumeSeconds(enrolledWatch)
+    setShowResumeDialog(true)
+  }, [lessonData, getWatchedSecondsForCurrentView, getCurrentEnrollment, courseId, lessonId, setResumeSeconds, setShowResumeDialog])
 
   if (lessonLoading) {
     return (
@@ -94,6 +118,10 @@ export function LessonContentLoader({
 
   const lesson = lessonData?.data;
 
+  
+
+  
+
   return (
     <div className="p-6 min-w-4xl mx-auto">
       <div className="mb-6">
@@ -117,14 +145,32 @@ export function LessonContentLoader({
         </div>
       </div>
       <div className="lg:flex lg:justify-center">
-        <LessonProgressWrapper
-          courseId={courseId}
-          lessonId={lessonId}
-          lessonType={lesson?.lessonType as LessonType}
-        >
-          <ContentRender lesson={lesson!} courseId={courseId} />
-        </LessonProgressWrapper>
+        {!showResumeDialog && (
+          <LessonProgressWrapper
+            courseId={courseId}
+            lessonId={lessonId}
+            lessonType={lesson?.lessonType as LessonType}
+          >
+            <ContentRender lesson={lesson!} courseId={courseId} />
+          </LessonProgressWrapper>
+        )}
       </div>
+      <Dialog open={showResumeDialog} onOpenChange={(open) => setShowResumeDialog(open)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Resume from last position</DialogTitle>
+          </DialogHeader>
+          <DialogDescription>
+            We detected that you left off at {resumeSeconds ? `${Math.floor(resumeSeconds / 60)}:${(resumeSeconds % 60).toString().padStart(2, '0')}` : ''}. Would you like to continue from that position?
+          </DialogDescription>
+          <DialogFooter className="mt-4">
+            <div className="flex gap-2 justify-end w-full">
+              <Button variant="secondary" onClick={() => { updateCurrentViewWithWatchedSeconds(courseId, lessonId, 0); setResumeSeconds(undefined); setShowResumeDialog(false) }}>Start from beginning</Button>
+              <Button onClick={() => { setShowResumeDialog(false) }}>Resume from {resumeSeconds ? `${Math.floor(resumeSeconds / 60)}:${(resumeSeconds % 60).toString().padStart(2, '0')}` : ''}</Button>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

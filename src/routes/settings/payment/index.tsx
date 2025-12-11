@@ -184,7 +184,7 @@ function RouteComponent() {
         </div>
 
         {/* Monthly Spending Chart */}
-        <Card>
+        <Card className='col-span-4'>
           <CardHeader>
             <div className="flex items-center gap-2">
               <TrendingUp className="h-5 w-5" />
@@ -202,9 +202,9 @@ function RouteComponent() {
                   color: "hsl(var(--chart-1))",
                 },
               }}
-              className="h-[300px]"
+              className="h-[300px] w-full"
             >
-              <BarChart data={monthlySpendingData}>
+              <BarChart data={monthlySpendingData} className='w-full'>
                 <XAxis
                   dataKey="month"
                   stroke="#888888"

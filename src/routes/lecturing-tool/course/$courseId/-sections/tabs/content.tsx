@@ -39,13 +39,14 @@ export default function ContentTab({ modules }: ContentTabProps) {
             <p className="text-muted-foreground">Start by adding your first module.</p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <>
             {modules.map((module) => (
               <ModuleAccordion key={module.id} data={module} defaultExpanded={false} />
             ))}
-          </div>
+          </>
         )}
       </CardContent>
     </>
   )
+
 }

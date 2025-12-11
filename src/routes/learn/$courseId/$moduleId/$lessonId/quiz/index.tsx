@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { useParams } from '@tanstack/react-router'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
@@ -7,6 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { AlertCircle, ChevronLeft, ChevronRight, CheckCircle } from 'lucide-react'
 import QuestionView from '@/components/course/course-learn/quiz/question-view'
+import { useCourseProgress } from '@/contexts/course/course-progress/hook'
 import { useQuizDoingPage } from './-hook'
 import {
   AlertDialog,
@@ -57,6 +59,21 @@ function RouteComponent() {
     // Helper functions
     getAnswerForQuestion,
   } = useQuizDoingPage()
+
+  const { courseId, lessonId } = useParams({ from: '/learn/$courseId/$moduleId/$lessonId/quiz/' })
+
+  const { markQuizComplete } = useCourseProgress()
+  const markedEmptyQuizRef = useRef(false)
+
+  // Mark quizzes with no questions as complete (once) for enrollment progress
+  useEffect(() => {
+    if (!currentQuiz) return
+    const hasNoQuestions = !currentQuiz.questions || currentQuiz.questions.length === 0
+    if (hasNoQuestions && courseId && lessonId && !markedEmptyQuizRef.current) {
+      markedEmptyQuizRef.current = true
+      markQuizComplete(courseId, lessonId, true)
+    }
+  }, [currentQuiz, courseId, lessonId, markQuizComplete])
 
   const [showSubmitDialog, setShowSubmitDialog] = useState(false)
 

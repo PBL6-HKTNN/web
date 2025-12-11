@@ -36,6 +36,7 @@ export const useIsEnrolled = (courseId: UUID) => {
     queryKey: enrollmentQueryKeys.enrollmentCheck(courseId),
     queryFn: () => enrollmentService.isEnrolled(courseId),
     enabled: !!courseId,
+    retry: false,
   });
 };
 

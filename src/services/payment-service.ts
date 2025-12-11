@@ -1,4 +1,4 @@
-import api from "@/utils/api";
+import api, { createApiService } from "@/utils/api";
 import API_ROUTES from "@/conf/constants/api-routes";
 import type { UUID } from "@/types";
 import type {
@@ -14,9 +14,14 @@ import type {
   PaymentIntentRequest,
   PaymentIntentResponse,
   WebhookResponse,
+  GetRevenueResponse,
+  GetMyPaymentsResponse,
+  GetAnalyticsResponse,
+  GetAnalyticsRequest,
+  GetRevenueRequest,
 } from "@/types/db/payment";
 
-export const paymentService = {
+const _paymentService = {
   // Cart services
   getCart: async (): Promise<GetCartResponse> => {
     const response = await api.get(API_ROUTES.PAYMENT.getCart);
@@ -80,4 +85,35 @@ export const paymentService = {
     const response = await api.post(API_ROUTES.PAYMENT.webhook, webhookData);
     return response.data;
   },
+
+  getRevenue: async (data: GetRevenueRequest): Promise<GetRevenueResponse> => {
+    const res = await api.post<GetRevenueResponse>(
+      API_ROUTES.PAYMENT.revenue,
+      data
+    );
+    return res.data;
+  },
+
+  getAnalytics: async (
+    data: GetAnalyticsRequest
+  ): Promise<GetAnalyticsResponse> => {
+    const res = await api.post<GetAnalyticsResponse>(
+      API_ROUTES.PAYMENT.analytics,
+      data
+    );
+    return res.data;
+  },
+
+  myPayments: async (): Promise<GetMyPaymentsResponse> => {
+    const res = await api.get<GetMyPaymentsResponse>(
+      API_ROUTES.PAYMENT.myPayments
+    );
+    return res.data;
+  },
 };
+
+// Export service with comprehensive error handling
+export const paymentService = createApiService(
+  _paymentService,
+  "PaymentService"
+);

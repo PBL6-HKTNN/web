@@ -23,7 +23,7 @@ export const Route = createFileRoute('/lecturing-tool/course/$courseId/')({
 function RouteComponent() {
   const { courseId } = Route.useParams()
   const { course, modules, isLoading, error } = useCourseDetailPage(courseId)
-  const { isOpen, isChecking, isSubmitting, checkResults, openModal, closeModal, performCheck, submitPublication } =
+  const { isOpen, isChecking, isSubmitting, checkResults, checkError, submitError, openModal, closeModal, performCheck, submitPublication } =
     useCoursePublicCheck(courseId)
   const { isOpen: isHideFormOpen, isSubmitting: isHiding, form: hideForm, openModal: openHideForm, closeModal: closeHideForm, onSubmit: onHideSubmit } =
     useCourseHideForm(courseId)
@@ -76,6 +76,8 @@ function RouteComponent() {
           isSubmitting={isSubmitting}
           isChecking={isChecking}
           checkResults={checkResults}
+          checkError={checkError}
+          submitError={submitError}
           onClose={closeModal}
           onPerformCheck={performCheck}
           onSubmitPublication={submitPublication}

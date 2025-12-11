@@ -5,6 +5,8 @@ import type {
   PaymentRequest,
   UpdatePaymentRequest,
   PaymentIntentRequest,
+  GetRevenueRequest,
+  GetAnalyticsRequest,
 } from "@/types/db/payment";
 import { paymentService } from "@/services/payment-service";
 
@@ -156,6 +158,31 @@ export const useProcessWebhook = () => {
     onError: () => {
       toast.error("Failed to process webhook");
     },
+  });
+};
+
+export const useGetRevenue = (data: GetRevenueRequest) => {
+  return useQuery({
+    queryKey: [...PAYMENT_QUERY_KEYS.all, "revenue"],
+    queryFn: () => paymentService.getRevenue(data),
+  });
+};
+
+export const useGetAnalytics = (
+  data: GetAnalyticsRequest,
+  options?: { enabled?: boolean }
+) => {
+  return useQuery({
+    queryKey: [...PAYMENT_QUERY_KEYS.all, "analytics", data],
+    queryFn: () => paymentService.getAnalytics(data),
+    ...options,
+  });
+};
+
+export const useGetMyPayments = () => {
+  return useQuery({
+    queryKey: [...PAYMENT_QUERY_KEYS.all, "my-payments"],
+    queryFn: paymentService.myPayments,
   });
 };
 
