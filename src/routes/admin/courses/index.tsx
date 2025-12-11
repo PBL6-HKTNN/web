@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
+import { useGetCourses } from '@/hooks/queries/course/course-hooks'
 import {
   Table,
   TableBody,
@@ -20,19 +21,16 @@ import {
 import {
   Search,
   Filter,
-  MoreHorizontal,
   BookOpen,
   Users,
-  Eye,
-  Edit,
-  Trash2,
   CheckCircle,
-  XCircle,
   Clock,
-  Star
+  Star,
+  Loader2
 } from 'lucide-react'
-import { adminCourses } from '@/mock-data/admin-courses'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
+import { CourseStatus } from '@/types/db/course'
+import type { GetCoursesFilterReq } from '@/types/db/course'
 
 export const Route = createFileRoute('/admin/courses/')({
   component: RouteComponent,
@@ -40,48 +38,81 @@ export const Route = createFileRoute('/admin/courses/')({
 
 function RouteComponent() {
   const [searchTerm, setSearchTerm] = useState('')
-  const [statusFilter, setStatusFilter] = useState('all')
-  const [modFilter, setModFilter] = useState('all')
+  const [statusFilter, setStatusFilter] = useState<CourseStatus | 'all'>('all')
 
-  // Mock data - sẽ thay thế bằng API calls
-  const courses = adminCourses
-
-  const mods = [...new Set(courses.map(course => course.mod))]
-
-  const filteredCourses = courses.filter(course => {
-    const matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         course.instructor.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         course.category.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = statusFilter === 'all' || course.status.toLowerCase().replace(' ', '') === statusFilter
-    const matchesMod = modFilter === 'all' || course.mod === modFilter
-    return matchesSearch && matchesStatus && matchesMod
-  })
-
-  const getStatusBadge = (status: string) => {
-    const variants = {
-      'Published': 'default',
-      'Under Review': 'secondary',
-      'Draft': 'outline',
-      'Rejected': 'outline'
-    } as const
-    const icons = {
-      'Published': <CheckCircle className="w-3 h-3" />,
-      'Under Review': <Clock className="w-3 h-3" />,
-      'Draft': <Edit className="w-3 h-3" />,
-      'Rejected': <XCircle className="w-3 h-3" />
+  // Build filter params for API
+  const filterParams: GetCoursesFilterReq = useMemo(() => {
+    const params: GetCoursesFilterReq = {
+      Page: 1,
+      PageSize: 100, // Get more courses for admin view
     }
+
+    if (statusFilter !== 'all') {
+      // Note: API might not support status filter directly, we'll filter client-side
+    }
+
+    return params
+  }, [statusFilter])
+
+  // Fetch courses from API
+  const {
+    data,
+    isLoading,
+    error,
+    isFetching,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useGetCourses(filterParams)
+
+  // Flatten the infinite query data
+  const courses = useMemo(() => {
+    return data?.pages.flatMap(page => page.data || []) || []
+  }, [data])
+
+  // Filter courses client-side based on search and status
+  const filteredCourses = useMemo(() => {
+    return courses.filter(course => {
+      const matchesSearch = 
+        course.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        course.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        course.language?.toLowerCase().includes(searchTerm.toLowerCase())
+      
+      const matchesStatus = statusFilter === 'all' || course.status === statusFilter
+      
+      return matchesSearch && matchesStatus
+    })
+  }, [courses, searchTerm, statusFilter])
+
+  const getStatusBadge = (status: CourseStatus) => {
+    const statusLabels = {
+      [CourseStatus.DRAFT]: 'Draft',
+      [CourseStatus.PUBLISHED]: 'Published',
+      [CourseStatus.ARCHIVED]: 'Archived',
+    } as const
+
+    const variants = {
+      [CourseStatus.DRAFT]: 'outline',
+      [CourseStatus.PUBLISHED]: 'default',
+      [CourseStatus.ARCHIVED]: 'secondary',
+    } as const
+
+    const icons = {
+      [CourseStatus.DRAFT]: <Clock className="w-3 h-3" />,
+      [CourseStatus.PUBLISHED]: <CheckCircle className="w-3 h-3" />,
+      [CourseStatus.ARCHIVED]: <Clock className="w-3 h-3" />,
+    }
+
     return (
-      <Badge variant={variants[status as keyof typeof variants] || 'secondary'} className="flex items-center gap-1">
-        {icons[status as keyof typeof icons]}
-        {status}
+      <Badge variant={variants[status] || 'secondary'} className="flex items-center gap-1">
+        {icons[status]}
+        {statusLabels[status] || 'Unknown'}
       </Badge>
     )
   }
 
-  const publishedCourses = courses.filter(c => c.status === 'Published').length
-  const totalStudents = courses
-    .filter(c => c.status === 'Published')
-    .reduce((sum, c) => sum + c.students, 0)
+  const publishedCourses = courses.filter(c => c.status === CourseStatus.PUBLISHED).length
+  const totalCourses = courses.length
 
   return (
     <div className="p-6 space-y-6 w-full">
@@ -99,7 +130,7 @@ function RouteComponent() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-2xl font-bold">{courses.length}</div>
+                <div className="text-2xl font-bold">{isLoading ? '...' : totalCourses}</div>
                 <p className="text-sm text-muted-foreground">Total Courses</p>
               </div>
               <BookOpen className="w-8 h-8 text-blue-600" />
@@ -110,7 +141,7 @@ function RouteComponent() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-2xl font-bold">{publishedCourses}</div>
+                <div className="text-2xl font-bold">{isLoading ? '...' : publishedCourses}</div>
                 <p className="text-sm text-muted-foreground">Published Courses</p>
               </div>
               <CheckCircle className="w-8 h-8 text-green-600" />
@@ -121,36 +152,16 @@ function RouteComponent() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-2xl font-bold">{totalStudents.toLocaleString()}</div>
-                <p className="text-sm text-muted-foreground">Total Students</p>
+                <div className="text-2xl font-bold">
+                  {isLoading ? '...' : courses.filter(c => c.status === CourseStatus.DRAFT).length}
+                </div>
+                <p className="text-sm text-muted-foreground">Draft Courses</p>
               </div>
-              <Users className="w-8 h-8 text-purple-600" />
+              <Clock className="w-8 h-8 text-orange-600" />
             </div>
           </CardContent>
         </Card>
       </div>
-
-      {/* Pending Reviews Alert */}
-      {/* {underReviewCourses > 0 && (
-        <Card className="border-orange-200 bg-orange-50">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <Clock className="w-5 h-5 text-orange-600" />
-              <div>
-                <h3 className="font-semibold text-orange-800">Courses Awaiting Review</h3>
-                <p className="text-sm text-orange-700">
-                  {underReviewCourses} course{underReviewCourses > 1 ? 's' : ''} need{underReviewCourses === 1 ? 's' : ''} moderator review
-                </p>
-              </div>
-              <Button variant="outline" size="sm" className="ml-auto">
-                Review Now
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )} */}
-
-      {/* Filters and Search */}
       <Card>
         <CardHeader>
           <CardTitle>Course Directory</CardTitle>
@@ -172,31 +183,20 @@ function RouteComponent() {
               <DropdownMenuTrigger asChild>
                 <Button variant="outline">
                   <Filter className="w-4 h-4 mr-2" />
-                  Status: {statusFilter === 'all' ? 'All' : statusFilter}
+                  Status: {statusFilter === 'all' 
+                    ? 'All' 
+                    : statusFilter === CourseStatus.PUBLISHED 
+                    ? 'Published' 
+                    : statusFilter === CourseStatus.DRAFT 
+                    ? 'Draft' 
+                    : 'Archived'}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuItem onClick={() => setStatusFilter('all')}>All</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setStatusFilter('published')}>Published</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setStatusFilter('underreview')}>Under Review</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setStatusFilter('draft')}>Draft</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setStatusFilter('rejected')}>Rejected</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline">
-                  <Filter className="w-4 h-4 mr-2" />
-                  Mod: {modFilter === 'all' ? 'All' : modFilter}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => setModFilter('all')}>All Mods</DropdownMenuItem>
-                {mods.map(mod => (
-                  <DropdownMenuItem key={mod} onClick={() => setModFilter(mod)}>
-                    {mod}
-                  </DropdownMenuItem>
-                ))}
+                <DropdownMenuItem onClick={() => setStatusFilter(CourseStatus.PUBLISHED)}>Published</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setStatusFilter(CourseStatus.DRAFT)}>Draft</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setStatusFilter(CourseStatus.ARCHIVED)}>Archived</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -207,92 +207,116 @@ function RouteComponent() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Course</TableHead>
-                  <TableHead>Instructor</TableHead>
-                  <TableHead>Moderator</TableHead>
+                  <TableHead>Instructor ID</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Price</TableHead>
-                  <TableHead>Students</TableHead>
+                  <TableHead>Level</TableHead>
+                  <TableHead>Language</TableHead>
+                  <TableHead>Modules</TableHead>
                   <TableHead>Rating</TableHead>
-                  <TableHead>Last Updated</TableHead>
-                  <TableHead className="w-[50px]">Actions</TableHead>
+                  <TableHead>Reviews</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredCourses.map((course) => (
-                  <TableRow key={course.id}>
-                    <TableCell>
-                      <div>
-                        <div className="font-medium">{course.title}</div>
-                        <div className="text-sm text-muted-foreground">{course.category}</div>
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={9} className="text-center py-8">
+                      <div className="flex items-center justify-center gap-2">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Loading courses...
                       </div>
-                    </TableCell>
-                    <TableCell>{course.instructor}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{course.mod}</Badge>
-                    </TableCell>
-                    <TableCell>{getStatusBadge(course.status)}</TableCell>
-                    <TableCell>${course.price}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <Users className="w-3 h-3" />
-                        {course.students}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {course.rating > 0 ? (
-                        <div className="flex items-center gap-1">
-                          <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                          {course.rating} ({course.reviews})
-                        </div>
-                      ) : (
-                        <span className="text-muted-foreground">-</span>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-sm">{course.lastUpdated}</TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
-                            <MoreHorizontal className="w-4 h-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
-                            <Eye className="w-4 h-4 mr-2" />
-                            View Details
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Edit className="w-4 h-4 mr-2" />
-                            Edit Course
-                          </DropdownMenuItem>
-                          {course.status === 'Under Review' && (
-                            <>
-                              <DropdownMenuItem className="text-green-600">
-                                <CheckCircle className="w-4 h-4 mr-2" />
-                                Approve Course
-                              </DropdownMenuItem>
-                              <DropdownMenuItem className="text-red-600">
-                                <XCircle className="w-4 h-4 mr-2" />
-                                Reject Course
-                              </DropdownMenuItem>
-                            </>
-                          )}
-                          <DropdownMenuItem className="text-red-600">
-                            <Trash2 className="w-4 h-4 mr-2" />
-                            Delete Course
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
                     </TableCell>
                   </TableRow>
-                ))}
+                ) : error ? (
+                  <TableRow>
+                    <TableCell colSpan={9} className="text-center py-8 text-red-600">
+                      Error loading courses: {error instanceof Error ? error.message : 'Unknown error'}
+                    </TableCell>
+                  </TableRow>
+                ) : filteredCourses.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
+                      No courses found matching your criteria.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredCourses.map((course) => (
+                    <TableRow key={course.id}>
+                      <TableCell>
+                        <div>
+                          <div className="font-medium">{course.title || 'Untitled'}</div>
+                          {course.description && (
+                            <div className="text-sm text-muted-foreground line-clamp-1">
+                              {course.description}
+                            </div>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-sm font-mono text-muted-foreground">
+                        {course.instructorId.substring(0, 8)}...
+                      </TableCell>
+                      <TableCell>{getStatusBadge(course.status)}</TableCell>
+                      <TableCell>${course.price.toFixed(2)}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline">
+                          {course.level === 0 ? 'Beginner' : course.level === 1 ? 'Intermediate' : 'Advanced'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-sm uppercase">{course.language}</TableCell>
+                      <TableCell>
+                        <Badge variant="secondary">{course.numberOfModules}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        {course.averageRating > 0 ? (
+                          <div className="flex items-center gap-1">
+                            <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                            {course.averageRating.toFixed(1)}
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1">
+                          <Users className="w-3 h-3" />
+                          {course.numberOfReviews}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </div>
 
-          {filteredCourses.length === 0 && (
-            <div className="text-center py-8 text-muted-foreground">
-              No courses found matching your criteria.
+          {/* Load More Button */}
+          {hasNextPage && !isLoading && (
+            <div className="flex justify-center mt-6">
+              <Button
+                onClick={() => fetchNextPage()}
+                disabled={isFetchingNextPage}
+                variant="outline"
+                size="lg"
+              >
+                {isFetchingNextPage ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Loading more...
+                  </>
+                ) : (
+                  'Load More Courses'
+                )}
+              </Button>
+            </div>
+          )}
+
+          {/* Loading overlay for filter changes */}
+          {isFetching && !isLoading && (
+            <div className="fixed inset-0 bg-background/50 backdrop-blur-sm z-50 flex items-center justify-center">
+              <div className="text-center">
+                <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">Loading courses...</p>
+              </div>
             </div>
           )}
         </CardContent>
