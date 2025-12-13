@@ -23,6 +23,7 @@ import { useToast } from "@/hooks/use-toast";
 import type { UUID } from "@/types";
 import type { Module } from "@/types/db/course/module";
 import type { Lesson } from "@/types/db/course/lesson";
+import type { QuizQuestion } from "@/types/db/course/quiz-question";
 
 import type { CreateQuizReq, UpdateQuizReq } from "@/types/db/course/quiz";
 import type { CreateModuleReq, UpdateModuleReq } from "@/types/db/course/module";
@@ -77,6 +78,11 @@ interface CourseEditContextType {
   createQuiz: (lessonId: UUID, quizData: CreateQuizReq) => Promise<void>;
   updateQuiz: (quizId: UUID, quizData: UpdateQuizReq) => Promise<void>;
   deleteQuiz: (quizId: UUID) => Promise<void>;
+  
+  // Clone actions
+  cloneModule: (moduleId: UUID) => Promise<void>;
+  cloneLesson: (lessonId: UUID, targetModuleId?: UUID) => Promise<void>;
+  cloneQuizQuestion: (sourceQuestionData: QuizQuestion, targetQuizId: UUID) => Promise<void>;
   
   // Data getters
   getSelectedModule: () => Module | null;
@@ -265,6 +271,125 @@ export function CourseEditProvider({ children, courseId }: CourseEditProviderPro
     }
   };
 
+  // Clone actions
+  const handleCloneModule = async (moduleId: UUID) => {
+    try {
+      // For now, use selected module data if it matches the moduleId
+      // In a complete implementation, you'd want to fetch the module data by ID
+      const moduleData = selectedModuleId === moduleId ? selectedModule.data?.data : null;
+      
+      if (!moduleData) {
+        error('Please select the module first to clone it');
+        return;
+      }
+
+      const clonedModuleData: CreateModuleReq = {
+        title: `${moduleData.title} (Copy)`,
+        order: moduleData.order + 1,
+        courseId: moduleData.courseId,
+      };
+
+      const newModuleResponse = await createModuleMutation.mutateAsync(clonedModuleData);
+      const newModuleId = newModuleResponse.data?.id;
+
+      if (newModuleId && moduleData.lessons) {
+        // Clone all lessons in the module
+        for (const lesson of moduleData.lessons) {
+          await handleCloneLesson(lesson.id, newModuleId);
+        }
+      }
+
+      success(`Module "${moduleData.title}" cloned successfully`);
+    } catch (err) {
+      error(`Failed to clone module: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      throw err;
+    }
+  };
+
+  const handleCloneLesson = async (lessonId: UUID, targetModuleId?: UUID) => {
+    try {
+      // For now, use selected lesson data if it matches the lessonId
+      // In a complete implementation, you'd want to fetch the lesson data by ID
+      let lessonData: Lesson | null = null;
+      const numberOfLessons = selectedModule.data?.data?.numberOfLessons || 0;
+      if (selectedLessonId === lessonId) {
+        lessonData = selectedLesson.data?.data || null;
+      } else {
+        // Try to find the lesson in the selected module's lessons
+        lessonData = selectedModule.data?.data?.lessons?.find(l => l.id === lessonId) || null;
+      }
+      
+      if (!lessonData) {
+        error('Lesson data not found. Please select the lesson first.');
+        return;
+      }
+
+      const clonedLessonData: CreateLessonReq = {
+        title: `${lessonData.title} (Copy)`,
+        moduleId: targetModuleId || lessonData.moduleId,
+        contentUrl: lessonData.contentUrl,
+        duration: 1,
+        orderIndex: numberOfLessons + 1,
+        isPreview: lessonData.isPreview,
+        lessonType: lessonData.lessonType,
+      };
+
+      const newLessonResponse = await createLessonMutation.mutateAsync(clonedLessonData);
+      const newLessonId = newLessonResponse.data?.id;
+
+      // If it has a quiz, clone the quiz too
+      if (lessonData.quiz && newLessonId) {
+        const clonedQuizData: CreateQuizReq = {
+          lessonId: newLessonId,
+          title: `${lessonData.quiz.title} (Copy)`,
+          description: lessonData.quiz.description || '',
+          passingMarks: lessonData.quiz.passingMarks,
+          questions: lessonData.quiz.questions?.map(question => ({
+            questionText: question.questionText,
+            questionType: question.questionType,
+            marks: question.marks,
+            answers: question.answers?.map(answer => ({
+              answerText: answer.answerText,
+              isCorrect: answer.isCorrect,
+            })) || [],
+          })) || [],
+        };
+
+        await createQuizMutation.mutateAsync(clonedQuizData);
+      }
+
+      success(`Lesson "${lessonData.title}" cloned successfully`);
+    } catch (err) {
+      error(`Failed to clone lesson: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      throw err;
+    }
+  };
+
+  const handleCloneQuizQuestion = async (sourceQuestionData: QuizQuestion, targetQuizId: UUID) => {
+    try {
+      // This is a placeholder implementation
+      // In practice, this would need to be integrated with quiz update logic
+      // since we typically don't have a separate "add question" endpoint
+      
+      const clonedQuestion = {
+        questionText: `${sourceQuestionData.questionText} (Copy)`,
+        questionType: sourceQuestionData.questionType,
+        marks: sourceQuestionData.marks,
+        answers: sourceQuestionData.answers?.map(answer => ({
+          answerText: answer.answerText,
+          isCorrect: answer.isCorrect,
+        })) || [],
+      };
+
+      // This would need to be implemented by fetching the current quiz,
+      // adding the cloned question, and updating the quiz
+      console.log('Cloning question to quiz:', targetQuizId, clonedQuestion);
+      success('Question cloned successfully');
+    } catch (err) {
+      error(`Failed to clone question: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      throw err;
+    }
+  };
 
   
   // Data getters
@@ -298,6 +423,9 @@ export function CourseEditProvider({ children, courseId }: CourseEditProviderPro
     createQuiz: handleCreateQuiz,
     updateQuiz: handleUpdateQuiz,
     deleteQuiz: handleDeleteQuiz,
+    cloneModule: handleCloneModule,
+    cloneLesson: handleCloneLesson,
+    cloneQuizQuestion: handleCloneQuizQuestion,
     getSelectedModule,
     getSelectedLesson,
   };

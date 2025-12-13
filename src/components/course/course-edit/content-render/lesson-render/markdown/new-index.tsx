@@ -2,13 +2,16 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, Save, Loader2, Trash2 } from "lucide-react";
+import { FileText, Save, Loader2, Trash2, Wand2 } from "lucide-react";
 import { MarkdownEditor } from "@/components/shared/md-editor";
+import { GenerateMarkdownModal } from "@/components/course/course-edit/modals/generate/markdown";
+import { useGenerateModals } from "@/components/course/course-edit/modals/generate/hooks";
 import { useUpdateLesson } from "@/hooks/queries/course/lesson-hooks";
 import { useToast } from "@/hooks/use-toast";
 import { useCourseEdit } from "@/contexts/course/use-course-edit";
 import { useState, useEffect } from "react";
 import type { Lesson } from "@/types/db/course/lesson";
+import { parseTimespanToSeconds } from "@/utils/time-utils";
 
 interface MarkdownLessonRenderProps {
   lesson: Lesson;
@@ -20,6 +23,16 @@ export function MarkdownLessonRender({ lesson }: MarkdownLessonRenderProps) {
   const updateLessonMutation = useUpdateLesson();
   const [content, setContent] = useState(lesson.contentUrl || "");
   const [hasChanges, setHasChanges] = useState(false);
+  
+  const {
+    isMarkdownModalOpen,
+    openMarkdownModal,
+    closeMarkdownModal,
+    attachedContext,
+    addContextItem,
+    removeContextItem,
+    clearContext,
+  } = useGenerateModals();
 
   useEffect(() => {
     setContent(lesson.contentUrl || "");
@@ -39,7 +52,7 @@ export function MarkdownLessonRender({ lesson }: MarkdownLessonRenderProps) {
           title: lesson.title,
           moduleId: lesson.moduleId,
           contentUrl: content, // Store markdown content in contentUrl
-          duration: lesson.duration,
+          duration: parseTimespanToSeconds(lesson.duration as string),
           orderIndex: lesson.orderIndex,
           isPreview: lesson.isPreview,
           lessonType: lesson.lessonType,
@@ -53,12 +66,18 @@ export function MarkdownLessonRender({ lesson }: MarkdownLessonRenderProps) {
     }
   };
 
+  const handleApplyGeneratedContent = (generatedContent: string) => {
+    setContent(generatedContent);
+    setHasChanges(true);
+  };
+
   const handleDelete = () => {
     openDeleteModal('lesson', lesson.id, lesson.title);
   };
 
   return (
-    <Card className="h-full overflow-y-auto flex flex-col">
+    <>
+      <Card className="h-full overflow-y-auto flex flex-col">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -93,6 +112,14 @@ export function MarkdownLessonRender({ lesson }: MarkdownLessonRenderProps) {
             <Button 
               size="sm" 
               variant="outline" 
+              onClick={openMarkdownModal}
+            >
+              <Wand2 className="mr-2 h-4 w-4" />
+              Generate Content
+            </Button>
+            <Button 
+              size="sm" 
+              variant="outline" 
               onClick={handleDelete}
               className="hover:bg-destructive hover:text-destructive-foreground"
             >
@@ -111,5 +138,16 @@ export function MarkdownLessonRender({ lesson }: MarkdownLessonRenderProps) {
         />
       </CardContent>
     </Card>
+
+    <GenerateMarkdownModal
+      isOpen={isMarkdownModalOpen}
+      onClose={closeMarkdownModal}
+      onApplyContent={handleApplyGeneratedContent}
+      attachedContext={attachedContext}
+      onAddContext={addContextItem}
+      onRemoveContext={removeContextItem}
+      onClearContext={clearContext}
+    />
+    </>
   );
 }

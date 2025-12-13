@@ -5,6 +5,7 @@ import { LessonRender } from "./lesson-render";
 import { FileQuestion } from "lucide-react";
 import { useContentRender } from "./hook";
 
+
 export function ContentRender() {
   const { selectMode, selectedLesson, selectedModule } = useContentRender();
  

@@ -1,29 +1,49 @@
-import { Star, Clock, Users } from "lucide-react";
+import { Star, Clock, Users, ShoppingCart, BookOpen, CheckCircle } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { AddToCartButton } from "@/components/payment/add-to-cart-button";
 import type { Course } from "@/types/db/course";
+import { CourseStatus } from "@/types/db/course";
+import { formatPriceSimple } from "@/utils/format";
+import { getAuthState } from "@/hooks";
 
 interface CourseCardProps {
-  course: Course;
+  course: Course & {
+    isInCart?: boolean;
+  };
 }
 
 export function CourseCard({ course }: CourseCardProps) {
   const navigate = useNavigate();
 
-  const handleClick = () => {
+  // const handleClick = () => {
+  //   navigate({ to: `/course/${course.id}` });
+  // };
+  const {
+    user
+  } = getAuthState();
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Don't navigate if clicking on buttons
+    if ((e.target as HTMLElement).closest('button')) {
+      e.stopPropagation();
+      return;
+    }
     navigate({ to: `/course/${course.id}` });
   };
 
+  const isDraft = course?.status === CourseStatus.DRAFT && user?.id === course.instructorId;
+
   const formatPrice = (price: number) => {
     if (price === 0) return "Free";
-    return `$${price}`;
+    return formatPriceSimple(price);
   };
 
   return (
     <Card
       className="group cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-1 py-0"
-      onClick={handleClick}
+      onClick={handleCardClick}
     >
       <div className="relative overflow-hidden aspect-video rounded-t-lg ">
         <img
@@ -36,6 +56,19 @@ export function CourseCard({ course }: CourseCardProps) {
             Free
           </Badge>
         )}
+        {course.isEnrolled && (
+          <Badge className="absolute top-2 left-2 bg-blue-600">
+            <CheckCircle className="w-3 h-3 mr-1" />
+            Enrolled
+          </Badge>
+        )}
+        {course.isInCart && !course.isEnrolled && (
+          <Badge className="absolute top-2 left-2 bg-orange-600">
+            <ShoppingCart className="w-3 h-3 mr-1" />
+            
+            In Cart
+          </Badge>
+        )}
       </div>
 
       <CardContent className="p-4">
@@ -46,9 +79,9 @@ export function CourseCard({ course }: CourseCardProps) {
           </h3>
 
           {/* Instructor */}
-          {course.instructorId && (
+          {course.description && (
             <p className="text-sm text-muted-foreground">
-              By {course.instructorId}
+              {course.description}
             </p>
           )}
 
@@ -82,12 +115,75 @@ export function CourseCard({ course }: CourseCardProps) {
             <div className="text-xl font-bold">
               {formatPrice(course.price)}
             </div>
-            {/* <Button
-              size="sm"
-              className="opacity-0 group-hover:opacity-100 transition-opacity"
-            >
-              View Details
-            </Button> */}
+            <div className="flex gap-2">
+              {isDraft ? (
+                <Button
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate({ to: `/lecturing-tool/course/${course.id}` });
+                  }}
+                >
+                  Edit Course
+                </Button>
+              ) : course.isEnrolled ? (
+                <Button
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate({ to: `/learn/${course.id}` });
+                  }}
+                >
+                  <BookOpen className="w-4 h-4 mr-2" />
+                  Continue Learning
+                </Button>
+              ) : course.isInCart ? (
+                <>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate({ to: `/cart` });
+                    }}
+                  >
+                    <ShoppingCart className="w-4 h-4 mr-2" />
+                    View Cart
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate({ to: `/course/${course.id}` });
+                    }}
+                  >
+                    View Details
+                  </Button>
+                </>
+              ) : (
+                <>
+                  {course.price > 0 && (
+                    <AddToCartButton
+                      courseId={course.id}
+                      variant="outline"
+                      size="sm"
+                      showText={false}
+                      className="opacity-0 group-hover:opacity-100 transition-opacity"
+                    />
+                  )}
+                  <Button
+                    size="sm"
+                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate({ to: `/course/${course.id}` });
+                    }}
+                  >
+                    View Details
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </CardContent>

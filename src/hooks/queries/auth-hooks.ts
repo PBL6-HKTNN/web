@@ -10,6 +10,7 @@ import type {
   ResetPasswordReq,
   AuthRes,
   AuthState,
+  ChangePasswordReq,
 } from "@/types/core/auth";
 import type { User } from "@/types/db/user";
 import Persistence from "@/utils/persistence";
@@ -203,6 +204,20 @@ export const useResetPassword = () => {
     },
     onError: (error) => {
       console.error("Password reset failed:", error);
+    },
+  });
+};
+
+export const useChangePassword = () => {
+  return useMutation<AuthRes, Error, ChangePasswordReq>({
+    mutationFn: authService.changePassword,
+    onSuccess: (response) => {
+      if (response.isSuccess) {
+        console.log("Password change successful");
+      }
+    },
+    onError: (error) => {
+      console.error("Password change failed:", error);
     },
   });
 };

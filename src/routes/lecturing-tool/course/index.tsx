@@ -9,7 +9,6 @@ export const Route = createFileRoute('/lecturing-tool/course/')({
 
 function RouteComponent() {
   const navigate = useNavigate()
-
   const handleCourseClick = (course: Course) => {
     navigate({
       to: '/lecturing-tool/course/$courseId',

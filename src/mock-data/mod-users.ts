@@ -1,0 +1,72 @@
+// Mock data for mod users management (students and instructors)
+export const users = [
+  {
+    id: '1',
+    name: 'John Doe',
+    email: 'john.doe@example.com',
+    role: 'Student',
+    status: 'Active',
+    joinDate: '2024-01-15',
+    lastLogin: '2024-11-20',
+    coursesEnrolled: 5,
+    totalSpent: 299.99,
+    reportsCount: 0,
+    warningsCount: 0
+  },
+  {
+    id: '2',
+    name: 'Jane Smith',
+    email: 'jane.smith@example.com',
+    role: 'Instructor',
+    status: 'Active',
+    joinDate: '2023-08-22',
+    lastLogin: '2024-11-19',
+    coursesCreated: 12,
+    totalEarnings: 2500.00,
+    reportsCount: 0,
+    warningsCount: 0,
+    approvalRating: 4.8
+  },
+  {
+    id: '3',
+    name: 'Bob Johnson',
+    email: 'bob.johnson@example.com',
+    role: 'Student',
+    status: 'Suspended',
+    joinDate: '2024-03-05',
+    lastLogin: '2024-10-15',
+    coursesEnrolled: 2,
+    totalSpent: 99.99,
+    reportsCount: 3,
+    warningsCount: 2,
+    suspensionReason: 'Multiple reports of inappropriate behavior'
+  },
+  {
+    id: '4',
+    name: 'Alice Brown',
+    email: 'alice.brown@example.com',
+    role: 'Instructor',
+    status: 'Active',
+    joinDate: '2023-06-10',
+    lastLogin: '2024-11-18',
+    coursesCreated: 8,
+    totalEarnings: 1800.00,
+    reportsCount: 1,
+    warningsCount: 0,
+    approvalRating: 4.6
+  },
+  {
+    id: '5',
+    name: 'Charlie Wilson',
+    email: 'charlie.wilson@example.com',
+    role: 'Student',
+    status: 'Warning',
+    joinDate: '2024-07-18',
+    lastLogin: '2024-11-15',
+    coursesEnrolled: 1,
+    totalSpent: 49.99,
+    reportsCount: 1,
+    warningsCount: 1,
+    warningReason: 'Academic dishonesty in course discussion'
+  },
+]

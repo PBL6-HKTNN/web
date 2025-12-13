@@ -1,4 +1,5 @@
 import { CourseLearnProvider } from '@/contexts/course'
+import { CourseProgressProvider } from '@/contexts/course/course-progress'
 import { authGuard } from '@/utils'
 import { createFileRoute, Outlet } from '@tanstack/react-router'
 
@@ -12,7 +13,9 @@ function RouteComponent() {
 
   return (
     <CourseLearnProvider courseId={courseId}>
-      <Outlet />
+      <CourseProgressProvider courseId={courseId}>
+        <Outlet />
+      </CourseProgressProvider>
     </CourseLearnProvider>
   )
 }

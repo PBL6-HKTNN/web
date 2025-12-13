@@ -1,17 +1,19 @@
 import ToolLayout from '@/components/layout/tool-layout'
 import { createFileRoute, Outlet } from '@tanstack/react-router'
-import { BookAIcon, LayoutDashboardIcon } from 'lucide-react'
-import { authGuard } from '@/utils'
+import { BookAIcon, LayoutDashboardIcon, BarChartIcon } from 'lucide-react'
+import { roleGuard } from '@/utils'
+import { UserRole } from '@/types/db'
 
 export const Route = createFileRoute('/lecturing-tool')({
   component: RouteComponent,
-  beforeLoad: authGuard,
+  beforeLoad: () => roleGuard([UserRole.INSTRUCTOR]),
 })
 
 function RouteComponent() {
   const items = [
     { label: 'Dashboard', icon: <LayoutDashboardIcon />, href: '/lecturing-tool' },
     { label: 'Course', icon: <BookAIcon />, href: '/lecturing-tool/course' },
+    { label: 'Analytics', icon: <BarChartIcon />, href: '/lecturing-tool/analytics' },
   ]
-  return <ToolLayout items={items}><Outlet /></ToolLayout>
+  return <ToolLayout title="Lecturing Tool" items={items}><Outlet /></ToolLayout>
 }

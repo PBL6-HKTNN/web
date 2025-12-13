@@ -12,9 +12,10 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronUp, Edit, Trash2 } from "lucide-react";
+import { ChevronUp, Edit, Trash2, Copy } from "lucide-react";
 import { QuestionType } from "@/types/db/course/quiz-question";
 import { QuizQuestionEditForm } from "./edit-form";
+import { truncate } from "@/utils/render-utils";
 
 interface QuizQuestionTableProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -22,6 +23,7 @@ interface QuizQuestionTableProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onUpdate: UseFieldArrayUpdate<any, "questions">;
   onRemove: (index: number) => void;
+  onClone: (index: number) => void;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   form: UseFormReturn<any>;
 }
@@ -30,6 +32,7 @@ export function QuizQuestionTable({
   questions,
   onUpdate,
   onRemove,
+  onClone,
   form,
 }: QuizQuestionTableProps) {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
@@ -79,7 +82,7 @@ export function QuizQuestionTable({
               <TableRow key={question.id || index}>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell className="font-medium">
-                  {question.questionText || <span className="text-muted-foreground italic">No question text</span>}
+                  {truncate(question.questionText) || <span className="text-muted-foreground italic">No question text</span>}
                 </TableCell>
                 <TableCell>{getQuestionTypeBadge(question.questionType)}</TableCell>
                 <TableCell>{question.marks}</TableCell>
@@ -90,6 +93,7 @@ export function QuizQuestionTable({
                       size="sm"
                       variant="ghost"
                       onClick={() => toggleExpand(index)}
+                      title={expandedIndex === index ? "Collapse" : "Edit"}
                     >
                       {expandedIndex === index ? (
                         <ChevronUp className="h-4 w-4" />
@@ -104,8 +108,18 @@ export function QuizQuestionTable({
                       type="button"
                       size="sm"
                       variant="ghost"
+                      onClick={() => onClone(index)}
+                      title="Clone question"
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
                       onClick={() => onRemove(index)}
                       className="text-destructive hover:text-destructive"
+                      title="Delete question"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -128,6 +142,17 @@ export function QuizQuestionTable({
               )}
             </>
           ))}
+          
+          {/* Total marks summary row */}
+          <TableRow className="border-t-2 border-primary/20 bg-muted/30">
+            <TableCell colSpan={3} className="font-medium text-right">
+              Total Marks:
+            </TableCell>
+            <TableCell className="font-bold text-primary">
+              {questions.reduce((total, question) => total + (question.marks || 0), 0)}
+            </TableCell>
+            <TableCell></TableCell>
+          </TableRow>
         </TableBody>
       </Table>
     </div>

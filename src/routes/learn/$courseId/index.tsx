@@ -2,12 +2,15 @@ import { authGuard } from '@/utils'
 import { createFileRoute } from '@tanstack/react-router'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { Clock, BookOpen, Star, Loader2 } from 'lucide-react'
-import { timeDurationFormat } from '@/utils/time-utils'
+import { Clock, BookOpen, Star, Loader2, Play, CheckCircle, Clock3, Circle } from 'lucide-react'
+import { parseTimespanToMinutes } from '@/utils/time-utils'
 import { LearningNavBar } from '@/components/layout/nav-bar-2'
+import { useNavigate } from '@tanstack/react-router'
 import ModuleAccordion from '@/components/course/module-accordion'
 import { useCourseOverview } from './-hook'
+import { EnrollmentProgressStatus } from '@/types/db/course/enrollment'
 
 export const Route = createFileRoute('/learn/$courseId/')({
   component: RouteComponent,
@@ -15,7 +18,55 @@ export const Route = createFileRoute('/learn/$courseId/')({
 })
 
 function CourseOverview() {
-  const { course, modules, totalLessons, isLoading, error, handleLessonSelect } = useCourseOverview()
+  const navigate = useNavigate();
+  const { 
+    course, 
+    modules, 
+    totalLessons, 
+    isLoading, 
+    error, 
+    handleLessonSelect, 
+    currentLesson, 
+    handleContinueLearning, 
+    hasCurrentLesson,
+    completedLessons,
+    enrollmentProgressStatus
+  } = useCourseOverview()
+
+  const getProgressStatusDisplay = (status: EnrollmentProgressStatus | undefined) => {
+    switch (status) {
+      case EnrollmentProgressStatus.NOT_STARTED:
+        return {
+          icon: Circle,
+          label: 'Not Started',
+          color: 'text-muted-foreground',
+          bgColor: 'bg-muted'
+        }
+      case EnrollmentProgressStatus.IN_PROGRESS:
+        return {
+          icon: Clock3,
+          label: 'In Progress',
+          color: 'text-blue-600',
+          bgColor: 'bg-blue-50 dark:bg-blue-950'
+        }
+      case EnrollmentProgressStatus.COMPLETED:
+        return {
+          icon: CheckCircle,
+          label: 'Completed',
+          color: 'text-green-600',
+          bgColor: 'bg-green-50 dark:bg-green-950'
+        }
+      default:
+        return {
+          icon: Circle,
+          label: 'Unknown',
+          color: 'text-muted-foreground',
+          bgColor: 'bg-muted'
+        }
+    }
+  }
+
+  const progressStatus = getProgressStatusDisplay(enrollmentProgressStatus)
 
   if (isLoading) {
     return (
@@ -92,7 +143,7 @@ function CourseOverview() {
                     <div className="flex items-center gap-2 text-sm">
                       <Clock className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                       <span className="truncate">
-                        {course.duration ? timeDurationFormat(course.duration) : 'N/A'}
+                        {parseTimespanToMinutes(course.duration)} minutes
                       </span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
@@ -112,6 +163,15 @@ function CourseOverview() {
                         ${course.price}
                       </span>
                       <Badge variant="outline">{course.status}</Badge>
+                    </div>
+                    <div className="flex items-center gap-2 ml-auto">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => navigate({ to: `/course/${course.id}` })}
+                      >
+                        View Course
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -157,11 +217,46 @@ function CourseOverview() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-muted-foreground">
-              Start your learning journey by selecting a lesson from the sidebar.
-              Each module contains multiple lessons that will help you master the concepts step by step.
-            </p>
-            <Separator />
+            {/* Progress Status */}
+            <div className={`p-4 rounded-lg border ${progressStatus.bgColor}`}>
+              <div className="flex items-center gap-3">
+                <progressStatus.icon className={`w-5 h-5 ${progressStatus.color}`} />
+                <div>
+                  <h4 className="font-medium">Course Progress</h4>
+                  <p className={`text-sm ${progressStatus.color}`}>
+                    {progressStatus.label}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {hasCurrentLesson && currentLesson ? (
+              <div className="space-y-4">
+                <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-medium">Continue Learning</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Resume: {currentLesson.title}
+                      </p>
+                    </div>
+                    <Button onClick={handleContinueLearning} className="ml-4">
+                      <Play className="w-4 h-4 mr-2" />
+                      Continue
+                    </Button>
+                  </div>
+                </div>
+                <Separator />
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <p className="text-muted-foreground">
+                  Start your learning journey by selecting a lesson from the sidebar.
+                  Each module contains multiple lessons that will help you master the concepts step by step.
+                </p>
+                <Separator />
+              </div>
+            )}
             <div className="flex flex-wrap gap-2">
               <Badge variant="secondary">
                 {modules.length} Modules
@@ -198,6 +293,7 @@ function CourseOverview() {
                     data={module}
                     onLessonSelect={handleLessonSelect}
                     defaultExpanded={false}
+                    completedLessons={completedLessons}
                   />
                 ))}
               </div>

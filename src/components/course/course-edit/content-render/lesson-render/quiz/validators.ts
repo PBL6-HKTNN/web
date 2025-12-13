@@ -100,13 +100,30 @@ export const questionSchema = z
   });
 
 // Quiz form schema
-export const quizFormSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  description: z.string().optional(),
-  passingMarks: z.number().min(0, "Passing marks must be at least 0"),
-  questions: z
-    .array(questionSchema)
-    .min(1, "At least one question is required"),
-});
+export const quizFormSchema = z
+  .object({
+    title: z.string().min(1, "Title is required"),
+    description: z.string().optional(),
+    passingMarks: z.number().min(0, "Passing marks must be at least 0"),
+    questions: z
+      .array(questionSchema)
+      .min(1, "At least one question is required"),
+  })
+  .superRefine((data, ctx) => {
+    // Calculate total marks from all questions
+    const totalMarks = data.questions.reduce(
+      (sum, question) => sum + question.marks,
+      0
+    );
+
+    // Validate passing marks don't exceed total marks
+    if (data.passingMarks > totalMarks) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Passing marks (${data.passingMarks}) cannot be higher than total marks (${totalMarks})`,
+        path: ["passingMarks"],
+      });
+    }
+  });
 
 export type QuizFormData = z.infer<typeof quizFormSchema>;

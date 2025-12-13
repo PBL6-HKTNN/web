@@ -1,7 +1,7 @@
 import API_ROUTES from "@/conf/constants/api-routes";
 import type { UUID } from "@/types";
 import type { ApiResponse } from "@/types/core/api";
-import type { Lesson } from "@/types/db/course/lesson";
+import type { CheckLessonLockedRes, Lesson } from "@/types/db/course/lesson";
 import type {
   CreateLessonReq,
   CreateLessonRes,
@@ -10,11 +10,11 @@ import type {
   UpdateLessonReq,
   UpdateLessonRes,
 } from "@/types/db/course/lesson";
-import { createServiceApi, serviceUrls } from "@/utils/api";
+import { createServiceApi, serviceUrls, createApiService } from "@/utils/api";
 
 const api = createServiceApi(serviceUrls.COURSE_SERVICE_URL);
 
-export const lessonService = {
+const _lessonService = {
   getLessons: async (): Promise<ApiResponse<Lesson[]>> => {
     const response = await api.get<ApiResponse<Lesson[]>>(
       API_ROUTES.LESSON.getLessons
@@ -52,4 +52,13 @@ export const lessonService = {
     );
     return response.data;
   },
+  checkLessonLocked: async (lessonId: UUID): Promise<CheckLessonLockedRes> => {
+    const response = await api.get<CheckLessonLockedRes>(
+      API_ROUTES.LESSON.checkLessonLocked(lessonId)
+    );
+    return response.data;
+  },
 };
+
+// Export service with comprehensive error handling
+export const lessonService = createApiService(_lessonService, "LessonService");

@@ -10,6 +10,12 @@ import type {
   CreateCourseReq,
   GetCoursesFilterReq,
   UpdateCourseReq,
+  ValidateCourseReq,
+} from "@/types/db/course";
+import type {
+  ChangeCourseStatusReq,
+  ModChangeCourseStatusReq,
+  PreSubmitCheckReq,
 } from "@/types/db/course";
 
 export const courseQueryKeys = {
@@ -22,6 +28,9 @@ export const courseQueryKeys = {
     [...courseQueryKeys.courseDetail(id), "content"] as const,
   courseModules: (courseId: UUID) =>
     [...courseQueryKeys.allCourses, "modules", courseId] as const,
+  courseAnalytics: ["course", "analytics"] as const,
+  requestBanCourse: (courseId: UUID) =>
+    ["course", "requested-ban", courseId] as const,
 };
 
 export const useGetCourses = (filters: GetCoursesFilterReq) => {
@@ -104,5 +113,62 @@ export const useDeleteCourse = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: courseQueryKeys.allCourses });
     },
+  });
+};
+
+export const useValidateCourse = () => {
+  return useMutation({
+    mutationFn: (data: ValidateCourseReq) => courseService.validateCourse(data),
+  });
+};
+
+export const useChangeCourseStatus = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: ChangeCourseStatusReq) =>
+      courseService.changeCourseStatus(data),
+    onSuccess: (_, { courseId }) => {
+      queryClient.invalidateQueries({
+        queryKey: courseQueryKeys.courseDetail(courseId),
+      });
+      queryClient.invalidateQueries({ queryKey: courseQueryKeys.allCourses });
+    },
+  });
+};
+
+export const useModChangeCourseStatus = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: ModChangeCourseStatusReq) =>
+      courseService.modChangeCourseStatus(data),
+    onSuccess: (_, { courseId }) => {
+      queryClient.invalidateQueries({
+        queryKey: courseQueryKeys.courseDetail(courseId),
+      });
+      queryClient.invalidateQueries({ queryKey: courseQueryKeys.allCourses });
+    },
+  });
+};
+
+export const useRequestBanCourse = (courseId?: UUID) => {
+  return useQuery({
+    queryKey: courseQueryKeys.requestBanCourse(courseId as UUID),
+    queryFn: () => courseService.requestedBanCourse(courseId as UUID),
+    enabled: !!courseId,
+  });
+};
+
+export const usePreSubmitCheck = () => {
+  return useMutation({
+    mutationFn: (data: PreSubmitCheckReq) => courseService.preSubmitCheck(data),
+  });
+};
+
+export const useInstructorCourseAnalytics = () => {
+  return useQuery({
+    queryKey: courseQueryKeys.courseAnalytics,
+    queryFn: () => courseService.analytics(),
   });
 };

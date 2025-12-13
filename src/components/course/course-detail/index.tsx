@@ -1,36 +1,70 @@
-
-import { Star, Clock, Users, Play, BookOpen, Video, FileText, Trophy, Heart } from "lucide-react";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@/components/ui/alert";
+import { CourseStatus } from "@/types/db/course";
+import {
+  AlertCircle,
+  Clock,
+  FileText,
+  Flag,
+  Heart,
+  MoreVertical,
+  Play,
+  ShoppingCart,
+  Star,
+  Trophy,
+  Users,
+  Video,
+} from "lucide-react";
+import { AddToCartButton } from "@/components/payment/add-to-cart-button";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { CourseReportForm } from "@/components/course/course-report-form";
+import CourseTabs from "./tabs";
+import { cn } from "@/lib/utils";
 import { useCourseDetail } from "./hook";
-import ModuleAccordion from "@/components/course/module-accordion";
 import { renderLevelLabel } from "@/utils/render-utils";
-import { useAddToWishlist, useIsInWishlist } from "@/hooks/queries/course/wishlist-hooks";
-import { useEnroll, useIsEnrolled } from "@/hooks/queries/course/enrollment-hooks";
+import { formatDate } from "@/utils/format";
+import { useRouter } from "@tanstack/react-router";
 
 interface CourseDetailProps {
   courseId: string;
 }
 
 export function CourseDetail({ courseId }: CourseDetailProps) {
-  const { course, modules, isLoading, error } = useCourseDetail(courseId);
-  // const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
+  const { 
+    course, 
+    modules, 
+    isLoading, 
+    error,
+    isInstructor,
+    isInCart,
+    addToCartMutation,
+    isInWishlist,
+    addToWishlistMutation,
+    removeFromWishlistMutation,
+    handleWishlistClick,
+    enrollMutation,
+    isEnrolled,
+    reviews,
+    averageRating,
+    reviewsLoading,
+    averageLoading,
+    formatPrice
+  } = useCourseDetail(courseId);
 
-  // Wishlist hooks
-  const { data: isInWishlist } = useIsInWishlist(courseId);
-  const addToWishlistMutation = useAddToWishlist();
-
-  // Enrollment hooks
-  const enrollMutation = useEnroll();
-  const { data: isEnrolledResponse } = useIsEnrolled(courseId);
-  const isEnrolled = !!isEnrolledResponse?.data;
-  const handleWishlistClick = () => {
-    addToWishlistMutation.mutate(courseId);
-  };
+  const router = useRouter();
 
   if (isLoading) {
     return (
@@ -69,42 +103,173 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
     );
   }
 
-  const formatPrice = (price: number) => {
-    if (price === 0) return "Free";
-    return `$${price}`;
+  const isDraft = course.status === CourseStatus.DRAFT;
+  const isArchived = course.status === CourseStatus.ARCHIVED;
+  const isBanned = course.isRequestedBanned;
+
+  const renderActionButtons = () => {
+    // Instructor view
+    if (isInstructor) {
+      return (
+        <Button
+          className="w-full"
+          size="lg"
+          variant="outline"
+          onClick={() => {
+            window.location.href = `/lecturing-tool/course/${courseId}`;
+          }}
+        >
+          Edit Course
+        </Button>
+      );
+    }
+
+    // Enrolled user view (except draft courses)
+    if (isEnrolled && !isDraft) {
+      return (
+        <Button
+          className="w-full"
+          size="lg"
+          onClick={() => {
+            window.location.href = `/learn/${courseId}`;
+          }}
+        >
+          Go to course
+        </Button>
+      );
+    }
+
+    // Non-enrolled, non-instructor view (only for published courses)
+    if (!isEnrolled && !isInstructor && !isDraft && !isArchived) {
+      if (course.price === 0) {
+        // Free course
+        return (
+          <div className="flex gap-3">
+            <Button
+              className="flex-1"
+              size="lg"
+              onClick={() => enrollMutation.mutate(courseId)}
+              disabled={enrollMutation.isPending}
+            >
+              {enrollMutation.isPending ? "Enrolling..." : "Enroll for free"}
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
+              className="h-auto"
+              onClick={handleWishlistClick}
+              disabled={addToWishlistMutation.isPending || removeFromWishlistMutation.isPending}
+            >
+              <Heart
+                className={cn(
+                  "w-5 h-5",  
+                  isInWishlist?.isSuccess && "fill-red-500 text-red-500",
+                )}
+              />
+            </Button>
+          </div>
+        );
+      }
+
+      // Paid course
+      if (isInCart) {
+        return (
+          <div className="space-y-3">
+            <Button
+              className="w-full"
+              size="lg"
+              variant="outline"
+              onClick={() => router.navigate({
+                to: "/cart",
+              })}
+            >
+              Go to cart
+            </Button>
+            <div className="flex items-center justify-center gap-2">
+              <Button
+                variant="link"
+                className="p-0 h-auto gap-2"
+                onClick={() => addToCartMutation.mutate(courseId)}
+                disabled={addToCartMutation.isPending}
+              >
+                Remove from cart
+              </Button>
+              <Separator orientation="vertical" className="h-4" />
+              <Button
+                variant="link"
+                className="p-0 h-auto gap-2"
+                onClick={handleWishlistClick}
+                disabled={addToWishlistMutation.isPending || removeFromWishlistMutation.isPending}
+              >
+                <Heart
+                  className={cn(
+                    "w-4 h-4",
+                    isInWishlist?.isSuccess && "fill-red-500 text-red-500",
+                  )}
+                />
+                {isInWishlist?.isSuccess ? "Remove from wishlist" : "Add to wishlist"}
+              </Button>
+            </div>
+          </div>
+        );
+      }
+
+      // Paid course, not in cart
+      return (
+        <div className="space-y-3">
+          <AddToCartButton
+            courseId={courseId}
+            size="lg"
+            className="w-full"
+          />
+          <div className="flex items-center justify-center gap-2">
+            <Button
+              variant="link"
+              className="p-0 h-auto gap-2"
+              onClick={() => {
+                /* Implement Buy Now */
+              }}
+            >
+              <ShoppingCart className="w-4 h-4" />
+              Buy now
+            </Button>
+            <Separator orientation="vertical" className="h-4" />
+             <Button
+                variant="link"
+                className="p-0 h-auto gap-2"
+                onClick={handleWishlistClick}
+                disabled={addToWishlistMutation.isPending || removeFromWishlistMutation.isPending}
+              >
+                <Heart
+                  className={cn(
+                    "w-4 h-4",
+                    isInWishlist?.isSuccess && "fill-red-500 text-red-500",
+                  )}
+                />
+                {isInWishlist?.isSuccess ? "Remove from wishlist" : "Add to wishlist"}
+              </Button>
+          </div>
+        </div>
+      );
+    }
+
+    // No buttons for draft/archived courses or other states
+    return null;
   };
 
-  const formatNumber = (num: number) => {
-    if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
-    if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
-    return num.toString();
-  };
-
-  // const toggleSection = (sectionId: string) => {
-  //   const newExpanded = new Set(expandedSections);
-  //   if (newExpanded.has(sectionId)) {
-  //     newExpanded.delete(sectionId);
-  //   } else {
-  //     newExpanded.add(sectionId);
-  //   }
-  //   setExpandedSections(newExpanded);
-  // };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
 
       {/* Header with Video/Thumbnail */}
       <div className="relative bg-black">
-        <div className="aspect-video max-w-4xl mx-auto relative">
+        <div className="aspect-video max-w-6xl mx-auto relative">
           {course.thumbnail ? (
-            <video
+            <img
               className="w-full h-full object-cover"
-              poster={course.thumbnail}
-              controls
-              preload="metadata"
-            >
-              <source src={course.thumbnail} type="video/mp4" />
-            </video>
+              src={course.thumbnail}
+              alt="Course Thumbnail"
+            />
           ) : (
             <div className="w-full h-full bg-gray-800 flex items-center justify-center">
               <div className="text-center text-white">
@@ -122,12 +287,70 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
 
           {/* Left Content */}
           <div className="lg:col-span-2 space-y-8">
-
+            {/* Alerts */}
+              {(isDraft || isArchived || isBanned) && (
+                <div className="mb-6 space-y-4">
+                  {isDraft && (
+                    <Alert variant="destructive">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertTitle>Draft Course</AlertTitle>
+                      <AlertDescription>
+                        This is a draft course and is not visible to students. Only
+                        you can see this page.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                  {isArchived && (
+                    <Alert>
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertTitle>Archived Course</AlertTitle>
+                      <AlertDescription>
+                        This course is archived and can no longer be purchased.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                  {isBanned && !isArchived && (
+                    <Alert variant="destructive">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertTitle>Under Review</AlertTitle>
+                      <AlertDescription>
+                        This course is under review due to reports and may be
+                        archived soon.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                </div>
+              )}
             {/* Course Title and Basic Info */}
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                {course.title}
-              </h1>
+              <div className="flex items-start justify-between mb-2">
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                  {course.title}
+                </h1>
+                {!isInstructor && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem asChild>
+                        <CourseReportForm 
+                          courseId={courseId} 
+                          course={course}
+                          trigger={
+                            <div className="flex items-center cursor-pointer w-full">
+                              <Flag className="w-4 h-4 mr-2" />
+                              Report Course
+                            </div>
+                          }
+                        />
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
+              </div>
               {course.description && (
                 <p className="text-xl text-gray-600 dark:text-gray-400 mb-4">
                   {course.description}
@@ -138,9 +361,9 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
               <div className="flex flex-wrap items-center gap-4 mb-4">
                 <div className="flex items-center gap-1">
                   <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                  <span className="font-semibold text-lg">{course.averageRating}</span>
+                  <span className="font-semibold text-lg">{averageRating}</span>
                   <span className="text-gray-600 dark:text-gray-400">
-                    ({formatNumber(course.numberOfReviews)} ratings)
+                    ({course.numberOfReviews} ratings)
                   </span>
                 </div>
                 <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
@@ -155,7 +378,7 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
                 <Badge variant="secondary">{course.language}</Badge>
                 {course.updatedAt && (
                   <span className="text-gray-600 dark:text-gray-400">
-                    Last updated {course.updatedAt.toLocaleString()}
+                    Last updated {formatDate(course.updatedAt)}
                   </span>
                 )}
               </div>
@@ -180,207 +403,19 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
             </div>
 
             {/* Course Content Tabs */}
-            <Tabs defaultValue="overview" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="curriculum">Curriculum</TabsTrigger>
-                <TabsTrigger value="instructor">Instructor</TabsTrigger>
-                <TabsTrigger value="reviews">Reviews</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="overview" className="space-y-6 mt-6">
-                {/* Description */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>About this course</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                      {course.description}
-                    </p>
-                  </CardContent>
-                </Card>
-
-                {/* What you'll learn */}
-                {/* {course.whatYouWillLearn && course.whatYouWillLearn.length > 0 && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>What you'll learn</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {course.whatYouWillLearn.map((item, index) => (
-                          <div key={index} className="flex items-start gap-3">
-                            <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-                            <span className="text-gray-700 dark:text-gray-300">{item}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                )} */}
-
-                {/* Requirements */}
-                {/* {course.requirements && course.requirements.length > 0 && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Requirements</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300">
-                        {course.requirements.map((req, index) => (
-                          <li key={index}>{req}</li>
-                        ))}
-                      </ul>
-                    </CardContent>
-                  </Card>
-                )} */}
-
-                {/* Target Audience */}
-                {/* {course.targetAudience && course.targetAudience.length > 0 && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Who this course is for</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300">
-                        {course.targetAudience.map((audience, index) => (
-                          <li key={index}>{audience}</li>
-                        ))}
-                      </ul>
-                    </CardContent>
-                  </Card>
-                )} */}
-              </TabsContent>
-
-              <TabsContent value="curriculum" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <BookOpen className="w-5 h-5" />
-                      Course content
-                    </CardTitle>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {modules.length} modules • {modules.reduce((total, module) => total + (module.lessons?.length || 0), 0)} lessons
-                    </p>
-                  </CardHeader>
-                  <CardContent>
-                    {isLoading ? (
-                      <div className="space-y-4">
-                        <div className="animate-pulse">
-                          <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded mb-4"></div>
-                          <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded mb-4"></div>
-                          <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded"></div>
-                        </div>
-                      </div>
-                    ) : modules.length === 0 ? (
-                      <div className="text-center py-8 text-muted-foreground">
-                        <BookOpen className="size-12 mx-auto mb-4 opacity-50" />
-                        <p>No modules found for this course.</p>
-                      </div>
-                    ) : (
-                      <div className="space-y-4">
-                        {modules.map((module) => (
-                          <ModuleAccordion
-                            key={module.id}
-                            data={module}
-                            defaultExpanded={false}
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="instructor" className="mt-6">
-                {/* <Card>
-                  <CardHeader>
-                    <CardTitle>Your instructor</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex gap-4">
-                      <Avatar className="w-20 h-20">
-                        <AvatarImage src={course.instructor?.profilePicture} />
-                        <AvatarFallback className="text-lg">
-                          {course.instructor?.name?.substring(0, 2).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1">
-                        <h3 className="text-xl font-semibold mb-2">{course.instructor?.name}</h3>
-                        <div className="flex items-center gap-4 mb-3">
-                          <div className="flex items-center gap-1">
-                            <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                            <span className="font-medium">{course.instructor?.rating}</span>
-                            <span className="text-gray-600 dark:text-gray-400">Instructor Rating</span>
-                          </div>
-                          <div className="text-gray-600 dark:text-gray-400">
-                            {formatNumber(course.instructor?.studentsCount || 0)} students
-                          </div>
-                          <div className="text-gray-600 dark:text-gray-400">
-                            {course.instructor?.coursesCount} courses
-                          </div>
-                        </div>
-                        <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                          {course.instructor?.bio}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card> */}
-              </TabsContent>
-
-              <TabsContent value="reviews" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Student feedback</CardTitle>
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-1">
-                        <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                        <span className="text-2xl font-bold">{course.averageRating}</span>
-                        <span className="text-gray-600 dark:text-gray-400">
-                          course rating • {formatNumber(course.numberOfReviews)} ratings
-                        </span>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    {/* <div className="space-y-6">
-                      {course.reviews?.map((review: CourseReview) => (
-                        <div key={review.id} className="border-b border-gray-200 dark:border-gray-700 pb-6 last:border-0">
-                          <div className="flex items-start gap-3">
-                            <Avatar className="w-10 h-10">
-                              <AvatarImage src={review.user?.avatar} />
-                              <AvatarFallback>
-                                {review.user?.name?.substring(0, 2).toUpperCase()}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className="font-medium">{review.user?.name}</span>
-                                <div className="flex">
-                                  {[...Array(5)].map((_, i) => (
-                                    <Star
-                                      key={i}
-                                      className={`w-4 h-4 ${i < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
-                                    />
-                                  ))}
-                                </div>
-                              </div>
-                              <p className="text-gray-700 dark:text-gray-300">{review.comment}</p>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div> */}
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
+            <CourseTabs
+              course={course}
+              modules={modules}
+              courseId={courseId}
+              reviews={reviews}
+              averageRating={averageRating}
+              reviewsLoading={reviewsLoading}
+              averageRatingLoading={averageLoading}
+            />
           </div>
 
           {/* Right Sidebar */}
-          <div className="space-y-6">
+          <div className="space-y-6 lg:-mt-36">
             <Card className="sticky top-24">
               <CardContent className="p-6">
                 {/* Video Preview */}
@@ -400,46 +435,9 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
                   )}
                 </div>
 
-                {/* Enroll and Wishlist Buttons */}
-                <div className="flex gap-3 mb-4">
-                  <Button
-                    className="flex-1"
-                    size="lg"
-                    onClick={() => {
-                      if (!isEnrolled) {
-                        enrollMutation.mutate(courseId);
-                      }
-                    }}
-                    disabled={enrollMutation.isPending || isEnrolled}
-                  >
-                    {isEnrolled
-                      ? "Enrolled"
-                      : enrollMutation.isPending
-                      ? "Enrolling..."
-                      : "Enroll for Free"}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className={`w-12 h-12 p-0 border-2 transition-all duration-200 ${
-                      isInWishlist
-                        ? 'border-red-500 bg-red-50 text-red-500 hover:bg-red-100'
-                        : 'border-gray-300 text-gray-400 hover:border-red-300 hover:text-red-400 hover:bg-red-50'
-                    }`}
-                    onClick={handleWishlistClick}
-                    disabled={addToWishlistMutation.isPending}
-                    title={isInWishlist ? 'Already in wishlist' : 'Add to wishlist'}
-                  >
-                    {addToWishlistMutation.isPending ? (
-                      <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                    ) : (
-                      <Heart
-                        className={`w-5 h-5 transition-all duration-200 ${
-                          isInWishlist ? 'fill-current' : ''
-                        }`}
-                      />
-                    )}
-                  </Button>
+                {/* Enroll, Cart, and Wishlist Buttons */}
+                <div className="space-y-3 mb-4">
+                  {renderActionButtons()}
                 </div>
 
                 {/* Course includes */}

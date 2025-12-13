@@ -13,11 +13,12 @@ import type {
   UpdateQuizReq,
   UpdateQuizRes,
 } from "@/types/db/course/quiz";
-import { createServiceApi, serviceUrls } from "@/utils";
+import type { GetQuizListResultsRes } from "@/types/db/course/quiz-attempt";
+import { createServiceApi, serviceUrls, createApiService } from "@/utils/api";
 
 const api = createServiceApi(serviceUrls.COURSE_SERVICE_URL);
 
-export const quizService = {
+const _quizService = {
   createQuiz: async (quizData: CreateQuizReq): Promise<CreateQuizRes> => {
     const response = await api.post<CreateQuizRes>(
       API_ROUTES.QUIZ.createQuiz,
@@ -74,4 +75,15 @@ export const quizService = {
     );
     return response.data;
   },
+  getQuizListResults: async (
+    lessonId: UUID
+  ): Promise<GetQuizListResultsRes> => {
+    const response = await api.get<GetQuizListResultsRes>(
+      API_ROUTES.QUIZ.getQuizListResults(lessonId)
+    );
+    return response.data;
+  },
 };
+
+// Export service with comprehensive error handling
+export const quizService = createApiService(_quizService, "QuizService");

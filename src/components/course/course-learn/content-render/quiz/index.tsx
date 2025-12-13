@@ -3,15 +3,30 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Clock, Target, Trophy, Play, Loader2 } from "lucide-react"
 import type { Lesson } from "@/types/db/course/lesson"
+import type { UUID } from "@/types"
 import { useQuizContent } from "./hook"
+import { useCourseProgress } from "@/contexts/course/course-progress"
+import { useEffect } from "react"
 
 type QuizContentProps = {
   lesson: Lesson
+  courseId: UUID
 }
 
-export default function QuizContent({ lesson }: QuizContentProps) {
+export default function QuizContent({ lesson, courseId }: QuizContentProps) {
   const { quiz, isLoading, error, handleStartQuiz } = useQuizContent(lesson)
-
+  const {
+      updateCurrentView
+    } = useCourseProgress()
+    
+    useEffect(() => {
+      return () => {
+        if (lesson.id && courseId){
+          updateCurrentView(courseId, lesson.id)
+        }
+      }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [lesson, courseId])
   if (isLoading) {
     return (
       <div className="text-center py-8">

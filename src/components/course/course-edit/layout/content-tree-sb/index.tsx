@@ -25,6 +25,8 @@ export function ContentTreeSidebar({ isLoading = false }: { isLoading?: boolean 
     handleAddLesson,
     handleDeleteModule,
     handleDeleteLesson,
+    handleCloneModule,
+    handleCloneLesson,
   } = useContentTreeSidebar();
 
 
@@ -87,6 +89,8 @@ export function ContentTreeSidebar({ isLoading = false }: { isLoading?: boolean 
                   onAddLesson={handleAddLesson}
                   onDeleteModule={handleDeleteModule}
                   onDeleteLesson={handleDeleteLesson}
+                  onCloneModule={handleCloneModule}
+                  onCloneLesson={handleCloneLesson}
                   isSelected={selectedModuleId === module.id}
                 />
               ))}

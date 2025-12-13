@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { wishlistService } from "@/services/course/wishlist-service";
 import type { UUID } from "@/types";
-import type { WishlistedCourseItem } from "@/types/db/course/wishlist";
 
 export const wishlistQueryKeys = {
   allWishlist: ["wishlist"] as const,
@@ -11,17 +10,18 @@ export const wishlistQueryKeys = {
 export const useGetWishlist = () => {
   return useQuery({
     queryKey: wishlistQueryKeys.wishlistLists(),
+    retry: 1,
     queryFn: () => {
       return wishlistService.getWishlist();
     },
   });
 };
 
-export const useAddToWishlist = () => {
+export const useAddToWishlist = (courseId: UUID) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (courseId: UUID) => wishlistService.addToWishlist(courseId),
+    mutationFn: () => wishlistService.addToWishlist(courseId),
     onSuccess: () => {
       // Invalidate all wishlist queries including individual checks
       queryClient.invalidateQueries({
@@ -34,20 +34,22 @@ export const useAddToWishlist = () => {
   });
 };
 
-export const useRemoveFromWishlist = () => {
+export const useRemoveFromWishlist = (courseId: UUID) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (courseId: UUID) =>
-      wishlistService.removeFromWishlist(courseId),
+    mutationFn: () => wishlistService.removeFromWishlist(courseId),
     onSuccess: () => {
       // Invalidate wishlist queries to refresh the list
       queryClient.invalidateQueries({
-        queryKey: wishlistQueryKeys.allWishlist,
+        queryKey: [...wishlistQueryKeys.allWishlist, "check", courseId],
       });
     },
     onError: (error) => {
       console.error("Remove from wishlist failed:", error);
+      queryClient.invalidateQueries({
+        queryKey: [...wishlistQueryKeys.allWishlist, "check", courseId],
+      });
     },
   });
 };
@@ -55,9 +57,7 @@ export const useRemoveFromWishlist = () => {
 export const useIsInWishlist = (courseId: UUID) => {
   return useQuery({
     queryKey: [...wishlistQueryKeys.allWishlist, "check", courseId],
-    queryFn: () => wishlistService.getWishlist(),
-    select: (data) => {
-      return data?.data?.some((item: WishlistedCourseItem) => item.courseId === courseId) || false;
-    },
+    queryFn: () => wishlistService.wishlistCheck(courseId),
+    enabled: !!courseId,
   });
 };

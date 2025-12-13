@@ -15,8 +15,7 @@ interface CourseTableFiltersProps {
 }
 
 const SORT_OPTIONS = [
-  { value: "name", label: "Name A-Z" },
-  { value: "date", label: "Date" },
+  { value: "price", label: "Price" },
   { value: "rating", label: "Rating" },
 ] as const;
 
@@ -50,7 +49,7 @@ export function CourseTableFilters({ filters, onFiltersChange, totalResults }: C
 
   const clearFilters = () => {
     onFiltersChange({
-      SortBy: 'name',
+      SortBy: 'price',
       Page: 1,
       PageSize: 12
     });

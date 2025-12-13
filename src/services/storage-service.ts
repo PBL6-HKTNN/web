@@ -1,15 +1,15 @@
 import { storageApiUrl } from "@/conf";
 import API_ROUTES from "@/conf/constants/api-routes";
 import type { UploadFileReq, UploadFileRes } from "@/types/core/storage";
-import { createServiceApi } from "@/utils/api";
+import { createServiceApi, createApiService } from "@/utils/api";
 
-const storageApi = createServiceApi(storageApiUrl);
+const api = createServiceApi(storageApiUrl);
 
-export const storageService = {
+const _storageService = {
   uploadFile: async (req: UploadFileReq): Promise<UploadFileRes> => {
     const formData = new FormData();
     formData.append("file", req.file);
-    const response = await storageApi.postForm(
+    const response = await api.postForm(
       API_ROUTES.STORAGE.uploadFile(req.type),
       formData
     );
@@ -17,9 +17,13 @@ export const storageService = {
   },
 
   deleteFile: async (publicId: string) => {
-    const response = await storageApi.delete(
-      API_ROUTES.STORAGE.deleteFile(publicId)
-    );
+    const response = await api.delete(API_ROUTES.STORAGE.deleteFile(publicId));
     return response.data;
   },
 };
+
+// Export service with comprehensive error handling
+export const storageService = createApiService(
+  _storageService,
+  "StorageService"
+);

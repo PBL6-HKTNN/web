@@ -10,13 +10,11 @@ export const Level = {
 
 export type Level = (typeof Level)[keyof typeof Level];
 
-const CourseStatus = {
+export const CourseStatus = {
   DRAFT: 0,
   PUBLISHED: 1,
   ARCHIVED: 2,
 } as const;
-
-export { CourseStatus };
 
 export type CourseStatus = (typeof CourseStatus)[keyof typeof CourseStatus];
 
@@ -31,18 +29,21 @@ export type Course = Base & {
   price: number;
   level: Level;
   language: string;
+  totalEnrollments: number;
   numberOfModules: number;
   numberOfReviews: number;
   averageRating: number;
   modules?: Module[];
+  isEnrolled?: boolean;
+  isRequestedBanned?: boolean;
 };
 
 export type CreateCourseReq = {
   instructorId: UUID;
   categoryId: UUID;
   title: string;
-  description?: string;
-  thumbnail?: string | null;
+  description: string;
+  thumbnail: string;
   price: number;
   level: Level;
   language: string;
@@ -67,8 +68,9 @@ export type GetCourseContentRes = ApiResponse<{
 export type GetCoursesFilterReq = {
   CategoryId?: UUID;
   Level?: Level;
+  InstructorId?: UUID;
   Language?: string;
-  SortBy?: "name" | "date" | "rating";
+  SortBy?: "price" | "rating";
   Page?: number;
   PageSize?: number;
 };
@@ -81,3 +83,43 @@ export type CourseEditReq = {
   thumbnail?: string | null;
   modules?: ModuleReq[];
 };
+
+export type ValidateCourseReq = {
+  courseId: UUID;
+  lessonId: UUID;
+};
+
+export type ValidateCourseRes = ApiResponse<boolean>;
+
+export type ChangeCourseStatusReq = {
+  courseId: UUID;
+  status: CourseStatus;
+  moderatorId: UUID;
+};
+
+export type ChangeCourseStatusRes = ApiResponse<Course>;
+
+export type ModChangeCourseStatusReq = ChangeCourseStatusReq;
+
+export type ModChangeCourseStatusRes = ChangeCourseStatusRes;
+
+export type PreSubmitCheckReq = {
+  courseId: UUID;
+};
+
+export type PreSubmitCheckRes = ApiResponse<string>;
+
+export type RequestedBanCourseRes = ApiResponse<{
+  success: boolean;
+  message: string;
+}>;
+
+export type CourseAnalyticsRes = ApiResponse<{
+  totalCourses: number;
+  publishedCourses: number;
+  draftCourses: number;
+  archivedCourses: number;
+  totalEnrollments: number;
+  monthlyNewEnrollments: number[];
+  top5Courses: Course[];
+}>;

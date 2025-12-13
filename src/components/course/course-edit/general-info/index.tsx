@@ -119,7 +119,7 @@ export function CourseForm({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Category *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLoading}>
+                    <Select onValueChange={field.onChange} value={field.value} disabled={isLoading}>
                       <FormControl>
                         <SelectTrigger data-testid="course-category-select">
                           <SelectValue placeholder="Select a category" />
@@ -147,7 +147,7 @@ export function CourseForm({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Difficulty Level *</FormLabel>
-                    <Select onValueChange={(value) => field.onChange(Number(value))} defaultValue={field.value?.toString()} disabled={isLoading}>
+                    <Select onValueChange={(value) => field.onChange(Number(value))} value={field.value?.toString()} disabled={isLoading}>
                       <FormControl>
                         <SelectTrigger data-testid="course-level-select">
                           <SelectValue placeholder="Select difficulty level" />
