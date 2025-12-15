@@ -15,6 +15,7 @@ import type {
   GetEnrolledCourseFilterReq,
   GetLastDateCourseResponse,
   GetCourseEnrolledStudentsResponse,
+  AddToCalendarResponse,
 } from "@/types/db/course/enrollment";
 import { createServiceApi, serviceUrls, createApiService } from "@/utils/api";
 
@@ -107,6 +108,18 @@ const _enrollmentService = {
     const response = await api.get(
       API_ROUTES.ENROLLMENT.getListStudentsByCourse(courseId)
     );
+    return response.data;
+  },
+
+  getTotalEnrollmentsByCourse: async (courseId: UUID): Promise<number> => {
+    const response = await api.get(
+      API_ROUTES.ENROLLMENT.getTotalEnrollmentsByCourse(courseId)
+    );
+    return response.data.totalStudents;
+  },
+
+  addToCalendar: async (courseId: UUID): Promise<AddToCalendarResponse> => {
+    const response = await api.get(API_ROUTES.ENROLLMENT.addCalendar(courseId));
     return response.data;
   },
 };

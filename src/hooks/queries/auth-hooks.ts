@@ -12,7 +12,11 @@ import type {
   AuthState,
   ChangePasswordReq,
 } from "@/types/core/auth";
-import type { User } from "@/types/db/user";
+import type {
+  ExchangeCodeForTokenReq,
+  GetRefreshTokenResponse,
+  User,
+} from "@/types/db/user";
 import Persistence from "@/utils/persistence";
 
 // Auth persistence keys
@@ -219,6 +223,18 @@ export const useChangePassword = () => {
     onError: (error) => {
       console.error("Password change failed:", error);
     },
+  });
+};
+
+export const useGetRefreshToken = () => {
+  return useMutation<GetRefreshTokenResponse, Error>({
+    mutationFn: authService.getRefreshToken,
+  });
+};
+
+export const useExchangeCodeForToken = () => {
+  return useMutation<GetRefreshTokenResponse, Error, ExchangeCodeForTokenReq>({
+    mutationFn: authService.exchangeCodeForToken,
   });
 };
 

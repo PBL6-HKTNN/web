@@ -45,3 +45,17 @@ export type UserDetailResponse = ApiResponse<{
   user: User;
   permissions: UserPermission[];
 }>;
+
+export type GetRefreshTokenQuery = {
+  returnUrl: string;
+};
+export type GetRefreshTokenResponse = ApiResponse<string>;
+
+export type ExchangeCodeForTokenReq = {
+  code: string;
+};
+
+export type ExchangeCodeForTokenResponse = ApiResponse<{
+  success: boolean;
+  message: string | null;
+}>;

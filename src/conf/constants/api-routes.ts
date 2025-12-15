@@ -11,6 +11,8 @@ const API_ROUTES = {
     resetPassword: "/Auth/reset-password",
     changePassword: "/Auth/change-password",
     logout: "/Auth/logout",
+    getRefreshToken: "/Auth/oauth-url",
+    exchangeCodeForToken: "/Auth/exchange",
   },
   USER: {
     getAllUsers: "/User",
@@ -106,6 +108,9 @@ const API_ROUTES = {
       `/Enrollment/get-last-date-Course/${courseId}`,
     getListStudentsByCourse: (courseId: UUID) =>
       `/Enrollment/get-list-students/${courseId}`,
+    getTotalEnrollmentsByCourse: (courseId: UUID) =>
+      `/Enrollment/total-enrollments/${courseId}`,
+    addCalendar: (courseId: UUID) => `/Enrollment/add-calendar/${courseId}`,
   },
   REVIEW: {
     createReview: "/Review",
