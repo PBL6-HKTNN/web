@@ -1,9 +1,13 @@
 import API_ROUTES from "@/conf/constants/api-routes";
 import type { UUID } from "@/types";
 import type {
+  CreateQuizInVideoReq,
+  CreateQuizInVideoRes,
   QuizStartAttemptRes,
   QuizSubmissionReq,
   QuizSubmissionRes,
+  SubmitQuizInVideoReq,
+  SubmitQuizInVideoRes,
 } from "@/types/db/course/quiz";
 import type {
   CreateQuizReq,
@@ -80,6 +84,24 @@ const _quizService = {
   ): Promise<GetQuizListResultsRes> => {
     const response = await api.get<GetQuizListResultsRes>(
       API_ROUTES.QUIZ.getQuizListResults(lessonId)
+    );
+    return response.data;
+  },
+  createQuizInVideo: async (
+    quizData: CreateQuizInVideoReq
+  ): Promise<CreateQuizInVideoRes> => {
+    const response = await api.post<CreateQuizInVideoRes>(
+      API_ROUTES.QUIZ.createQuizInVideo,
+      quizData
+    );
+    return response.data;
+  },
+  submitQuizInVideo: async (
+    submissionData: SubmitQuizInVideoReq
+  ): Promise<SubmitQuizInVideoRes> => {
+    const response = await api.post<SubmitQuizInVideoRes>(
+      API_ROUTES.QUIZ.submitQuizInVideo,
+      submissionData
     );
     return response.data;
   },

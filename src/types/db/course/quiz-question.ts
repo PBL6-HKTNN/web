@@ -1,5 +1,5 @@
 import type { Answer } from "./answer";
-import type { UUID } from "@/types/core";
+import type { Base, UUID } from "@/types/core";
 
 export type QuizQuestion = {
   questionId?: UUID;
@@ -7,6 +7,14 @@ export type QuizQuestion = {
   questionType: QuestionType;
   marks: number;
   answers: Answer[];
+};
+
+export type QuizInVideo = Base & {
+  lessonId: UUID;
+  time: string;
+  question: string;
+  options: string[];
+  correctAnswer: string;
 };
 
 export const QuestionType = {

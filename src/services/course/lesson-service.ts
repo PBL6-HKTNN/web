@@ -1,7 +1,11 @@
 import API_ROUTES from "@/conf/constants/api-routes";
 import type { UUID } from "@/types";
 import type { ApiResponse } from "@/types/core/api";
-import type { CheckLessonLockedRes, Lesson } from "@/types/db/course/lesson";
+import type {
+  CheckLessonLockedRes,
+  CheckLessonVideoRes,
+  Lesson,
+} from "@/types/db/course/lesson";
 import type {
   CreateLessonReq,
   CreateLessonRes,
@@ -55,6 +59,13 @@ const _lessonService = {
   checkLessonLocked: async (lessonId: UUID): Promise<CheckLessonLockedRes> => {
     const response = await api.get<CheckLessonLockedRes>(
       API_ROUTES.LESSON.checkLessonLocked(lessonId)
+    );
+    return response.data;
+  },
+
+  checkLessonVideo: async (lessonId: UUID): Promise<CheckLessonVideoRes> => {
+    const response = await api.get<CheckLessonVideoRes>(
+      API_ROUTES.LESSON.checkLessonVideo(lessonId)
     );
     return response.data;
   },

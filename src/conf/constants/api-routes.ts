@@ -76,6 +76,8 @@ const API_ROUTES = {
     updateLesson: (lessonId: UUID) => `/Lesson/update/${lessonId}`,
     deleteLesson: (lessonId: UUID) => `/Lesson/${lessonId}`,
     checkLessonLocked: (lessonId: UUID) => `/Lesson/check-locked/${lessonId}`,
+    checkLessonVideo: (lessonId: UUID) =>
+      `/Lesson/${lessonId}/video-checkpoint`,
   },
   QUIZ: {
     getQuizzes: "/Quiz",
@@ -88,6 +90,8 @@ const API_ROUTES = {
     getQuizAttempts: (quizId: UUID) => `/Quiz/Attempts/${quizId}`,
     updateQuiz: (quizId: UUID) => `/Quiz/update/${quizId}`,
     deleteQuiz: (quizId: UUID) => `/Quiz/${quizId}`,
+    createQuizInVideo: "/Quiz/create-quiz",
+    submitQuizInVideo: "/Quiz/submit/quiz-in-video",
   },
   WISHLIST: {
     getWishlist: "/Wishlist/get",
