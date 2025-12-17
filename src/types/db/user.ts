@@ -39,6 +39,21 @@ export type ChangeAvatarReq = {
 
 export type UpdateProfileReq = Partial<Pick<User, "name" | "bio">>;
 
+export type EditUserByAdminReq = {
+  id: string;
+  name: string;
+  password?: string;
+  isActive: boolean;
+  role: UserRole;
+};
+
+export type CreateUserByAdminReq = {
+  email: string;
+  password: string;
+  name: string;
+  role: UserRole;
+};
+
 export type UserDetailResponse = ApiResponse<{
   success: boolean;
   message: string | null;

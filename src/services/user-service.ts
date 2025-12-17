@@ -1,7 +1,7 @@
 import API_ROUTES from "@/conf/constants/api-routes";
 import type { ChangeAvatarReq, UpdateProfileReq } from "@/types/db";
 import api, { createApiService } from "@/utils/api";
-import type { User, UserDetailResponse } from "@/types/db/user";
+import type { User, UserDetailResponse, EditUserByAdminReq, CreateUserByAdminReq } from "@/types/db/user";
 import type { ApiResponse } from "@/types/core/api";
 
 const _userService = {
@@ -37,6 +37,16 @@ const _userService = {
 
   updateProfile: async (userId: string, data: UpdateProfileReq) => {
     const response = await api.put(API_ROUTES.USER.updateProfile(userId), data);
+    return response.data;
+  },
+
+  editUserByAdmin: async (data: EditUserByAdminReq): Promise<ApiResponse<User>> => {
+    const response = await api.post(API_ROUTES.USER.adminEdit, data);
+    return response.data;
+  },
+
+  createUserByAdmin: async (data: CreateUserByAdminReq): Promise<ApiResponse<User>> => {
+    const response = await api.post(API_ROUTES.USER.adminCreate, data);
     return response.data;
   },
 };
