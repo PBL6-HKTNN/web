@@ -47,6 +47,7 @@ import { Route as LearnCourseIdRouteRouteImport } from './routes/learn/$courseId
 import { Route as AuthMainLayoutRouteRouteImport } from './routes/auth/_mainLayout/route'
 import { Route as AdminUsersRouteRouteImport } from './routes/admin/users/route'
 import { Route as AdminTransactionsRouteRouteImport } from './routes/admin/transactions/route'
+import { Route as AdminRequestsReportsRouteRouteImport } from './routes/admin/requests-reports/route'
 import { Route as AdminPermissionsRouteRouteImport } from './routes/admin/permissions/route'
 import { Route as AdminCoursesRouteRouteImport } from './routes/admin/courses/route'
 import { Route as SettingsRequestHistoryIndexRouteImport } from './routes/settings/request-history/index'
@@ -63,6 +64,7 @@ import { Route as AuthVerifyIndexRouteImport } from './routes/auth/verify/index'
 import { Route as AuthForgotPasswordIndexRouteImport } from './routes/auth/forgot-password/index'
 import { Route as AdminUsersIndexRouteImport } from './routes/admin/users/index'
 import { Route as AdminTransactionsIndexRouteImport } from './routes/admin/transactions/index'
+import { Route as AdminRequestsReportsIndexRouteImport } from './routes/admin/requests-reports/index'
 import { Route as AdminPermissionsIndexRouteImport } from './routes/admin/permissions/index'
 import { Route as AdminCoursesIndexRouteImport } from './routes/admin/courses/index'
 import { Route as LearnCourseIdModuleIdRouteRouteImport } from './routes/learn/$courseId/$moduleId/route'
@@ -275,6 +277,12 @@ const AdminTransactionsRouteRoute = AdminTransactionsRouteRouteImport.update({
   path: '/transactions',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminRequestsReportsRouteRoute =
+  AdminRequestsReportsRouteRouteImport.update({
+    id: '/requests-reports',
+    path: '/requests-reports',
+    getParentRoute: () => AdminRouteRoute,
+  } as any)
 const AdminPermissionsRouteRoute = AdminPermissionsRouteRouteImport.update({
   id: '/permissions',
   path: '/permissions',
@@ -360,6 +368,12 @@ const AdminTransactionsIndexRoute = AdminTransactionsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminTransactionsRouteRoute,
 } as any)
+const AdminRequestsReportsIndexRoute =
+  AdminRequestsReportsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AdminRequestsReportsRouteRoute,
+  } as any)
 const AdminPermissionsIndexRoute = AdminPermissionsIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -489,6 +503,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/admin/courses': typeof AdminCoursesRouteRouteWithChildren
   '/admin/permissions': typeof AdminPermissionsRouteRouteWithChildren
+  '/admin/requests-reports': typeof AdminRequestsReportsRouteRouteWithChildren
   '/admin/transactions': typeof AdminTransactionsRouteRouteWithChildren
   '/admin/users': typeof AdminUsersRouteRouteWithChildren
   '/learn/$courseId': typeof LearnCourseIdRouteRouteWithChildren
@@ -515,6 +530,7 @@ export interface FileRoutesByFullPath {
   '/learn/$courseId/$moduleId': typeof LearnCourseIdModuleIdRouteRouteWithChildren
   '/admin/courses/': typeof AdminCoursesIndexRoute
   '/admin/permissions/': typeof AdminPermissionsIndexRoute
+  '/admin/requests-reports/': typeof AdminRequestsReportsIndexRoute
   '/admin/transactions/': typeof AdminTransactionsIndexRoute
   '/admin/users/': typeof AdminUsersIndexRoute
   '/auth/forgot-password': typeof AuthForgotPasswordIndexRoute
@@ -567,6 +583,7 @@ export interface FileRoutesByTo {
   '/google/callback': typeof _providerGoogleCallbackRouteRoute
   '/admin/courses': typeof AdminCoursesIndexRoute
   '/admin/permissions': typeof AdminPermissionsIndexRoute
+  '/admin/requests-reports': typeof AdminRequestsReportsIndexRoute
   '/admin/transactions': typeof AdminTransactionsIndexRoute
   '/admin/users': typeof AdminUsersIndexRoute
   '/auth/forgot-password': typeof AuthForgotPasswordIndexRoute
@@ -613,6 +630,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/admin/courses': typeof AdminCoursesRouteRouteWithChildren
   '/admin/permissions': typeof AdminPermissionsRouteRouteWithChildren
+  '/admin/requests-reports': typeof AdminRequestsReportsRouteRouteWithChildren
   '/admin/transactions': typeof AdminTransactionsRouteRouteWithChildren
   '/admin/users': typeof AdminUsersRouteRouteWithChildren
   '/auth/_mainLayout': typeof AuthMainLayoutRouteRouteWithChildren
@@ -640,6 +658,7 @@ export interface FileRoutesById {
   '/learn/$courseId/$moduleId': typeof LearnCourseIdModuleIdRouteRouteWithChildren
   '/admin/courses/': typeof AdminCoursesIndexRoute
   '/admin/permissions/': typeof AdminPermissionsIndexRoute
+  '/admin/requests-reports/': typeof AdminRequestsReportsIndexRoute
   '/admin/transactions/': typeof AdminTransactionsIndexRoute
   '/admin/users/': typeof AdminUsersIndexRoute
   '/auth/forgot-password/': typeof AuthForgotPasswordIndexRoute
@@ -690,6 +709,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/admin/courses'
     | '/admin/permissions'
+    | '/admin/requests-reports'
     | '/admin/transactions'
     | '/admin/users'
     | '/learn/$courseId'
@@ -716,6 +736,7 @@ export interface FileRouteTypes {
     | '/learn/$courseId/$moduleId'
     | '/admin/courses/'
     | '/admin/permissions/'
+    | '/admin/requests-reports/'
     | '/admin/transactions/'
     | '/admin/users/'
     | '/auth/forgot-password'
@@ -768,6 +789,7 @@ export interface FileRouteTypes {
     | '/google/callback'
     | '/admin/courses'
     | '/admin/permissions'
+    | '/admin/requests-reports'
     | '/admin/transactions'
     | '/admin/users'
     | '/auth/forgot-password'
@@ -813,6 +835,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/admin/courses'
     | '/admin/permissions'
+    | '/admin/requests-reports'
     | '/admin/transactions'
     | '/admin/users'
     | '/auth/_mainLayout'
@@ -840,6 +863,7 @@ export interface FileRouteTypes {
     | '/learn/$courseId/$moduleId'
     | '/admin/courses/'
     | '/admin/permissions/'
+    | '/admin/requests-reports/'
     | '/admin/transactions/'
     | '/admin/users/'
     | '/auth/forgot-password/'
@@ -1159,6 +1183,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminTransactionsRouteRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/requests-reports': {
+      id: '/admin/requests-reports'
+      path: '/requests-reports'
+      fullPath: '/admin/requests-reports'
+      preLoaderRoute: typeof AdminRequestsReportsRouteRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/permissions': {
       id: '/admin/permissions'
       path: '/permissions'
@@ -1270,6 +1301,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/transactions/'
       preLoaderRoute: typeof AdminTransactionsIndexRouteImport
       parentRoute: typeof AdminTransactionsRouteRoute
+    }
+    '/admin/requests-reports/': {
+      id: '/admin/requests-reports/'
+      path: '/'
+      fullPath: '/admin/requests-reports/'
+      preLoaderRoute: typeof AdminRequestsReportsIndexRouteImport
+      parentRoute: typeof AdminRequestsReportsRouteRoute
     }
     '/admin/permissions/': {
       id: '/admin/permissions/'
@@ -1434,6 +1472,20 @@ const AdminPermissionsRouteRouteWithChildren =
     AdminPermissionsRouteRouteChildren,
   )
 
+interface AdminRequestsReportsRouteRouteChildren {
+  AdminRequestsReportsIndexRoute: typeof AdminRequestsReportsIndexRoute
+}
+
+const AdminRequestsReportsRouteRouteChildren: AdminRequestsReportsRouteRouteChildren =
+  {
+    AdminRequestsReportsIndexRoute: AdminRequestsReportsIndexRoute,
+  }
+
+const AdminRequestsReportsRouteRouteWithChildren =
+  AdminRequestsReportsRouteRoute._addFileChildren(
+    AdminRequestsReportsRouteRouteChildren,
+  )
+
 interface AdminTransactionsRouteRouteChildren {
   AdminTransactionsIndexRoute: typeof AdminTransactionsIndexRoute
 }
@@ -1465,6 +1517,7 @@ const AdminUsersRouteRouteWithChildren = AdminUsersRouteRoute._addFileChildren(
 interface AdminRouteRouteChildren {
   AdminCoursesRouteRoute: typeof AdminCoursesRouteRouteWithChildren
   AdminPermissionsRouteRoute: typeof AdminPermissionsRouteRouteWithChildren
+  AdminRequestsReportsRouteRoute: typeof AdminRequestsReportsRouteRouteWithChildren
   AdminTransactionsRouteRoute: typeof AdminTransactionsRouteRouteWithChildren
   AdminUsersRouteRoute: typeof AdminUsersRouteRouteWithChildren
   AdminIndexRoute: typeof AdminIndexRoute
@@ -1473,6 +1526,7 @@ interface AdminRouteRouteChildren {
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminCoursesRouteRoute: AdminCoursesRouteRouteWithChildren,
   AdminPermissionsRouteRoute: AdminPermissionsRouteRouteWithChildren,
+  AdminRequestsReportsRouteRoute: AdminRequestsReportsRouteRouteWithChildren,
   AdminTransactionsRouteRoute: AdminTransactionsRouteRouteWithChildren,
   AdminUsersRouteRoute: AdminUsersRouteRouteWithChildren,
   AdminIndexRoute: AdminIndexRoute,

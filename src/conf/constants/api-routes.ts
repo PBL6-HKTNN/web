@@ -20,6 +20,8 @@ const API_ROUTES = {
     changeAvatar: (userId: string) => `/User/${userId}/avatar`,
     updateProfile: (userId: string) => `/User/${userId}/profile`,
     getPermissions: (userId: string) => `/Permission/user-permission/${userId}`,
+    adminEdit: "/User/admin/edit",
+    adminCreate: "/User/admin/create",
   },
   PERMISSION: {
     list: "/Permission/",

@@ -5,7 +5,8 @@ import {
   UsersIcon,
   CreditCardIcon,
   BookOpenIcon,
-  ShieldIcon
+  ShieldIcon,
+  FileIcon
 } from 'lucide-react'
 import { roleGuard } from '@/utils'
 import { UserRole } from '@/types/db'
@@ -22,6 +23,7 @@ function RouteComponent() {
     { label: 'Transactions', icon: <CreditCardIcon />, href: '/admin/transactions' },
     { label: 'Courses', icon: <BookOpenIcon />, href: '/admin/courses' },
     { label: 'Permissions', icon: <ShieldIcon />, href: '/admin/permissions' },
+    { label: 'Requests & Reports', icon: <FileIcon />, href: '/admin/requests-reports' },
   ]
   return <ToolLayout title='Admin Panel' items={items}><Outlet /></ToolLayout>
 }
