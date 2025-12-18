@@ -11,6 +11,8 @@ const API_ROUTES = {
     resetPassword: "/Auth/reset-password",
     changePassword: "/Auth/change-password",
     logout: "/Auth/logout",
+    getRefreshToken: "/Auth/oauth-url",
+    exchangeCodeForToken: "/Auth/exchange",
   },
   USER: {
     getAllUsers: "/User",
@@ -18,6 +20,8 @@ const API_ROUTES = {
     changeAvatar: (userId: string) => `/User/${userId}/avatar`,
     updateProfile: (userId: string) => `/User/${userId}/profile`,
     getPermissions: (userId: string) => `/Permission/user-permission/${userId}`,
+    adminEdit: "/User/admin/edit",
+    adminCreate: "/User/admin/create",
   },
   PERMISSION: {
     list: "/Permission/",
@@ -74,6 +78,8 @@ const API_ROUTES = {
     updateLesson: (lessonId: UUID) => `/Lesson/update/${lessonId}`,
     deleteLesson: (lessonId: UUID) => `/Lesson/${lessonId}`,
     checkLessonLocked: (lessonId: UUID) => `/Lesson/check-locked/${lessonId}`,
+    checkLessonVideo: (lessonId: UUID) =>
+      `/Lesson/${lessonId}/video-checkpoint`,
   },
   QUIZ: {
     getQuizzes: "/Quiz",
@@ -86,6 +92,8 @@ const API_ROUTES = {
     getQuizAttempts: (quizId: UUID) => `/Quiz/Attempts/${quizId}`,
     updateQuiz: (quizId: UUID) => `/Quiz/update/${quizId}`,
     deleteQuiz: (quizId: UUID) => `/Quiz/${quizId}`,
+    createQuizInVideo: "/Quiz/create-quiz",
+    submitQuizInVideo: "/Quiz/submit/quiz-in-video",
   },
   WISHLIST: {
     getWishlist: "/Wishlist/get",
@@ -106,6 +114,9 @@ const API_ROUTES = {
       `/Enrollment/get-last-date-Course/${courseId}`,
     getListStudentsByCourse: (courseId: UUID) =>
       `/Enrollment/get-list-students/${courseId}`,
+    getTotalEnrollmentsByCourse: (courseId: UUID) =>
+      `/Enrollment/total-enrollments/${courseId}`,
+    addCalendar: (courseId: UUID) => `/Enrollment/add-calendar/${courseId}`,
   },
   REVIEW: {
     createReview: "/Review",

@@ -14,6 +14,8 @@ export const lessonQueryKeys = {
   lessonDetail: (id: UUID) => [...lessonQueryKeys.lessonDetails(), id] as const,
   lessonLocked: (id: UUID) =>
     [...lessonQueryKeys.lessonDetail(id), "locked"] as const,
+  lessonVideoCheck: (id: UUID) =>
+    [...lessonQueryKeys.lessonDetail(id), "video-check"] as const,
 };
 
 export const useGetLessons = () => {
@@ -93,6 +95,15 @@ export const useCheckLessonLocked = (lessonId: UUID) => {
   return useQuery({
     queryKey: lessonQueryKeys.lessonLocked(lessonId),
     queryFn: () => lessonService.checkLessonLocked(lessonId),
+    enabled: !!lessonId,
+    retry: false,
+  });
+};
+
+export const useCheckLessonVideo = (lessonId: UUID) => {
+  return useQuery({
+    queryKey: lessonQueryKeys.lessonVideoCheck(lessonId),
+    queryFn: () => lessonService.checkLessonVideo(lessonId),
     enabled: !!lessonId,
     retry: false,
   });

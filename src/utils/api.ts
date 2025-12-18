@@ -209,6 +209,7 @@ export function getQueryErrorMessage(
   if (typeof error === "object" && error && "normalized" in error) {
     const enhancedError = error as EnhancedError;
     if (enhancedError.normalized?.message) {
+      toast.error(enhancedError.normalized.message);
       return enhancedError.normalized.message;
     }
   }

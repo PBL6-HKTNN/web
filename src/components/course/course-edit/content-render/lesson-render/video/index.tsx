@@ -1,20 +1,36 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog } from "@/components/ui/dialog";
-import { Video, Edit, Save, X, Upload, Loader2, Trash2 } from "lucide-react";
+import {
+  Video,
+  Edit,
+  Save,
+  X,
+  Upload,
+  Loader2,
+  Trash2,
+  HelpCircle,
+} from "lucide-react";
 import { MediaUploadDialog } from "@/components/shared/image-upload";
 import { useUpdateLesson } from "@/hooks/queries/course/lesson-hooks";
 import { useToast } from "@/hooks/use-toast";
 import { useCourseEdit } from "@/contexts/course/use-course-edit";
+import { isYouTubeUrl, getYouTubeEmbedUrl } from "@/utils/video-utils";
+import { parseTimespanToSeconds } from "@/utils/time-utils";
+import CreateQuizInVideoModal from "@/components/course/course-edit/modals/create-quiz-in-video";
 import type { Lesson } from "@/types/db/course/lesson";
 import type { UploadFileRes } from "@/types/core/storage";
-import { parseTimespanToSeconds } from "@/utils/time-utils";
-import { isYouTubeUrl, getYouTubeEmbedUrl } from "@/utils/video-utils";
 
 interface VideoLessonRenderProps {
   lesson: Lesson;
@@ -28,6 +44,7 @@ export function VideoLessonRender({ lesson }: VideoLessonRenderProps) {
   const [videoUrl, setVideoUrl] = useState(lesson.contentUrl || "");
   const [hasChanges, setHasChanges] = useState(false);
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
+  const [isCreateQuizModalOpen, setIsCreateQuizModalOpen] = useState(false);
 
   useEffect(() => {
     setVideoUrl(lesson.contentUrl || "");
@@ -56,12 +73,14 @@ export function VideoLessonRender({ lesson }: VideoLessonRenderProps) {
           lessonType: lesson.lessonType,
         },
       });
-      
+
       success("Video lesson updated successfully");
       setIsEditing(false);
       setHasChanges(false);
     } catch (err) {
-      error(`Failed to update lesson: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      error(
+        `Failed to update lesson: ${err instanceof Error ? err.message : "Unknown error"}`
+      );
     }
   };
 
@@ -81,7 +100,7 @@ export function VideoLessonRender({ lesson }: VideoLessonRenderProps) {
   };
 
   const handleDelete = () => {
-    openDeleteModal('lesson', lesson.id, lesson.title);
+    openDeleteModal("lesson", lesson.id, lesson.title);
   };
 
   return (
@@ -99,14 +118,29 @@ export function VideoLessonRender({ lesson }: VideoLessonRenderProps) {
           </div>
           <div className="flex items-center gap-2">
             {!isEditing && lesson.contentUrl && (
-              <Button size="sm" variant="outline" onClick={() => setIsEditing(true)}>
-                <Edit className="h-4 w-4 mr-2" />
-                Edit
-              </Button>
+              <>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setIsCreateQuizModalOpen(true)}
+                  title="Add quiz question at a specific timestamp"
+                >
+                  <HelpCircle className="h-4 w-4 mr-2" />
+                  Add Quiz
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setIsEditing(true)}
+                >
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit
+                </Button>
+              </>
             )}
-            <Button 
-              size="sm" 
-              variant="outline" 
+            <Button
+              size="sm"
+              variant="outline"
               onClick={handleDelete}
               className="hover:bg-destructive hover:text-destructive-foreground"
             >
@@ -141,8 +175,11 @@ export function VideoLessonRender({ lesson }: VideoLessonRenderProps) {
 
               <div className="space-y-2">
                 <Label>Upload Video</Label>
-                <Dialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
-                  <div 
+                <Dialog
+                  open={isUploadDialogOpen}
+                  onOpenChange={setIsUploadDialogOpen}
+                >
+                  <div
                     className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center hover:border-muted-foreground/50 transition-colors cursor-pointer"
                     onClick={() => setIsUploadDialogOpen(true)}
                   >
@@ -174,8 +211,8 @@ export function VideoLessonRender({ lesson }: VideoLessonRenderProps) {
                   Cancel
                 </Button>
               )}
-              <Button 
-                onClick={handleSave} 
+              <Button
+                onClick={handleSave}
                 disabled={!hasChanges || updateLessonMutation.isPending}
               >
                 {updateLessonMutation.isPending ? (
@@ -196,7 +233,9 @@ export function VideoLessonRender({ lesson }: VideoLessonRenderProps) {
           <div className="space-y-4">
             <div className="rounded-lg border bg-muted/50 p-4">
               <p className="text-sm font-medium mb-2">Video URL</p>
-              <p className="text-sm text-muted-foreground break-all">{lesson.contentUrl}</p>
+              <p className="text-sm text-muted-foreground break-all">
+                {lesson.contentUrl}
+              </p>
             </div>
 
             {lesson.contentUrl && (
@@ -224,6 +263,15 @@ export function VideoLessonRender({ lesson }: VideoLessonRenderProps) {
           </div>
         )}
       </CardContent>
+
+      <CreateQuizInVideoModal
+        isOpen={isCreateQuizModalOpen}
+        onOpenChange={setIsCreateQuizModalOpen}
+        lessonId={lesson.id}
+        onSuccess={() => {
+          // Optionally refresh or notify user
+        }}
+      />
     </Card>
   );
 }

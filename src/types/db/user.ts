@@ -39,9 +39,38 @@ export type ChangeAvatarReq = {
 
 export type UpdateProfileReq = Partial<Pick<User, "name" | "bio">>;
 
+export type EditUserByAdminReq = {
+  id: string;
+  name: string;
+  password?: string;
+  isActive: boolean;
+  role: UserRole;
+};
+
+export type CreateUserByAdminReq = {
+  email: string;
+  password: string;
+  name: string;
+  role: UserRole;
+};
+
 export type UserDetailResponse = ApiResponse<{
   success: boolean;
   message: string | null;
   user: User;
   permissions: UserPermission[];
+}>;
+
+export type GetRefreshTokenQuery = {
+  returnUrl: string;
+};
+export type GetRefreshTokenResponse = ApiResponse<string>;
+
+export type ExchangeCodeForTokenReq = {
+  code: string;
+};
+
+export type ExchangeCodeForTokenResponse = ApiResponse<{
+  success: boolean;
+  message: string | null;
 }>;

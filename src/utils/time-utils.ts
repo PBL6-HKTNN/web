@@ -65,3 +65,30 @@ export const formatSecondsToTimespan = (totalSeconds: number): string => {
 
   return parts.join(":");
 };
+
+/**
+ * Converts seconds or milliseconds to "mm:ss" format for quiz timestamps
+ * @param time - Time in seconds or milliseconds
+ * @param isMilliseconds - Whether the time is in milliseconds (default: false)
+ * @returns Time string in "mm:ss" format
+ */
+export const secondsToTimestamp = (
+  time: number,
+  isMilliseconds: boolean = false
+): string => {
+  const totalSeconds = isMilliseconds
+    ? Math.floor(time / 1000)
+    : Math.floor(time);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+};
+
+/**
+ * Converts video currentTime (in seconds) to "mm:ss" format
+ * @param currentTime - Current playback time in seconds
+ * @returns Time string in "mm:ss" format
+ */
+export const videoTimeToTimestamp = (currentTime: number): string => {
+  return secondsToTimestamp(currentTime, false);
+};

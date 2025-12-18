@@ -94,3 +94,5 @@ export type GetCourseEnrolledStudentsResponse = ApiResponse<{
 }>;
 
 export type GetLastDateCourseResponse = ApiResponse<Date | string>;
+
+export type AddToCalendarResponse = ApiResponse<string[]>;

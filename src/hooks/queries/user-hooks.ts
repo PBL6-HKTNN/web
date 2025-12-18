@@ -1,6 +1,7 @@
 import { useMutation, useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import { userService } from "@/services/user-service";
 import type { ChangeAvatarReq, UpdateProfileReq, User } from "@/types/db";
+import type { EditUserByAdminReq, CreateUserByAdminReq } from "@/types/db/user";
 import type { ApiResponse } from "@/types/core/api";
 import { toast } from "sonner";
 import Persistence from "@/utils/persistence";
@@ -106,6 +107,53 @@ export const useUpdateProfile = () => {
     },
     onError: (error) => {
       toast.error("Profile update failed: " + error.message);
+    },
+  });
+};
+
+export const useEditUserByAdmin = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    ApiResponse<User>,
+    Error,
+    EditUserByAdminReq
+  >({
+    mutationFn: (data) => userService.editUserByAdmin(data),
+    onSuccess: (response, variables) => {
+      if (response.isSuccess && response.data) {
+        // Invalidate user queries to refresh the UI
+        queryClient.invalidateQueries({ queryKey: userQueryKeys.detail(variables.id) });
+        queryClient.invalidateQueries({ queryKey: userQueryKeys.lists() });
+
+        toast.success("User updated successfully");
+      }
+    },
+    onError: (error) => {
+      toast.error("Failed to update user: " + error.message);
+    },
+  });
+};
+
+export const useCreateUserByAdmin = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    ApiResponse<User>,
+    Error,
+    CreateUserByAdminReq
+  >({
+    mutationFn: (data) => userService.createUserByAdmin(data),
+    onSuccess: (response) => {
+      if (response.isSuccess && response.data) {
+        // Invalidate user queries to refresh the UI
+        queryClient.invalidateQueries({ queryKey: userQueryKeys.lists() });
+
+        toast.success("User created successfully");
+      }
+    },
+    onError: (error) => {
+      toast.error("Failed to create user: " + error.message);
     },
   });
 };

@@ -3,8 +3,6 @@ import  { useState, useEffect, useMemo, useRef } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import type { ApiResponse } from '@/types/core/api'
-import type { UserDetailResponse } from '@/types/db/user'
 import {
   Dialog,
   DialogContent,
@@ -33,12 +31,13 @@ export const Route = createFileRoute('/admin/users/$userId/')({
   component: RouteComponent,
 })
 
-import { useUser } from '@/hooks/queries/user-hooks'
+import { useUser, useEditUserByAdmin } from '@/hooks/queries/user-hooks'
 import { UserRole, UserStatus } from '@/types/db/user'
 import type { UserPermission } from '@/types/db/permission'
 import type { Permission } from '@/types/db/permission'
 import { usePermissions, useAssignPermissionToUser, useRemoveUserPermission, useUserPermissions } from '@/hooks/queries/permission-hooks'
 import { toast } from 'sonner'
+import type { EditUserByAdminReq } from '@/types/db/user'
 
 
 function RouteComponent() {
@@ -46,17 +45,18 @@ function RouteComponent() {
   const navigate = useNavigate()
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [editForm, setEditForm] = useState({
-    email: '',
+    name: '',
     password: '',
     confirmPassword: '',
-    role: ''
+    role: '',
+    isActive: true
   })
   const [selectedPermissions, setSelectedPermissions] = useState<Set<string>>(new Set())
   const [isSaving, setIsSaving] = useState(false)
   const hasInitializedPermissions = useRef(false)
 
   const { data: apiResponse, isLoading, error } = useUser(userId)
-  const userResponse = (apiResponse as unknown as ApiResponse<UserDetailResponse>)?.data
+  const userResponse = apiResponse?.data
   const user = userResponse?.user || null
 
   const { data: userPermissionsRaw = [], isLoading: permissionsLoading } = useUserPermissions(userId)
@@ -79,6 +79,7 @@ function RouteComponent() {
   // Mutations for permission management
   const assignPermissionMutation = useAssignPermissionToUser()
   const removePermissionMutation = useRemoveUserPermission()
+  const editUserMutation = useEditUserByAdmin()
 
   // Initialize selected permissions when edit modal opens for the first time
   useEffect(() => {
@@ -120,35 +121,74 @@ function RouteComponent() {
     return { toAssign, toRemove }
   }
 
+  // Map role string to UserRole enum
+  const getRoleFromString = (roleString: string): UserRole => {
+    switch (roleString) {
+      case 'Student':
+        return UserRole.STUDENT
+      case 'Lecturer':
+        return UserRole.INSTRUCTOR
+      case 'Moderator':
+      case 'Mod':
+        return UserRole.MODERATOR
+      case 'Admin':
+        return UserRole.ADMIN
+      default:
+        return UserRole.STUDENT
+    }
+  }
+
   const handleSaveChanges = async () => {
-    const { toAssign, toRemove } = getPermissionChanges()
-    if (toAssign.length === 0 && toRemove.length === 0) {
-      setIsEditModalOpen(false)
+    // Validate password if provided
+    if (editForm.password && editForm.password !== editForm.confirmPassword) {
+      toast.error('Passwords do not match')
       return
     }
 
     setIsSaving(true)
     try {
-      // Perform assign operations
-      const assignPromises = toAssign.map(permissionId =>
-        assignPermissionMutation.mutateAsync({
-          userId: userId,
-          permissionId: permissionId
-        })
-      )
+      // First, update user information using admin edit API
+      const roleValue = getRoleFromString(editForm.role)
+      const editUserData: EditUserByAdminReq = {
+        id: userId,
+        name: editForm.name,
+        isActive: editForm.isActive,
+        role: roleValue,
+      }
 
-      const removePromises = toRemove.map(permissionId => {
-        // Find userPermission by permissionId (not by userPermission id)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const userPermission = permissions.find((p: any) => (p.permissionId || p.id) === permissionId)
-        // Use userPermission.id (which is UserPermissionGroup ID) for removal
-        return userPermission ? removePermissionMutation.mutateAsync(userPermission.id) : Promise.resolve()
-      })
-      await Promise.all([...assignPromises, ...removePromises])
+      // Only include password if it's provided
+      if (editForm.password && editForm.password.trim() !== '') {
+        editUserData.password = editForm.password
+      }
+
+      await editUserMutation.mutateAsync(editUserData)
+
+      // Then, update permissions
+      const { toAssign, toRemove } = getPermissionChanges()
+      
+      if (toAssign.length > 0 || toRemove.length > 0) {
+        // Perform assign operations
+        const assignPromises = toAssign.map(permissionId =>
+          assignPermissionMutation.mutateAsync({
+            userId: userId,
+            permissionId: permissionId
+          })
+        )
+
+        const removePromises = toRemove.map(permissionId => {
+          // Find userPermission by permissionId (not by userPermission id)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const userPermission = permissions.find((p: any) => (p.permissionId || p.id) === permissionId)
+          // Use userPermission.id (which is UserPermissionGroup ID) for removal
+          return userPermission ? removePermissionMutation.mutateAsync(userPermission.id) : Promise.resolve()
+        })
+        await Promise.all([...assignPromises, ...removePromises])
+      }
+
       setIsEditModalOpen(false)
-      toast.success('Permissions updated successfully')
     } catch (error) {
-      console.error('Failed to update permissions:', error)
+      console.error('Failed to update user:', error)
+      toast.error('Failed to update user')
     } finally {
       setIsSaving(false)
     }
@@ -165,15 +205,14 @@ function RouteComponent() {
     )
   }
 
-  if (error || !apiResponse || apiResponse.success === false || !user) {
+  if (error || !apiResponse || !apiResponse.isSuccess || !user) {
     return (
       <div className="p-6">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-muted-foreground mb-2">User Not Found</h2>
           <p className="text-muted-foreground">
             {error ? `Error loading user: ${error.message}` :
-             apiResponse?.message ? apiResponse.message :
-             'The requested user could not be found.'}
+             userResponse?.message || 'The requested user could not be found.'}
           </p>
           <Button onClick={() => navigate({ to: '/admin/users' })} className="mt-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -231,11 +270,16 @@ function RouteComponent() {
           <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
             <DialogTrigger asChild>
               <Button variant="outline" onClick={() => {
+                const roleLabel = user.role === UserRole.STUDENT ? 'Student' :
+                                 user.role === UserRole.INSTRUCTOR ? 'Lecturer' :
+                                 user.role === UserRole.MODERATOR ? 'Moderator' :
+                                 user.role === UserRole.ADMIN ? 'Admin' : 'Student'
                 setEditForm({
-                  email: user.email,
+                  name: user.name,
                   password: '',
                   confirmPassword: '',
-                  role: user.role.toString()
+                  role: roleLabel,
+                  isActive: user.status === UserStatus.ACTIVE
                 })
               }}>
                 Edit
@@ -253,6 +297,18 @@ function RouteComponent() {
                   <p className="col-span-3 text-muted-foreground">{user.email}</p>
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="name" className="text-right">
+                    Name
+                  </Label>
+                  <Input
+                    id="name"
+                    value={editForm.name}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
+                    className="col-span-3"
+                    placeholder="Enter user name"
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="password" className="text-right">
                     Password
                   </Label>
@@ -262,8 +318,7 @@ function RouteComponent() {
                     value={editForm.password}
                     onChange={(e) => setEditForm(prev => ({ ...prev, password: e.target.value }))}
                     className="col-span-3"
-                    placeholder="Enter new password"
-                  
+                    placeholder="Enter new password (optional)"
                   />
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
@@ -290,9 +345,25 @@ function RouteComponent() {
                     <SelectContent>
                       <SelectItem value="Student">Student</SelectItem>
                       <SelectItem value="Lecturer">Lecturer</SelectItem>
-                      <SelectItem value="Mod">Moderator</SelectItem>
+                      <SelectItem value="Moderator">Moderator</SelectItem>
+                      <SelectItem value="Admin">Admin</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="isActive" className="text-right">
+                    Status
+                  </Label>
+                  <div className="col-span-3 flex items-center space-x-2">
+                    <Checkbox
+                      id="isActive"
+                      checked={editForm.isActive}
+                      onCheckedChange={(checked) => setEditForm(prev => ({ ...prev, isActive: checked as boolean }))}
+                    />
+                    <Label htmlFor="isActive" className="text-sm font-normal cursor-pointer">
+                      Active
+                    </Label>
+                  </div>
                 </div>
 
                 {/* Permissions Section */}

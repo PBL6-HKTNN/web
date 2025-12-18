@@ -1,23 +1,43 @@
 // JSX runtime handles React import automatically
-import { Skeleton } from '@/components/ui/skeleton'
-import { useGetCourseEnrolledStudents, useGetLastDateCourse } from '@/hooks/queries/course/enrollment-hooks'
-import { formatDate } from '@/utils/format'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Input } from '@/components/ui/input'
-import { Search } from 'lucide-react'
-import { CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  useGetCourseEnrolledStudents,
+  useGetLastDateCourse,
+} from "@/hooks/queries/course/enrollment-hooks";
+import { formatDate } from "@/utils/format";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
+import {
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 
 interface StudentsTabProps {
-  courseId: string
+  courseId: string;
 }
 
 export default function StudentsTab({ courseId }: StudentsTabProps) {
-  const { data: studentsData, isLoading: studentsLoading, error: studentsError } = useGetCourseEnrolledStudents(courseId)
-  const { data: lastDateData, isLoading: lastDateLoading } = useGetLastDateCourse(courseId)
+  const {
+    data: studentsData,
+    isLoading: studentsLoading,
+    error: studentsError,
+  } = useGetCourseEnrolledStudents(courseId);
+  const { data: lastDateData, isLoading: lastDateLoading } =
+    useGetLastDateCourse(courseId);
 
-  const students = studentsData?.data?.students || []
-  const lastDate = lastDateData?.data || null
+  const students = studentsData?.data?.students || [];
+  const lastDate = lastDateData?.data || null;
 
   if (studentsLoading || lastDateLoading) {
     return (
@@ -35,7 +55,7 @@ export default function StudentsTab({ courseId }: StudentsTabProps) {
           ))}
         </div>
       </div>
-    )
+    );
   }
 
   if (studentsError) {
@@ -43,7 +63,7 @@ export default function StudentsTab({ courseId }: StudentsTabProps) {
       <div className="p-6 text-center">
         <p className="text-destructive">Failed to load enrolled students.</p>
       </div>
-    )
+    );
   }
 
   return (
@@ -52,7 +72,9 @@ export default function StudentsTab({ courseId }: StudentsTabProps) {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <CardTitle>Enrolled Students</CardTitle>
-            <CardDescription>Manage and view students enrolled in this course</CardDescription>
+            <CardDescription>
+              Manage and view students enrolled in this course
+            </CardDescription>
           </div>
           <div className="relative w-full md:w-64">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -66,8 +88,20 @@ export default function StudentsTab({ courseId }: StudentsTabProps) {
       </CardHeader>
       <CardContent>
         <div className="flex justify-between items-center mb-4 text-sm text-muted-foreground">
-          <div>Total Students: <span className="font-medium text-foreground">{students.length}</span></div>
-          {lastDate && <div>Last enrollment: <span className="font-medium text-foreground">{formatDate(lastDate)}</span></div>}
+          <div>
+            Total Students:{" "}
+            <span className="font-medium text-foreground">
+              {students.length}
+            </span>
+          </div>
+          {lastDate && (
+            <div>
+              Last enrollment:{" "}
+              <span className="font-medium text-foreground">
+                {formatDate(lastDate)}
+              </span>
+            </div>
+          )}
         </div>
 
         <div className="rounded-md border">
@@ -76,14 +110,16 @@ export default function StudentsTab({ courseId }: StudentsTabProps) {
               <TableRow>
                 <TableHead className="w-[50px]"></TableHead>
                 <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
                 <TableHead className="text-right">Enrolled Date</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {students.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
+                  <TableCell
+                    colSpan={4}
+                    className="h-24 text-center text-muted-foreground"
+                  >
                     No students enrolled yet.
                   </TableCell>
                 </TableRow>
@@ -98,7 +134,6 @@ export default function StudentsTab({ courseId }: StudentsTabProps) {
                       </Avatar>
                     </TableCell>
                     <TableCell className="font-medium">{studentName}</TableCell>
-                    <TableCell className="text-muted-foreground">student@example.com</TableCell>
                     <TableCell className="text-right text-muted-foreground">
                       {/* Mock date for now as API only returns names */}
                       {formatDate(new Date().toISOString())}
@@ -111,5 +146,5 @@ export default function StudentsTab({ courseId }: StudentsTabProps) {
         </div>
       </CardContent>
     </>
-  )
+  );
 }
