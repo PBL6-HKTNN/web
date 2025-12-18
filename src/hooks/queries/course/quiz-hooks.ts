@@ -5,7 +5,10 @@ import type {
   CreateQuizReq,
   UpdateQuizReq,
   QuizSubmissionReq,
+  CreateQuizInVideoReq,
+  SubmitQuizInVideoReq,
 } from "@/types/db/course/quiz";
+import { lessonQueryKeys } from "./lesson-hooks";
 
 export const quizQueryKeys = {
   allQuizzes: ["quizzes"] as const,
@@ -113,5 +116,29 @@ export const useGetQuizListResults = (lessonId: UUID) => {
     queryKey: quizQueryKeys.quizListResults(lessonId),
     queryFn: () => quizService.getQuizListResults(lessonId),
     enabled: !!lessonId,
+  });
+};
+
+export const useCreateQuizInVideo = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: CreateQuizInVideoReq) =>
+      quizService.createQuizInVideo(data),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: lessonQueryKeys.lessonVideoCheck(variables.lessonId),
+      });
+    },
+  });
+};
+
+export const useSubmitQuizInVideo = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: SubmitQuizInVideoReq) =>
+      quizService.submitQuizInVideo(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: quizQueryKeys.allQuizzes });
+    },
   });
 };

@@ -143,3 +143,24 @@ export const useGetLastDateCourse = (courseId?: UUID) => {
     enabled: !!courseId,
   });
 };
+
+export const useGetTotalEnrollmentsByCourse = (courseId?: UUID) => {
+  return useQuery({
+    queryKey: enrollmentQueryKeys.enrollmentStudents(courseId),
+    queryFn: () =>
+      enrollmentService.getTotalEnrollmentsByCourse(courseId || ""),
+    enabled: !!courseId,
+  });
+};
+
+export const useAddToCalendar = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (courseId: UUID) => enrollmentService.addToCalendar(courseId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: enrollmentQueryKeys.allEnrollments,
+      });
+    },
+  });
+};

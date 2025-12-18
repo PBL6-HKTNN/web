@@ -1,72 +1,84 @@
-import { authGuard } from '@/utils'
-import { createFileRoute } from '@tanstack/react-router'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
-import { Clock, BookOpen, Star, Loader2, Play, CheckCircle, Clock3, Circle } from 'lucide-react'
-import { parseTimespanToMinutes } from '@/utils/time-utils'
-import { LearningNavBar } from '@/components/layout/nav-bar-2'
-import { useNavigate } from '@tanstack/react-router'
-import ModuleAccordion from '@/components/course/module-accordion'
-import { useCourseOverview } from './-hook'
-import { EnrollmentProgressStatus } from '@/types/db/course/enrollment'
+import { authGuard } from "@/utils";
+import { createFileRoute } from "@tanstack/react-router";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import {
+  Clock,
+  BookOpen,
+  Star,
+  Loader2,
+  Play,
+  CheckCircle,
+  Clock3,
+  Circle,
+} from "lucide-react";
+import { parseTimespanToMinutes } from "@/utils/time-utils";
+import { LearningNavBar } from "@/components/layout/nav-bar-2";
+import { useNavigate } from "@tanstack/react-router";
+import ModuleAccordion from "@/components/course/module-accordion";
+import { useCourseOverview } from "./-hook";
+import { EnrollmentProgressStatus } from "@/types/db/course/enrollment";
+import AddToCalendar from "@/components/course/add-to-calendar";
 
-export const Route = createFileRoute('/learn/$courseId/')({
+export const Route = createFileRoute("/learn/$courseId/")({
   component: RouteComponent,
   beforeLoad: authGuard,
-})
+});
 
 function CourseOverview() {
   const navigate = useNavigate();
-  const { 
-    course, 
-    modules, 
-    totalLessons, 
-    isLoading, 
-    error, 
-    handleLessonSelect, 
-    currentLesson, 
-    handleContinueLearning, 
+  const {
+    course,
+    modules,
+    totalLessons,
+    isLoading,
+    error,
+    handleLessonSelect,
+    currentLesson,
+    handleContinueLearning,
     hasCurrentLesson,
     completedLessons,
-    enrollmentProgressStatus
-  } = useCourseOverview()
+    enrollmentProgressStatus,
+  } = useCourseOverview();
 
-  const getProgressStatusDisplay = (status: EnrollmentProgressStatus | undefined) => {
+  const getProgressStatusDisplay = (
+    status: EnrollmentProgressStatus | undefined
+  ) => {
     switch (status) {
       case EnrollmentProgressStatus.NOT_STARTED:
         return {
           icon: Circle,
-          label: 'Not Started',
-          color: 'text-muted-foreground',
-          bgColor: 'bg-muted'
-        }
+          label: "Not Started",
+          color: "text-muted-foreground",
+          bgColor: "bg-muted",
+        };
       case EnrollmentProgressStatus.IN_PROGRESS:
         return {
           icon: Clock3,
-          label: 'In Progress',
-          color: 'text-blue-600',
-          bgColor: 'bg-blue-50 dark:bg-blue-950'
-        }
+          label: "In Progress",
+          color: "text-blue-600",
+          bgColor: "bg-blue-50 dark:bg-blue-950",
+        };
       case EnrollmentProgressStatus.COMPLETED:
         return {
           icon: CheckCircle,
-          label: 'Completed',
-          color: 'text-green-600',
-          bgColor: 'bg-green-50 dark:bg-green-950'
-        }
+          label: "Completed",
+          color: "text-green-600",
+          bgColor: "bg-green-50 dark:bg-green-950",
+        };
       default:
         return {
           icon: Circle,
-          label: 'Unknown',
-          color: 'text-muted-foreground',
-          bgColor: 'bg-muted'
-        }
+          label: "Unknown",
+          color: "text-muted-foreground",
+          bgColor: "bg-muted",
+        };
     }
-  }
+  };
 
-  const progressStatus = getProgressStatusDisplay(enrollmentProgressStatus)
+  const progressStatus = getProgressStatusDisplay(enrollmentProgressStatus);
 
   if (isLoading) {
     return (
@@ -79,7 +91,7 @@ function CourseOverview() {
           </div>
         </div>
       </>
-    )
+    );
   }
 
   if (error || !course) {
@@ -94,220 +106,233 @@ function CourseOverview() {
               </div>
               <h2 className="text-xl font-semibold mb-2">Course Not Found</h2>
               <p className="text-muted-foreground text-sm">
-                The course you're looking for doesn't exist or you don't have access to it.
+                The course you're looking for doesn't exist or you don't have
+                access to it.
               </p>
             </CardContent>
           </Card>
         </div>
       </>
-    )
+    );
   }
 
   return (
-  <>
-    <LearningNavBar />
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-6 lg:px-8 lg:py-8 max-w-7xl">
-        {/* Course Header - Responsive */}
-        <div className="mb-8">
-          <Card className="overflow-hidden">
-            <CardContent className="p-0">
-              <div className="flex flex-col lg:flex-row gap-6 p-6 lg:p-8">
-                {/* Course Image */}
-                <div className="flex-shrink-0">
-                  <img
-                    src={course.thumbnail || '/placeholder-course.jpg'}
-                    alt={course.title}
-                    className="w-full h-48 lg:w-48 lg:h-32 object-cover rounded-lg"
-                  />
+    <>
+      <LearningNavBar />
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-6 lg:px-8 lg:py-8 max-w-7xl">
+          {/* Course Header - Responsive */}
+          <div className="mb-8">
+            <Card className="overflow-hidden">
+              <CardContent className="p-0">
+                <div className="flex flex-col lg:flex-row gap-6 p-6 lg:p-8">
+                  {/* Course Image */}
+                  <div className="flex-shrink-0">
+                    <img
+                      src={course.thumbnail || "/placeholder-course.jpg"}
+                      alt={course.title}
+                      className="w-full h-48 lg:w-48 lg:h-32 object-cover rounded-lg"
+                    />
+                  </div>
+
+                  {/* Course Info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
+                      <div className="min-w-0 flex-1">
+                        <h1 className="text-2xl lg:text-3xl font-bold mb-2 break-words">
+                          {course.title}
+                        </h1>
+                        <p className="text-muted-foreground text-sm lg:text-base mb-3 line-clamp-2">
+                          {course.description}
+                        </p>
+                      </div>
+                      <Badge variant="secondary" className="self-start">
+                        {course.level}
+                      </Badge>
+                    </div>
+
+                    {/* Course Stats - Responsive Grid */}
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+                      <div className="flex items-center gap-2 text-sm">
+                        <Clock className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                        <span className="truncate">
+                          {parseTimespanToMinutes(course.duration)} minutes
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <BookOpen className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                        <span>{course.numberOfReviews} reviews</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Star className="w-4 h-4 fill-yellow-400 text-yellow-400 flex-shrink-0" />
+                        <span>{course.averageRating}</span>
+                      </div>
+                    </div>
+
+                    {/* Price and Status */}
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <div className="flex items-center gap-2">
+                        <span className="text-2xl font-bold text-primary">
+                          ${course.price}
+                        </span>
+                        <Badge variant="outline">{course.status}</Badge>
+                      </div>
+                      <div className="flex items-center gap-2 ml-auto">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() =>
+                            navigate({ to: `/course/${course.id}` })
+                          }
+                        >
+                          View Course
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+              </CardContent>
+            </Card>
+          </div>
 
-                {/* Course Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
-                    <div className="min-w-0 flex-1">
-                      <h1 className="text-2xl lg:text-3xl font-bold mb-2 break-words">
-                        {course.title}
-                      </h1>
-                      <p className="text-muted-foreground text-sm lg:text-base mb-3 line-clamp-2">
-                        {course.description}
-                      </p>
-                    </div>
-                    <Badge variant="secondary" className="self-start">
-                      {course.level}
-                    </Badge>
+          {/* Course Stats Cards - Responsive */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+            <Card>
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl font-bold text-primary mb-1">
+                  {modules.length}
+                </div>
+                <div className="text-sm text-muted-foreground">Modules</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl font-bold text-primary mb-1">
+                  {totalLessons}
+                </div>
+                <div className="text-sm text-muted-foreground">Lessons</div>
+              </CardContent>
+            </Card>
+            <Card className="sm:col-span-2 lg:col-span-1">
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl font-bold text-primary mb-1">
+                  {course.averageRating}
+                </div>
+                <div className="text-sm text-muted-foreground">Rating</div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Welcome Section */}
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BookOpen className="w-5 h-5" />
+                Welcome to {course.title}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Progress Status */}
+              <div
+                className={`p-4 rounded-lg border ${progressStatus.bgColor}`}
+              >
+                <div className="flex items-center gap-3">
+                  <progressStatus.icon
+                    className={`w-5 h-5 ${progressStatus.color}`}
+                  />
+                  <div>
+                    <h4 className="font-medium">Course Progress</h4>
+                    <p className={`text-sm ${progressStatus.color}`}>
+                      {progressStatus.label}
+                    </p>
                   </div>
+                </div>
+              </div>
 
-                  {/* Course Stats - Responsive Grid */}
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
-                    <div className="flex items-center gap-2 text-sm">
-                      <Clock className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                      <span className="truncate">
-                        {parseTimespanToMinutes(course.duration)} minutes
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <BookOpen className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                      <span>{course.numberOfReviews} reviews</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <Star className="w-4 h-4 fill-yellow-400 text-yellow-400 flex-shrink-0" />
-                      <span>{course.averageRating}</span>
-                    </div>
-                  </div>
-
-                  {/* Price and Status */}
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <div className="flex items-center gap-2">
-                      <span className="text-2xl font-bold text-primary">
-                        ${course.price}
-                      </span>
-                      <Badge variant="outline">{course.status}</Badge>
-                    </div>
-                    <div className="flex items-center gap-2 ml-auto">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => navigate({ to: `/course/${course.id}` })}
-                      >
-                        View Course
+              {hasCurrentLesson && currentLesson ? (
+                <div className="space-y-4">
+                  <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium">Continue Learning</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Resume: {currentLesson.title}
+                        </p>
+                      </div>
+                      <Button onClick={handleContinueLearning} className="ml-4">
+                        <Play className="w-4 h-4 mr-2" />
+                        Continue
                       </Button>
                     </div>
                   </div>
+                  <Separator />
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Course Stats Cards - Responsive */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-          <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-primary mb-1">
-                {modules.length}
-              </div>
-              <div className="text-sm text-muted-foreground">Modules</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-primary mb-1">
-                {totalLessons}
-              </div>
-              <div className="text-sm text-muted-foreground">Lessons</div>
-            </CardContent>
-          </Card>
-          <Card className="sm:col-span-2 lg:col-span-1">
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-primary mb-1">
-                {course.averageRating}
-              </div>
-              <div className="text-sm text-muted-foreground">Rating</div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Welcome Section */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BookOpen className="w-5 h-5" />
-              Welcome to {course.title}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Progress Status */}
-            <div className={`p-4 rounded-lg border ${progressStatus.bgColor}`}>
-              <div className="flex items-center gap-3">
-                <progressStatus.icon className={`w-5 h-5 ${progressStatus.color}`} />
-                <div>
-                  <h4 className="font-medium">Course Progress</h4>
-                  <p className={`text-sm ${progressStatus.color}`}>
-                    {progressStatus.label}
+              ) : (
+                <div className="space-y-4">
+                  <p className="text-muted-foreground">
+                    Start your learning journey by selecting a lesson from the
+                    sidebar. Each module contains multiple lessons that will
+                    help you master the concepts step by step.
                   </p>
+                  <Separator />
                 </div>
+              )}
+              <div className="flex flex-wrap gap-2">
+                <Badge variant="secondary">{modules.length} Modules</Badge>
+                <Badge variant="outline">{totalLessons} Lessons</Badge>
+                <Badge variant="outline">{course.level}</Badge>
               </div>
-            </div>
 
-            {hasCurrentLesson && currentLesson ? (
-              <div className="space-y-4">
-                <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium">Continue Learning</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Resume: {currentLesson.title}
-                      </p>
-                    </div>
-                    <Button onClick={handleContinueLearning} className="ml-4">
-                      <Play className="w-4 h-4 mr-2" />
-                      Continue
-                    </Button>
+              {/* Add to Calendar Section */}
+              <div className="pt-4 border-t">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-medium mb-1">Sync with Calendar</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Add this course schedule to your Google Calendar
+                    </p>
                   </div>
+                  <AddToCalendar courseId={course.id} />
                 </div>
-                <Separator />
               </div>
-            ) : (
-              <div className="space-y-4">
-                <p className="text-muted-foreground">
-                  Start your learning journey by selecting a lesson from the sidebar.
-                  Each module contains multiple lessons that will help you master the concepts step by step.
-                </p>
-                <Separator />
-              </div>
-            )}
-            <div className="flex flex-wrap gap-2">
-              <Badge variant="secondary">
-                {modules.length} Modules
-              </Badge>
-              <Badge variant="outline">
-                {totalLessons} Lessons
-              </Badge>
-              <Badge variant="outline">
-                {course.level}
-              </Badge>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        {/* Course Content */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BookOpen className="w-5 h-5" />
-              Course Content
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {modules.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                <BookOpen className="size-12 mx-auto mb-4 opacity-50" />
-                <p>No modules found for this course.</p>
-              </div>
-            ) : (
-              <div>
-                {modules.map((module) => (
-                  <ModuleAccordion
-                    key={module.id}
-                    data={module}
-                    onLessonSelect={handleLessonSelect}
-                    defaultExpanded={false}
-                    completedLessons={completedLessons}
-                  />
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+          {/* Course Content */}
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BookOpen className="w-5 h-5" />
+                Course Content
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {modules.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <BookOpen className="size-12 mx-auto mb-4 opacity-50" />
+                  <p>No modules found for this course.</p>
+                </div>
+              ) : (
+                <div>
+                  {modules.map((module) => (
+                    <ModuleAccordion
+                      key={module.id}
+                      data={module}
+                      onLessonSelect={handleLessonSelect}
+                      defaultExpanded={false}
+                      completedLessons={completedLessons}
+                    />
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
-    </div>
-  </>
-  )
+    </>
+  );
 }
 
 function RouteComponent() {
-  return (
-      <CourseOverview />
-  )
+  return <CourseOverview />;
 }

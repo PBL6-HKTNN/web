@@ -11,6 +11,11 @@ import type {
   AuthRes,
   ChangePasswordReq,
 } from "@/types/core/auth";
+import type {
+  ExchangeCodeForTokenReq,
+  GetRefreshTokenResponse,
+} from "@/types/db";
+import { ggRedirectUri } from "@/conf";
 
 const _authService = {
   async login(data: LoginReq): Promise<AuthRes> {
@@ -57,6 +62,28 @@ const _authService = {
   async changePassword(data: ChangePasswordReq): Promise<AuthRes> {
     const response = await api.put<AuthRes>(
       API_ROUTES.AUTH.changePassword,
+      data
+    );
+    return response.data;
+  },
+
+  async getRefreshToken(): Promise<GetRefreshTokenResponse> {
+    const response = await api.get<GetRefreshTokenResponse>(
+      API_ROUTES.AUTH.getRefreshToken,
+      {
+        params: {
+          returnUrl: ggRedirectUri,
+        },
+      }
+    );
+    return response.data;
+  },
+
+  async exchangeCodeForToken(
+    data: ExchangeCodeForTokenReq
+  ): Promise<GetRefreshTokenResponse> {
+    const response = await api.post<GetRefreshTokenResponse>(
+      API_ROUTES.AUTH.exchangeCodeForToken,
       data
     );
     return response.data;

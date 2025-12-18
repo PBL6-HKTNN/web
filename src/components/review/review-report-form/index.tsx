@@ -21,7 +21,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Flag } from "lucide-react";
-import { useGetRequestTypes, useCreateRequest } from "@/hooks/queries/request-hooks";
+import {
+  useGetRequestTypes,
+  useCreateRequest,
+} from "@/hooks/queries/request-hooks";
 import { RequestTypeEnum } from "@/types/db/request";
 import type { Review } from "@/types/db/review";
 
@@ -68,6 +71,8 @@ export function ReviewReportForm({ review, trigger }: ReviewReportFormProps) {
       {
         requestTypeId: reportReviewType.id,
         description: data.description,
+        reviewId: review.id,
+        courseId: review.courseId,
         // Note: We might need to add userId to the request if the backend expects it
         // For now, assuming the backend gets the reporter from auth context
       },
@@ -81,7 +86,11 @@ export function ReviewReportForm({ review, trigger }: ReviewReportFormProps) {
   };
 
   const defaultTrigger = (
-    <Button variant="ghost" size="sm" className="text-gray-500 hover:text-red-500">
+    <Button
+      variant="ghost"
+      size="sm"
+      className="text-gray-500 hover:text-red-500"
+    >
       <Flag className="w-4 h-4 mr-1" />
       Report
     </Button>
@@ -89,15 +98,14 @@ export function ReviewReportForm({ review, trigger }: ReviewReportFormProps) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {trigger || defaultTrigger}
-      </DialogTrigger>
+      <DialogTrigger asChild>{trigger || defaultTrigger}</DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Report Review</DialogTitle>
           <DialogDescription>
-            Report this review by {review.user?.name || "Anonymous"} for inappropriate content.
-            Your report will be reviewed by our moderators.
+            Report this review by {review.user?.name || "Anonymous"} for
+            inappropriate content. Your report will be reviewed by our
+            moderators.
           </DialogDescription>
         </DialogHeader>
 

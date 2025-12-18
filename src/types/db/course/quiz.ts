@@ -1,5 +1,5 @@
 import type { Base, UUID } from "@/types/core";
-import type { QuizQuestion } from "./quiz-question";
+import type { QuizInVideo, QuizQuestion } from "./quiz-question";
 import type { QuizAttempt } from "./quiz-attempt";
 import type { ApiResponse } from "@/types/core/api";
 
@@ -43,11 +43,14 @@ export type QuizSubmissionReq = {
 
 export type QuizSubmissionRes = ApiResponse<QuizAttempt>;
 
-//mock
-export type QuizReq = {
-  title: string;
-  description?: string;
-  totalMarks: number;
-  passingScore: number;
-  quizQuestions: QuizQuestion[];
+export type CreateQuizInVideoReq = Omit<QuizInVideo, keyof Base>;
+export type CreateQuizInVideoRes = ApiResponse<QuizInVideo>;
+
+export type SubmitQuizInVideoReq = {
+  videoCheckpointId: UUID;
+  answer: string;
 };
+export type SubmitQuizInVideoRes = ApiResponse<{
+  success: boolean;
+  message: string;
+}>;

@@ -66,6 +66,7 @@ import { Route as AdminTransactionsIndexRouteImport } from './routes/admin/trans
 import { Route as AdminPermissionsIndexRouteImport } from './routes/admin/permissions/index'
 import { Route as AdminCoursesIndexRouteImport } from './routes/admin/courses/index'
 import { Route as LearnCourseIdModuleIdRouteRouteImport } from './routes/learn/$courseId/$moduleId/route'
+import { Route as _providerGoogleCallbackRouteRouteImport } from './routes/__provider/google/callback/route'
 import { Route as ModUsersUserIdIndexRouteImport } from './routes/mod/users/$userId/index'
 import { Route as LecturingToolCourseCreateIndexRouteImport } from './routes/lecturing-tool/course/create/index'
 import { Route as LecturingToolCourseCourseIdIndexRouteImport } from './routes/lecturing-tool/course/$courseId/index'
@@ -375,6 +376,12 @@ const LearnCourseIdModuleIdRouteRoute =
     path: '/$moduleId',
     getParentRoute: () => LearnCourseIdRouteRoute,
   } as any)
+const _providerGoogleCallbackRouteRoute =
+  _providerGoogleCallbackRouteRouteImport.update({
+    id: '/__provider/google/callback',
+    path: '/google/callback',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ModUsersUserIdIndexRoute = ModUsersUserIdIndexRouteImport.update({
   id: '/$userId/',
   path: '/$userId/',
@@ -504,6 +511,7 @@ export interface FileRoutesByFullPath {
   '/settings/': typeof SettingsIndexRoute
   '/users/': typeof UsersIndexRoute
   '/your-courses/': typeof YourCoursesIndexRoute
+  '/google/callback': typeof _providerGoogleCallbackRouteRoute
   '/learn/$courseId/$moduleId': typeof LearnCourseIdModuleIdRouteRouteWithChildren
   '/admin/courses/': typeof AdminCoursesIndexRoute
   '/admin/permissions/': typeof AdminPermissionsIndexRoute
@@ -556,6 +564,7 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsIndexRoute
   '/users': typeof UsersIndexRoute
   '/your-courses': typeof YourCoursesIndexRoute
+  '/google/callback': typeof _providerGoogleCallbackRouteRoute
   '/admin/courses': typeof AdminCoursesIndexRoute
   '/admin/permissions': typeof AdminPermissionsIndexRoute
   '/admin/transactions': typeof AdminTransactionsIndexRoute
@@ -627,6 +636,7 @@ export interface FileRoutesById {
   '/settings/': typeof SettingsIndexRoute
   '/users/': typeof UsersIndexRoute
   '/your-courses/': typeof YourCoursesIndexRoute
+  '/__provider/google/callback': typeof _providerGoogleCallbackRouteRoute
   '/learn/$courseId/$moduleId': typeof LearnCourseIdModuleIdRouteRouteWithChildren
   '/admin/courses/': typeof AdminCoursesIndexRoute
   '/admin/permissions/': typeof AdminPermissionsIndexRoute
@@ -702,6 +712,7 @@ export interface FileRouteTypes {
     | '/settings/'
     | '/users/'
     | '/your-courses/'
+    | '/google/callback'
     | '/learn/$courseId/$moduleId'
     | '/admin/courses/'
     | '/admin/permissions/'
@@ -754,6 +765,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/users'
     | '/your-courses'
+    | '/google/callback'
     | '/admin/courses'
     | '/admin/permissions'
     | '/admin/transactions'
@@ -824,6 +836,7 @@ export interface FileRouteTypes {
     | '/settings/'
     | '/users/'
     | '/your-courses/'
+    | '/__provider/google/callback'
     | '/learn/$courseId/$moduleId'
     | '/admin/courses/'
     | '/admin/permissions/'
@@ -875,6 +888,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   ContactRoute: typeof ContactRoute
   BeAnInstructorIndexRoute: typeof BeAnInstructorIndexRoute
+  _providerGoogleCallbackRouteRoute: typeof _providerGoogleCallbackRouteRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1277,6 +1291,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/learn/$courseId/$moduleId'
       preLoaderRoute: typeof LearnCourseIdModuleIdRouteRouteImport
       parentRoute: typeof LearnCourseIdRouteRoute
+    }
+    '/__provider/google/callback': {
+      id: '/__provider/google/callback'
+      path: '/google/callback'
+      fullPath: '/google/callback'
+      preLoaderRoute: typeof _providerGoogleCallbackRouteRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/mod/users/$userId/': {
       id: '/mod/users/$userId/'
@@ -1814,6 +1835,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   ContactRoute: ContactRoute,
   BeAnInstructorIndexRoute: BeAnInstructorIndexRoute,
+  _providerGoogleCallbackRouteRoute: _providerGoogleCallbackRouteRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

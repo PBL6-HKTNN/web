@@ -8,6 +8,7 @@ const automationApiUrl = import.meta.env.VITE_AUTOMATION_API;
 const separatedServiceFlag = Number.parseInt(
   import.meta.env.VITE_SEPARATED_SERVICE ?? "0"
 );
+const ggRedirectUri = import.meta.env.VITE_GG_REDIRECT_URI;
 
 export {
   clientId,
@@ -18,4 +19,5 @@ export {
   storageApiUrl,
   reviewApiUrl,
   automationApiUrl,
+  ggRedirectUri,
 };
