@@ -2,7 +2,13 @@ import { useState } from "react";
 import { Filter, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { useGetCategories } from "@/hooks/queries/course/category-hooks";
@@ -28,7 +34,11 @@ const LEVEL_OPTIONS: { value: Level; label: string }[] = [
   { value: Level.ADVANCED, label: "Advanced" },
 ];
 
-export function CourseFilters({ filters, onFiltersChange, totalResults }: CourseFiltersProps) {
+export function CourseFilters({
+  filters,
+  onFiltersChange,
+  totalResults,
+}: CourseFiltersProps) {
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const { data: categoriesData } = useGetCategories();
 
@@ -45,26 +55,25 @@ export function CourseFilters({ filters, onFiltersChange, totalResults }: Course
   const handleSortChange = (sortBy: string) => {
     onFiltersChange({
       ...filters,
-      SortBy: sortBy as GetCoursesFilterReq['SortBy'],
-      Page: 1
+      SortBy: sortBy as GetCoursesFilterReq["SortBy"],
+      Page: 1,
     });
   };
 
   const clearFilters = () => {
     onFiltersChange({
-      SortBy: 'name',
+      SortBy: "price",
       Page: 1,
-      PageSize: 12
+      PageSize: 12,
     });
   };
 
-  const activeFiltersCount = [
-    filters.CategoryId,
-    filters.Level
-  ].filter(Boolean).length;
+  const activeFiltersCount = [filters.CategoryId, filters.Level].filter(
+    Boolean
+  ).length;
 
   const getSortValue = () => {
-    return filters.SortBy || 'name';
+    return filters.SortBy || "name";
   };
 
   return (
@@ -73,14 +82,17 @@ export function CourseFilters({ filters, onFiltersChange, totalResults }: Course
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div className="flex items-center gap-4">
           <p className="text-sm text-muted-foreground">
-            {totalResults !== undefined ? `${totalResults} courses found` : "Loading..."}
+            {totalResults !== undefined
+              ? `${totalResults} courses found`
+              : "Loading..."}
           </p>
 
           {/* Active Filters Summary */}
           {activeFiltersCount > 0 && (
             <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground">
-                {activeFiltersCount} filter{activeFiltersCount !== 1 ? 's' : ''} applied
+                {activeFiltersCount} filter{activeFiltersCount !== 1 ? "s" : ""}{" "}
+                applied
               </span>
               <Button
                 variant="ghost"
@@ -172,7 +184,10 @@ export function CourseFilters({ filters, onFiltersChange, totalResults }: Course
                     <SelectContent>
                       <SelectItem value="all">All Levels</SelectItem>
                       {LEVEL_OPTIONS.map((level) => (
-                        <SelectItem key={level.value} value={level.value.toString()}>
+                        <SelectItem
+                          key={level.value}
+                          value={level.value.toString()}
+                        >
                           {level.label}
                         </SelectItem>
                       ))}

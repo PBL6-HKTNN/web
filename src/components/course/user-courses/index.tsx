@@ -6,7 +6,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { EnrolledCourseCard } from "./enrolled-course-card";
 import { WishlistCourseCard } from "./wishlist-course-card";
 import { useUserCourses } from "./hook";
-import { EnrolledCoursesFilter } from './enrolled-courses-filter'
+import { EnrolledCoursesFilter } from "./enrolled-courses-filter";
 import type { WishlistedCourseItem } from "@/types/db/course/wishlist";
 import type { EnrolledCourseItem } from "@/types/db/course/enrollment";
 
@@ -15,91 +15,119 @@ export function UserCourses() {
 
   const [activeTab, setActiveTab] = useState("enrolled");
 
-  const { filters, setFilter, enrolledCourses, enrolledLoading, enrolledHasNextPage, enrolledFetchNextPage, enrolledFetchingNextPage, wishlistItems, wishlistLoading, wishlistError, removeFromWishlist } = useUserCourses();
+  const {
+    filters,
+    setFilter,
+    enrolledCourses,
+    enrolledLoading,
+    enrolledHasNextPage,
+    enrolledFetchNextPage,
+    enrolledFetchingNextPage,
+    wishlistItems,
+    wishlistLoading,
+    wishlistError,
+    removeFromWishlist,
+  } = useUserCourses();
 
   const renderEnrolledCourses = () => {
-    // Always render the header and filter first so the controls are visible
-    // even when the enrolled list is empty or loading.
     if (enrolledLoading) {
       return (
-        <div className="space-y-8">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <BookOpen className="w-5 h-5 text-blue-600" />
-              <h2 className="text-xl font-semibold">My Enrolled Courses ({enrolledCourses.length})</h2>
+        <div className="space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div className="space-y-1">
+              <h2 className="text-2xl font-bold tracking-tight">
+                My Enrolled Courses
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Continue where you left off
+              </p>
             </div>
-            <div>
-              <EnrolledCoursesFilter filters={filters} onChange={(f) => setFilter(f)} />
+            <div className="flex items-center gap-2">
+              <EnrolledCoursesFilter
+                filters={filters}
+                onChange={(f) => setFilter(f)}
+              />
             </div>
           </div>
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 gap-6">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="animate-pulse">
-                <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
-              </div>
+              <div
+                key={i}
+                className="h-[180px] w-full animate-pulse rounded-xl bg-muted"
+              />
             ))}
           </div>
         </div>
       );
     }
 
-    // Don’t early return on enrolled error — always render header and filters.
-    // Show an inline alert in the content area so users can adjust filters or retry without losing context.
-    // Render header + either placeholder or the list
     return (
-      <div className="space-y-8">
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <BookOpen className="w-5 h-5 text-blue-600" />
-              <h2 className="text-xl font-semibold">My Enrolled Courses ({enrolledCourses.length})</h2>
-            </div>
-            <div>
-              <EnrolledCoursesFilter filters={filters} onChange={(f) => setFilter(f)} />
-            </div>
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div className="space-y-1">
+            <h2 className="text-2xl font-bold tracking-tight">
+              My Enrolled Courses ({enrolledCourses.length})
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              Manage and track your learning progress
+            </p>
           </div>
-
-          {enrolledCourses.length === 0 ? (
-            <div className="text-center py-12">
-              <BookOpen className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-              <h3 className="text-xl font-semibold mb-2">No enrolled courses</h3>
-              <p className="text-muted-foreground mb-4">
-                You haven't enrolled in any courses yet. Browse our course catalog to get started!
-              </p>
-              <Button onClick={() => navigate({ to: '/course' })}>
-                Browse Courses
-              </Button>
-            </div>
-          ) : (
-            <>
-              <div className="grid grid-cols-1 gap-6">
-                {enrolledCourses.map((course: EnrolledCourseItem) => (
-                  <EnrolledCourseCard key={course.id} course={course} />
-                ))}
-              </div>
-              {/* Load More Button */}
-              {enrolledHasNextPage && (
-                <div className="flex justify-center mt-6">
-                  <Button
-                    onClick={() => enrolledFetchNextPage?.()}
-                    disabled={enrolledFetchingNextPage}
-                    variant="outline"
-                    size="lg"
-                  >
-                    {enrolledFetchingNextPage ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Loading more...
-                      </>
-                    ) : (
-                      'Load More Courses'
-                    )}
-                  </Button>
-                </div>
-              )}
-            </>
-          )}
+          <div className="flex items-center gap-2">
+            <EnrolledCoursesFilter
+              filters={filters}
+              onChange={(f) => setFilter(f)}
+            />
+          </div>
         </div>
+
+        {enrolledCourses.length === 0 ? (
+          <div className="flex min-h-[400px] flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 text-center animate-in fade-in zoom-in duration-500">
+            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 mb-6">
+              <BookOpen className="h-10 w-10 text-primary" />
+            </div>
+            <h3 className="text-2xl font-bold mb-2">No enrolled courses yet</h3>
+            <p className="mx-auto max-w-[400px] text-muted-foreground mb-8">
+              You haven't started any courses. Explore our catalog to find the
+              perfect course for you.
+            </p>
+            <Button
+              size="lg"
+              onClick={() => navigate({ to: "/course" })}
+              className="font-semibold"
+            >
+              Browse Courses
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 gap-6">
+              {enrolledCourses.map((course: EnrolledCourseItem) => (
+                <EnrolledCourseCard key={course.id} course={course} />
+              ))}
+            </div>
+
+            {enrolledHasNextPage && (
+              <div className="flex justify-center pt-8">
+                <Button
+                  onClick={() => enrolledFetchNextPage?.()}
+                  disabled={enrolledFetchingNextPage}
+                  variant="outline"
+                  size="lg"
+                  className="min-w-[200px] font-semibold"
+                >
+                  {enrolledFetchingNextPage ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Loading more...
+                    </>
+                  ) : (
+                    "Load More Courses"
+                  )}
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     );
   };
@@ -107,41 +135,59 @@ export function UserCourses() {
   const renderWishlist = () => {
     if (wishlistLoading) {
       return (
-        <div className="space-y-4">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="animate-pulse">
-              <div className="h-24 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
-            </div>
-          ))}
+        <div className="space-y-6">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold tracking-tight">My Wishlist</h2>
+            <p className="text-sm text-muted-foreground">
+              Courses you're interested in
+            </p>
+          </div>
+          <div className="grid grid-cols-1 gap-6">
+            {[...Array(3)].map((_, i) => (
+              <div
+                key={i}
+                className="h-[180px] w-full animate-pulse rounded-xl bg-muted"
+              />
+            ))}
+          </div>
         </div>
       );
     }
 
     if (wishlistError || wishlistItems.length === 0) {
       return (
-        <div className="text-center py-12">
-          <Heart className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-          <h3 className="text-xl font-semibold mb-2">Your wishlist is empty</h3>
-          <p className="text-muted-foreground mb-4">
-            Save courses you're interested in for later. They'll appear here.
+        <div className="flex min-h-[400px] flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 text-center animate-in fade-in zoom-in duration-500">
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-destructive/10 mb-6">
+            <Heart className="h-10 w-10 text-destructive" />
+          </div>
+          <h3 className="text-2xl font-bold mb-2">Your wishlist is empty</h3>
+          <p className="mx-auto max-w-[400px] text-muted-foreground mb-8">
+            Save courses you're interested in for later. They'll appear here
+            when you're ready to enroll.
           </p>
-          <Button onClick={() => navigate({ to: '/course' })}>
-            Browse Courses
+          <Button
+            size="lg"
+            onClick={() => navigate({ to: "/course" })}
+            className="font-semibold"
+          >
+            Explore Courses
           </Button>
         </div>
       );
     }
 
     return (
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Heart className="w-5 h-5 text-red-500" />
-            <h2 className="text-xl font-semibold">My Wishlist ({wishlistItems.length})</h2>
-          </div>
+      <div className="space-y-6">
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold tracking-tight">
+            My Wishlist ({wishlistItems.length})
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Courses you've saved for later
+          </p>
         </div>
 
-        <div className="space-y-3">
+        <div className="grid grid-cols-1 gap-6">
           {wishlistItems.map((item: WishlistedCourseItem) => (
             <WishlistCourseCard
               key={item.courseId}
@@ -156,32 +202,44 @@ export function UserCourses() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">My Learning</h1>
-          <p className="text-muted-foreground">
-            Track your progress and manage your courses
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-12 max-w-6xl">
+        <div className="mb-10 space-y-2">
+          <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">
+            My Learning
+          </h1>
+          <p className="text-xl text-muted-foreground">
+            Track your progress and manage your educational journey
           </p>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 max-w-md">
-            <TabsTrigger value="enrolled" className="flex items-center gap-2">
-              <BookOpen className="w-4 h-4" />
-              My Courses ({enrolledCourses.length})
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="w-full space-y-8"
+        >
+          <TabsList className="inline-flex h-12 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground w-full max-w-md">
+            <TabsTrigger
+              value="enrolled"
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-md px-8 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm w-full"
+            >
+              <BookOpen className="mr-2 h-4 w-4" />
+              My Courses
             </TabsTrigger>
-            <TabsTrigger value="wishlist" className="flex items-center gap-2">
-              <Heart className="w-4 h-4" />
-              Wishlist ({wishlistItems.length})
+            <TabsTrigger
+              value="wishlist"
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-md px-8 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm w-full"
+            >
+              <Heart className="mr-2 h-4 w-4" />
+              Wishlist
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="enrolled" className="mt-8">
+          <TabsContent value="enrolled" className="mt-0 outline-none">
             {renderEnrolledCourses()}
           </TabsContent>
 
-          <TabsContent value="wishlist" className="mt-8">
+          <TabsContent value="wishlist" className="mt-0 outline-none">
             {renderWishlist()}
           </TabsContent>
         </Tabs>
