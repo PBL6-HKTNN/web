@@ -23,7 +23,7 @@ export function CertificateViewerModal({
       onOpenChange={onOpenChange}
       src={certificateUrl}
       alt="Course Completion Certificate"
-      mediaType="image"
+      mediaType="pdf"
     >
       <Button variant="default" onClick={onDownload} disabled={isDownloading}>
         <Download className="w-4 h-4 mr-2" />

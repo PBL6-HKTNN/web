@@ -12,7 +12,7 @@ export interface MediaViewerProps {
   onOpenChange: (open: boolean) => void;
   src: string;
   alt?: string;
-  mediaType?: "image" | "video";
+  mediaType?: "image" | "video" | "pdf";
   children?: ReactNode;
   className?: string;
 }
@@ -32,7 +32,7 @@ export const MediaViewer = ({
         <DialogOverlay />
         <DialogContent
           className={cn(
-            "flex flex-col items-center justify-center gap-4 border-0 bg-transparent shadow-none w-full max-w-4xl",
+            "flex flex-col items-center justify-center gap-4 border-0 bg-transparent shadow-none w-full lg:min-w-7xl max-w-4xl",
             className
           )}
           showCloseButton={true}
@@ -45,12 +45,33 @@ export const MediaViewer = ({
                 alt={alt}
                 className="max-w-full max-h-[80vh] object-contain"
               />
-            ) : (
+            ) : mediaType === "video" ? (
               <video
                 src={src}
                 controls
                 className="max-w-full max-h-[80vh] object-contain"
               />
+            ) : (
+              // Certificates/PDFs should render in a responsive landscape frame
+              <div
+                className={cn(
+                  "w-full max-w-7xl aspect-video rounded-md overflow-hidden bg-black"
+                )}
+              >
+                <iframe
+                  src={src}
+                  title={alt}
+                  style={{
+                    transform: "scale(0.8)",
+                    transformOrigin: "0 0",
+                    width: "125%",
+                    height: "125%",
+                  }}
+                  frameBorder="0"
+                  loading="lazy"
+                  className="w-full h-full"
+                />
+              </div>
             )}
           </div>
 

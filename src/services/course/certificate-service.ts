@@ -1,13 +1,13 @@
-import { certificateApiUrl } from "@/conf";
 import API_ROUTES from "@/conf/constants/api-routes";
 import type { UUID } from "@/types";
 import type {
   GenerateCertRes,
   GetMyCertsRes,
 } from "@/types/db/course/certificate";
-import { createApiService, createServiceApi } from "@/utils";
+import { createApiService } from "@/utils";
+import api from "@/utils/api";
 
-const api = createServiceApi(certificateApiUrl);
+// const api = createServiceApi(certificateApiUrl);
 
 const _certificateService = {
   generateCert: async (enrollmentId: UUID): Promise<GenerateCertRes> => {

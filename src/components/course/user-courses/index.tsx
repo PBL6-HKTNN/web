@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { BookOpen, Heart, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -29,7 +29,7 @@ export function UserCourses() {
     removeFromWishlist,
   } = useUserCourses();
 
-  const renderEnrolledCourses = () => {
+  const RenderEnrolledCourses = React.memo(() => {
     if (enrolledLoading) {
       return (
         <div className="space-y-6">
@@ -130,9 +130,9 @@ export function UserCourses() {
         )}
       </div>
     );
-  };
+  });
 
-  const renderWishlist = () => {
+  const RenderWishlist = React.memo(() => {
     if (wishlistLoading) {
       return (
         <div className="space-y-6">
@@ -199,11 +199,11 @@ export function UserCourses() {
         </div>
       </div>
     );
-  };
+  });
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-12 max-w-6xl">
+      <div className="max-w-7xl container mx-auto px-4 py-12">
         <div className="mb-10 space-y-2">
           <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">
             My Learning
@@ -236,11 +236,11 @@ export function UserCourses() {
           </TabsList>
 
           <TabsContent value="enrolled" className="mt-0 outline-none">
-            {renderEnrolledCourses()}
+            <RenderEnrolledCourses />
           </TabsContent>
 
           <TabsContent value="wishlist" className="mt-0 outline-none">
-            {renderWishlist()}
+            <RenderWishlist />
           </TabsContent>
         </Tabs>
       </div>
