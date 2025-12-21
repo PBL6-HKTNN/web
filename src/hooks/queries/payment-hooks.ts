@@ -92,6 +92,7 @@ export const useGetPayment = () => {
   return useQuery({
     queryKey: PAYMENT_QUERY_KEYS.payment(),
     queryFn: paymentService.getPayment,
+    retry: 1,
   });
 };
 
@@ -99,6 +100,7 @@ export const useListPayments = () => {
   return useQuery({
     queryKey: PAYMENT_QUERY_KEYS.payments(),
     queryFn: paymentService.listPayments,
+    retry: 1,
   });
 };
 
@@ -183,6 +185,7 @@ export const useGetMyPayments = () => {
   return useQuery({
     queryKey: [...PAYMENT_QUERY_KEYS.all, "my-payments"],
     queryFn: paymentService.myPayments,
+    retry: 1,
   });
 };
 

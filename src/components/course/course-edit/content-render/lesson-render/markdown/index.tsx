@@ -1,16 +1,25 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { FileText } from "lucide-react";
-import type { LessonReq } from "@/types/db/course/lesson";
+import type { Lesson } from "@/types/db/course/lesson";
 import { MarkdownEditor } from "@/components/shared/md-editor";
 
 interface MarkdownLessonRenderProps {
-  lesson: LessonReq;
+  lesson: Lesson;
   onUpdateContent: (content: string) => void;
 }
 
-export function MarkdownLessonRender({ lesson, onUpdateContent }: MarkdownLessonRenderProps) {
+export function MarkdownLessonRender({
+  lesson,
+  onUpdateContent,
+}: MarkdownLessonRenderProps) {
   return (
     <Card className="h-full overflow-y-auto flex flex-col">
       <CardHeader>
@@ -25,7 +34,7 @@ export function MarkdownLessonRender({ lesson, onUpdateContent }: MarkdownLesson
 
       <CardContent className="flex-1">
         <MarkdownEditor
-          value={lesson.rawContent}
+          value={lesson.contentUrl}
           onChange={onUpdateContent}
           placeholder="Start writing your lesson content..."
           height="100%"

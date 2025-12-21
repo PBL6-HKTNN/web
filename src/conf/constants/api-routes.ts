@@ -118,6 +118,15 @@ const API_ROUTES = {
       `/Enrollment/total-enrollments/${courseId}`,
     addCalendar: (courseId: UUID) => `/Enrollment/add-calendar/${courseId}`,
   },
+  CERTIFICATE: {
+    generateCert: (enrollmentId: UUID) =>
+      `/Certificate/${enrollmentId}/generate`,
+    getMyCerts: "/Certificate/my",
+    getCertStatus: (enrollmentId: UUID) =>
+      `/Certificate/${enrollmentId}/status`,
+    downloadCert: (enrollmentId: UUID) =>
+      `/Certificate/${enrollmentId}/download`,
+  },
   REVIEW: {
     createReview: "/Review",
     getReviewsByCourse: (courseId: UUID) => `/Review/course/${courseId}`,

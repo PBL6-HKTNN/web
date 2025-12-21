@@ -1,17 +1,16 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useCheckoutPage } from './-hook'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
-import { ArrowLeft, CheckCircle, CreditCard, X} from 'lucide-react'
+import { ArrowRight, CheckCircle, X, RefreshCw } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
-import { formatPrice } from '@/utils/format'
-import { OrderStatus, type OrderItem } from '@/types/db/payment'
+import { OrderStatus } from '@/types/db/payment'
 import { loadStripe } from '@stripe/stripe-js'
 import { Elements } from '@stripe/react-stripe-js'
 import { stripePk } from '@/conf'
-import { CheckoutForm } from '@/components/payment/checkout-form'
+import { CheckoutHeader } from './-sections/checkout-header'
+import { OrderDetails } from './-sections/order-details'
+import { CheckoutSummary } from './-sections/checkout-summary'
 
 const stripePromise = loadStripe(stripePk)
 
@@ -32,14 +31,14 @@ function RouteComponent() {
 
   if (isLoading) {
     return (
-      <div className="container max-w-4xl mx-auto py-8">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-muted rounded w-1/4"></div>
-          <div className="grid gap-6 lg:grid-cols-3">
-            <div className="lg:col-span-2 space-y-4">
-              <div className="h-32 bg-muted rounded"></div>
+      <div className="container mx-auto py-12">
+        <div className="animate-pulse space-y-8">
+          <div className="h-12 bg-muted rounded-2xl w-1/3"></div>
+          <div className="grid gap-8 lg:grid-cols-3">
+            <div className="lg:col-span-2 space-y-6">
+              <div className="h-64 bg-muted rounded-3xl"></div>
             </div>
-            <div className="h-64 bg-muted rounded"></div>
+            <div className="h-96 bg-muted rounded-3xl"></div>
           </div>
         </div>
       </div>
@@ -48,20 +47,25 @@ function RouteComponent() {
 
   if (hasError || !paymentData) {
     return (
-      <div className="container max-w-4xl mx-auto py-8">
-        <Card>
-          <CardContent className="p-8 text-center">
-            <X className="h-12 w-12 text-destructive mx-auto mb-4" />
-            <h2 className="text-xl font-semibold mb-2">Payment not found</h2>
-            <p className="text-muted-foreground mb-4">
-              There was an error loading your payment. Please try again.
-            </p>
-            <div className="space-x-2">
-              <Button onClick={() => refetch()} variant="outline">
+      <div className="container max-w-4xl mx-auto py-20">
+        <Card className="border-none shadow-2xl">
+          <CardContent className="p-12 text-center space-y-6">
+            <div className="w-20 h-20 rounded-full bg-destructive/10 flex items-center justify-center mx-auto">
+              <X className="h-10 w-10 text-destructive" />
+            </div>
+            <div className="space-y-2">
+              <h2 className="text-3xl font-black tracking-tight">Payment not found</h2>
+              <p className="text-muted-foreground font-medium">
+                There was an error loading your payment. Please try again.
+              </p>
+            </div>
+            <div className="flex justify-center gap-4">
+              <Button onClick={() => refetch()} variant="outline" size="lg" className="font-bold rounded-full px-8">
+                <RefreshCw className="h-4 w-4 mr-2" />
                 Retry
               </Button>
               <Link to="/cart">
-                <Button>Back to Cart</Button>
+                <Button size="lg" className="font-bold rounded-full px-8">Back to Cart</Button>
               </Link>
             </div>
           </CardContent>
@@ -75,20 +79,34 @@ function RouteComponent() {
 
   if (isPaymentCompleted) {
     return (
-      <div className="container max-w-4xl mx-auto py-8">
-        <Card>
-          <CardContent className="p-8 text-center">
-            <CheckCircle className="h-12 w-12 text-green-600 mx-auto mb-4" />
-            <h2 className="text-2xl font-semibold mb-2">You have no in progress payment</h2>
-            <p className="text-muted-foreground mb-6">
-              Your payment has already been completed.
-            </p>
-            <div className="space-x-2">
+      <div className="container max-w-4xl mx-auto py-20">
+        <Card className="border-none shadow-2xl">
+          <CardContent className="p-12 text-center space-y-8">
+            <div className="relative inline-block">
+              <div className="absolute inset-0 bg-green-500/20 blur-3xl rounded-full" />
+              <div className="relative w-24 h-24 rounded-full bg-green-50 dark:bg-green-900/20 flex items-center justify-center mx-auto border-4 border-background shadow-xl">
+                <CheckCircle className="h-12 w-12 text-green-600" />
+              </div>
+            </div>
+            
+            <div className="space-y-3">
+              <h2 className="text-4xl font-black tracking-tight">Payment Completed</h2>
+              <p className="text-lg text-muted-foreground font-medium leading-relaxed">
+                Your payment has already been processed successfully.
+              </p>
+            </div>
+
+            <div className="flex justify-center gap-4">
               <Link to="/your-courses">
-                <Button>View My Courses</Button>
+                <Button size="lg" className="h-14 px-10 text-lg font-black rounded-full shadow-xl shadow-primary/20 group">
+                  View My Courses
+                  <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                </Button>
               </Link>
               <Link to="/cart">
-                <Button variant="outline">Continue Shopping</Button>
+                <Button variant="outline" size="lg" className="h-14 px-10 text-lg font-black rounded-full">
+                  Continue Shopping
+                </Button>
               </Link>
             </div>
           </CardContent>
@@ -99,117 +117,24 @@ function RouteComponent() {
 
   return (
     <Elements stripe={stripePromise}>
-      <div className="container max-w-7xl mx-auto py-8">
-      {/* Header */}
-      <div className="flex items-center gap-4 mb-8">
-        <Link to="/cart" className="text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="h-5 w-5" />
-        </Link>
-        <div className="flex items-center gap-2">
-          <CreditCard className="h-6 w-6" />
-          <h1 className="text-2xl font-bold">Checkout</h1>
-          {totalItems > 0 && (
-            <Badge variant="secondary">
-              {totalItems} {totalItems === 1 ? 'item' : 'items'}
-            </Badge>
-          )}
-        </div>
-      </div>
+      <div className="container max-w-7xl mx-auto py-12 px-4">
+        <CheckoutHeader totalItems={totalItems} />
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Order Items */}
-        <div className="lg:col-span-2">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">
-                Order Details
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {paymentData.orderItems?.map((item: OrderItem, index: number) => (
-                  <div key={item.courseId}>
-                    <div className="flex gap-4">
-                      {/* Course Thumbnail */}
-                      <div className="flex-shrink-0">
-                        <img
-                          src={item.thumbnailUrl}
-                          alt={item.courseTitle}
-                          className="w-16 h-16 object-cover rounded-md border"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.src = '/placeholder-course.jpg'; // Fallback image
-                          }}
-                        />
-                      </div>
+        <div className="grid gap-10 lg:grid-cols-3 items-start">
+          <div className="lg:col-span-2">
+            <OrderDetails orderItems={paymentData.orderItems} />
+          </div>
 
-                      {/* Course Details */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <h3 className="font-medium">{item.courseTitle}</h3>
-                            <p className="text-sm text-muted-foreground mt-1">
-                              {item.description}
-                            </p>
-                          </div>
-                          <div className="text-right ml-4">
-                            <p className="font-medium">{formatPrice(item.price)}</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    {index < (paymentData.orderItems?.length || 0) - 1 && (
-                      <Separator className="mt-4" />
-                    )}
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Payment Summary */}
-        <div className="lg:col-span-1">
-          <div className="sticky top-8 space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Order Summary</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Subtotal ({totalItems} items)</span>
-                    <span>{formatPrice(totalAmount)}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Taxes</span>
-                    <span>$0.00</span>
-                  </div>
-                </div>
-                
-                <Separator />
-                
-                <div className="flex justify-between font-semibold text-lg">
-                  <span>Total</span>
-                  <span className="text-primary">{formatPrice(totalAmount)}</span>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <CheckoutForm 
-              onSuccess={handlePurchase} 
-              paymentData={paymentData}
+          <div className="lg:col-span-1">
+            <CheckoutSummary
               totalAmount={totalAmount}
+              totalItems={totalItems}
+              paymentData={paymentData}
+              handlePurchase={handlePurchase}
             />
-            
-            <div className="text-xs text-muted-foreground text-center">
-              <p>Secure checkout powered by Stripe</p>
-              <p>30-day money-back guarantee</p>
-            </div>
           </div>
         </div>
       </div>
-    </div>
     </Elements>
   )
 }

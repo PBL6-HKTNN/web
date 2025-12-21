@@ -34,21 +34,22 @@ export const useAddToWishlist = (courseId: UUID) => {
   });
 };
 
-export const useRemoveFromWishlist = (courseId: UUID) => {
+export const useRemoveFromWishlist = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: () => wishlistService.removeFromWishlist(courseId),
-    onSuccess: () => {
+    mutationFn: (courseId: UUID) =>
+      wishlistService.removeFromWishlist(courseId),
+    onSuccess: (_, variable) => {
       // Invalidate wishlist queries to refresh the list
       queryClient.invalidateQueries({
-        queryKey: [...wishlistQueryKeys.allWishlist, "check", courseId],
+        queryKey: [...wishlistQueryKeys.allWishlist, "check", variable],
       });
     },
-    onError: (error) => {
+    onError: (error, variable) => {
       console.error("Remove from wishlist failed:", error);
       queryClient.invalidateQueries({
-        queryKey: [...wishlistQueryKeys.allWishlist, "check", courseId],
+        queryKey: [...wishlistQueryKeys.allWishlist, "check", variable],
       });
     },
   });
