@@ -18,6 +18,7 @@ import {
   PenToolIcon,
   Cog,
   ShieldUserIcon,
+  KeyIcon,
 } from "lucide-react";
 import { useAuthState, useLogout } from "@/hooks/queries/auth-hooks";
 import { useGetCart } from "@/hooks/queries/payment-hooks";
@@ -159,6 +160,14 @@ export function NavBar() {
                           <Link to="/mod" className="flex items-center">
                             <ShieldUserIcon className="mr-2 h-4 w-4" />
                             Moderator Tools
+                          </Link>
+                        </DropdownMenuItem>
+                      </RequiredRole>
+                      <RequiredRole roles={[UserRole.ADMIN]}>
+                        <DropdownMenuItem asChild>
+                          <Link to="/admin" className="flex items-center">
+                            <KeyIcon className="mr-2 h-4 w-4" />
+                            Admin Tools
                           </Link>
                         </DropdownMenuItem>
                       </RequiredRole>
