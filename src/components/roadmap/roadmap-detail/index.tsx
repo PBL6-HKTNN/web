@@ -1,41 +1,47 @@
-import { useRoadmapDetailComponent } from './hook'
-import { RoadmapHeader } from '../roadmap-header'
-import { RoadmapCoursesList } from '../roadmap-courses-list'
-import { EditRoadmapDialog } from '../edit-roadmap-dialog'
-import { AddCourseDialog } from '../add-course-dialog'
-import { RemoveCourseDialog } from '../remove-course-dialog'
-import { DeleteRoadmapDialog } from '../delete-roadmap-dialog'
-import { useEditRoadmapDialog } from '../edit-roadmap-dialog/hooks'
-import { useAddCourseDialog } from '../add-course-dialog/hooks'
-import { useRemoveCourseDialog } from '../remove-course-dialog/hooks'
-import { useDeleteRoadmapDialog } from '../delete-roadmap-dialog/hooks'
-import { useRoadmapCoursesList } from '../roadmap-courses-list/hooks'
-import { Card, CardHeader, CardContent } from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { AlertCircle } from 'lucide-react'
-import { useQueryClient } from '@tanstack/react-query'
-import type { UUID } from '@/types'
+import { useRoadmapDetailComponent } from "./hook";
+import { RoadmapHeader } from "../roadmap-header";
+import { RoadmapCoursesList } from "../roadmap-courses-list";
+import { EditRoadmapDialog } from "../edit-roadmap-dialog";
+import { AddCourseDialog } from "../add-course-dialog";
+import { RemoveCourseDialog } from "../remove-course-dialog";
+import { DeleteRoadmapDialog } from "../delete-roadmap-dialog";
+import { useEditRoadmapDialog } from "../edit-roadmap-dialog/hooks";
+import { useAddCourseDialog } from "../add-course-dialog/hooks";
+import { useRemoveCourseDialog } from "../remove-course-dialog/hooks";
+import { useDeleteRoadmapDialog } from "../delete-roadmap-dialog/hooks";
+import { useRoadmapCoursesList } from "../roadmap-courses-list/hooks";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import DiagonalSplitLayout from "@/components/shared/diagonal-split-layout";
+import type { UUID } from "@/types";
 
 interface RoadmapDetailProps {
-  roadmapId: UUID
+  roadmapId: UUID;
 }
 
 export function RoadmapDetail({ roadmapId }: RoadmapDetailProps) {
-  const queryClient = useQueryClient()
-  const { roadmap, isLoading, error } = useRoadmapDetailComponent(roadmapId)
+  const queryClient = useQueryClient();
+  const { roadmap, isLoading, error, imageUrls } =
+    useRoadmapDetailComponent(roadmapId);
 
   // Refresh roadmap data after mutations
   const refreshRoadmap = () => {
-    queryClient.invalidateQueries({ queryKey: ['roadmap', roadmapId] })
-  }
+    queryClient.invalidateQueries({ queryKey: ["roadmap", roadmapId] });
+  };
 
   // Hooks for each component
-  const editDialog = useEditRoadmapDialog(roadmapId, roadmap, refreshRoadmap)
-  const addCourseDialog = useAddCourseDialog(roadmapId, roadmap, refreshRoadmap)
-  const removeCourseDialog = useRemoveCourseDialog(roadmapId, refreshRoadmap)
-  const deleteRoadmapDialog = useDeleteRoadmapDialog(roadmapId)
-  const coursesList = useRoadmapCoursesList(roadmapId, roadmap)
+  const editDialog = useEditRoadmapDialog(roadmapId, roadmap, refreshRoadmap);
+  const addCourseDialog = useAddCourseDialog(
+    roadmapId,
+    roadmap,
+    refreshRoadmap
+  );
+  const removeCourseDialog = useRemoveCourseDialog(roadmapId, refreshRoadmap);
+  const deleteRoadmapDialog = useDeleteRoadmapDialog(roadmapId);
+  const coursesList = useRoadmapCoursesList(roadmapId, roadmap);
 
   if (isLoading) {
     return (
@@ -51,7 +57,7 @@ export function RoadmapDetail({ roadmapId }: RoadmapDetailProps) {
           </CardContent>
         </Card>
       </div>
-    )
+    );
   }
 
   if (error || !roadmap) {
@@ -60,15 +66,25 @@ export function RoadmapDetail({ roadmapId }: RoadmapDetailProps) {
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            {error?.message || 'Failed to load roadmap. Please try again.'}
+            {error?.message || "Failed to load roadmap. Please try again."}
           </AlertDescription>
         </Alert>
       </div>
-    )
+    );
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="container max-w-7xl mx-auto p-6 space-y-6">
+      {/* Diagonal background from course thumbnails (if any) */}
+      {imageUrls && imageUrls.length > 0 && (
+        <DiagonalSplitLayout
+          imageUrls={imageUrls}
+          height="260px"
+          overlayColor="rgba(0,0,0,0.18)"
+          className="rounded-lg"
+        />
+      )}
+
       {/* Header */}
       <RoadmapHeader
         roadmap={roadmap}
@@ -129,5 +145,5 @@ export function RoadmapDetail({ roadmapId }: RoadmapDetailProps) {
         isLoading={deleteRoadmapDialog.isLoading}
       />
     </div>
-  )
+  );
 }

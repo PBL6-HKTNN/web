@@ -1,11 +1,16 @@
-import { Outlet, createFileRoute } from '@tanstack/react-router'
-import { authGuard } from '@/utils'
-export const Route = createFileRoute('/roadmap')({
+import { Outlet, createFileRoute } from "@tanstack/react-router";
+import { authGuard } from "@/utils";
+import { NavBar } from "@/components/layout";
+export const Route = createFileRoute("/roadmap")({
   component: RouteComponent,
   beforeLoad: authGuard,
-})
+});
 
 function RouteComponent() {
-  return <Outlet />
+  return (
+    <>
+      <NavBar />
+      <Outlet />
+    </>
+  );
 }
-

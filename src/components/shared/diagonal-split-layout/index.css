@@ -1,0 +1,79 @@
+.diagonal-split {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  display: block;
+  font-family: inherit;
+}
+
+.dsl-slice {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  transition: transform 300ms ease;
+}
+
+.dsl-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  -o-object-fit: cover;
+}
+
+/* Optional thin separator to emphasize the slash between slices */
+.dsl-slice::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(0,0,0,0.06));
+  mix-blend-mode: normal;
+  opacity: 0.4;
+}
+
+.dsl-separator {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  transform: translateX(-50%) rotate(18deg);
+  transform-origin: center;
+  pointer-events: none;
+  z-index: 20;
+  opacity: 0.9;
+  /* make separators thin and crisp */
+  background-clip: content-box;
+}
+
+.dsl-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.25);
+}
+
+/* Small responsive behaviour */
+@media (max-width: 640px) {
+  .dsl-content {
+    width: 100%;
+    padding: 1rem;
+    position: relative;
+  }
+  /* fall back to stacked vertical layout on small screens */
+  .diagonal-split {
+    display: block;
+    height: auto;
+  }
+  .dsl-slice {
+    position: relative;
+    clip-path: none !important;
+    height: 220px;
+  }
+  .dsl-slice .dsl-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}

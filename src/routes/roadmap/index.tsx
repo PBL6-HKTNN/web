@@ -1,5 +1,9 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { useMyRoadmaps, useCreateRoadmap, useDeleteRoadmap } from '@/hooks/queries/roadmap-hooks'
+import { createFileRoute } from "@tanstack/react-router";
+import {
+  useMyRoadmaps,
+  useCreateRoadmap,
+  useDeleteRoadmap,
+} from "@/hooks/queries/roadmap-hooks";
 import {
   RoadmapListHeader,
   RoadmapsGrid,
@@ -7,18 +11,18 @@ import {
   CourseSelectionDialog,
   DeleteRoadmapDialog,
   useRoadmapList,
-} from '@/components/roadmap/roadmaplist'
+} from "@/components/roadmap/roadmaplist";
 
-export const Route = createFileRoute('/roadmap/')({
+export const Route = createFileRoute("/roadmap/")({
   component: RouteComponent,
-})
+});
 
 function RouteComponent() {
-  const { data: roadmapsData, isLoading } = useMyRoadmaps()
-  const createRoadmapMutation = useCreateRoadmap()
-  const deleteRoadmapMutation = useDeleteRoadmap()
+  const { data: roadmapsData, isLoading } = useMyRoadmaps();
+  const createRoadmapMutation = useCreateRoadmap();
+  const deleteRoadmapMutation = useDeleteRoadmap();
 
-  const roadmaps = roadmapsData?.data?.roadmaps || []
+  const roadmaps = roadmapsData?.data?.roadmaps || [];
 
   const {
     isCreateDialogOpen,
@@ -42,16 +46,16 @@ function RouteComponent() {
     roadmapToDelete,
     handleDeleteRoadmap,
     confirmDeleteRoadmap,
-  } = useRoadmapList(deleteRoadmapMutation, roadmaps)
+  } = useRoadmapList(deleteRoadmapMutation, roadmaps);
 
   const handleCreate = async () => {
     await handleCreateRoadmap(async (form) => {
-      await createRoadmapMutation.mutateAsync(form)
-    })
-  }
+      await createRoadmapMutation.mutateAsync(form);
+    });
+  };
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="container max-w-7xl  mx-auto p-6 space-y-6">
       {/* Header */}
       <RoadmapListHeader onCreateClick={() => setIsCreateDialogOpen(true)} />
 
@@ -98,5 +102,5 @@ function RouteComponent() {
         isLoading={deleteRoadmapMutation.isPending}
       />
     </div>
-  )
+  );
 }
