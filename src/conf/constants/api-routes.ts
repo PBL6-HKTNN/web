@@ -165,6 +165,18 @@ const API_ROUTES = {
     deleteRequest: (requestId: UUID) => `/Request/delete/${requestId}`,
     resolveRequest: "/Request/resolve",
   },
+  ROADMAP: {
+    create: "/Roadmap",
+    getMy: "/Roadmap/my",
+    getDetail: (id: UUID) => `/Roadmap/${id}`,
+    join: (id: UUID) => `/Roadmap/${id}/join`,
+    update: (id: UUID) => `/Roadmap/${id}`,
+    addCourse: (id: UUID) => `/Roadmap/${id}/courses`,
+    reorderCourses: (id: UUID) => `/Roadmap/${id}/courses/reorder`,
+    removeCourse: (id: UUID, courseId: UUID) => `/Roadmap/${id}/courses/${courseId}`,
+    syncProgress: (id: UUID) => `/Roadmap/${id}/sync-progress`,
+    delete: (id: UUID) => `/Roadmap/${id}`,
+  },
 };
 
 export default API_ROUTES;

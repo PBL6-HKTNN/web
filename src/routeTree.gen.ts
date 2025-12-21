@@ -15,6 +15,7 @@ import { Route as R404RouteImport } from './routes/404'
 import { Route as YourCoursesRouteRouteImport } from './routes/your-courses/route'
 import { Route as UsersRouteRouteImport } from './routes/users/route'
 import { Route as SettingsRouteRouteImport } from './routes/settings/route'
+import { Route as RoadmapRouteRouteImport } from './routes/roadmap/route'
 import { Route as ModRouteRouteImport } from './routes/mod/route'
 import { Route as LecturingToolRouteRouteImport } from './routes/lecturing-tool/route'
 import { Route as LearnRouteRouteImport } from './routes/learn/route'
@@ -27,6 +28,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as YourCoursesIndexRouteImport } from './routes/your-courses/index'
 import { Route as UsersIndexRouteImport } from './routes/users/index'
 import { Route as SettingsIndexRouteImport } from './routes/settings/index'
+import { Route as RoadmapIndexRouteImport } from './routes/roadmap/index'
 import { Route as ModIndexRouteImport } from './routes/mod/index'
 import { Route as LecturingToolIndexRouteImport } from './routes/lecturing-tool/index'
 import { Route as CourseIndexRouteImport } from './routes/course/index'
@@ -39,6 +41,7 @@ import { Route as CourseCourseIdRouteImport } from './routes/course/$courseId'
 import { Route as SettingsRequestHistoryRouteRouteImport } from './routes/settings/request-history/route'
 import { Route as SettingsProfileRouteRouteImport } from './routes/settings/profile/route'
 import { Route as SettingsPaymentRouteRouteImport } from './routes/settings/payment/route'
+import { Route as RoadmapRoadmapIdRouteRouteImport } from './routes/roadmap/$roadmapId/route'
 import { Route as ModUsersRouteRouteImport } from './routes/mod/users/route'
 import { Route as ModReportsManagementRouteRouteImport } from './routes/mod/reports-management/route'
 import { Route as ModLecturerManagementRouteRouteImport } from './routes/mod/lecturer-management/route'
@@ -53,6 +56,7 @@ import { Route as AdminCoursesRouteRouteImport } from './routes/admin/courses/ro
 import { Route as SettingsRequestHistoryIndexRouteImport } from './routes/settings/request-history/index'
 import { Route as SettingsProfileIndexRouteImport } from './routes/settings/profile/index'
 import { Route as SettingsPaymentIndexRouteImport } from './routes/settings/payment/index'
+import { Route as RoadmapRoadmapIdIndexRouteImport } from './routes/roadmap/$roadmapId/index'
 import { Route as ModUsersIndexRouteImport } from './routes/mod/users/index'
 import { Route as ModReportsManagementIndexRouteImport } from './routes/mod/reports-management/index'
 import { Route as ModLecturerManagementIndexRouteImport } from './routes/mod/lecturer-management/index'
@@ -115,6 +119,11 @@ const SettingsRouteRoute = SettingsRouteRouteImport.update({
   path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RoadmapRouteRoute = RoadmapRouteRouteImport.update({
+  id: '/roadmap',
+  path: '/roadmap',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ModRouteRoute = ModRouteRouteImport.update({
   id: '/mod',
   path: '/mod',
@@ -174,6 +183,11 @@ const SettingsIndexRoute = SettingsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => SettingsRouteRoute,
+} as any)
+const RoadmapIndexRoute = RoadmapIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => RoadmapRouteRoute,
 } as any)
 const ModIndexRoute = ModIndexRouteImport.update({
   id: '/',
@@ -235,6 +249,11 @@ const SettingsPaymentRouteRoute = SettingsPaymentRouteRouteImport.update({
   id: '/payment',
   path: '/payment',
   getParentRoute: () => SettingsRouteRoute,
+} as any)
+const RoadmapRoadmapIdRouteRoute = RoadmapRoadmapIdRouteRouteImport.update({
+  id: '/$roadmapId',
+  path: '/$roadmapId',
+  getParentRoute: () => RoadmapRouteRoute,
 } as any)
 const ModUsersRouteRoute = ModUsersRouteRouteImport.update({
   id: '/users',
@@ -308,6 +327,11 @@ const SettingsPaymentIndexRoute = SettingsPaymentIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => SettingsPaymentRouteRoute,
+} as any)
+const RoadmapRoadmapIdIndexRoute = RoadmapRoadmapIdIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => RoadmapRoadmapIdRouteRoute,
 } as any)
 const ModUsersIndexRoute = ModUsersIndexRouteImport.update({
   id: '/',
@@ -495,6 +519,7 @@ export interface FileRoutesByFullPath {
   '/learn': typeof LearnRouteRouteWithChildren
   '/lecturing-tool': typeof LecturingToolRouteRouteWithChildren
   '/mod': typeof ModRouteRouteWithChildren
+  '/roadmap': typeof RoadmapRouteRouteWithChildren
   '/settings': typeof SettingsRouteRouteWithChildren
   '/users': typeof UsersRouteRouteWithChildren
   '/your-courses': typeof YourCoursesRouteRouteWithChildren
@@ -511,6 +536,7 @@ export interface FileRoutesByFullPath {
   '/mod/lecturer-management': typeof ModLecturerManagementRouteRouteWithChildren
   '/mod/reports-management': typeof ModReportsManagementRouteRouteWithChildren
   '/mod/users': typeof ModUsersRouteRouteWithChildren
+  '/roadmap/$roadmapId': typeof RoadmapRoadmapIdRouteRouteWithChildren
   '/settings/payment': typeof SettingsPaymentRouteRouteWithChildren
   '/settings/profile': typeof SettingsProfileRouteRouteWithChildren
   '/settings/request-history': typeof SettingsRequestHistoryRouteRouteWithChildren
@@ -523,6 +549,7 @@ export interface FileRoutesByFullPath {
   '/course/': typeof CourseIndexRoute
   '/lecturing-tool/': typeof LecturingToolIndexRoute
   '/mod/': typeof ModIndexRoute
+  '/roadmap/': typeof RoadmapIndexRoute
   '/settings/': typeof SettingsIndexRoute
   '/users/': typeof UsersIndexRoute
   '/your-courses/': typeof YourCoursesIndexRoute
@@ -542,6 +569,7 @@ export interface FileRoutesByFullPath {
   '/mod/lecturer-management/': typeof ModLecturerManagementIndexRoute
   '/mod/reports-management/': typeof ModReportsManagementIndexRoute
   '/mod/users/': typeof ModUsersIndexRoute
+  '/roadmap/$roadmapId/': typeof RoadmapRoadmapIdIndexRoute
   '/settings/payment/': typeof SettingsPaymentIndexRoute
   '/settings/profile/': typeof SettingsProfileIndexRoute
   '/settings/request-history/': typeof SettingsRequestHistoryIndexRoute
@@ -577,6 +605,7 @@ export interface FileRoutesByTo {
   '/course': typeof CourseIndexRoute
   '/lecturing-tool': typeof LecturingToolIndexRoute
   '/mod': typeof ModIndexRoute
+  '/roadmap': typeof RoadmapIndexRoute
   '/settings': typeof SettingsIndexRoute
   '/users': typeof UsersIndexRoute
   '/your-courses': typeof YourCoursesIndexRoute
@@ -595,6 +624,7 @@ export interface FileRoutesByTo {
   '/mod/lecturer-management': typeof ModLecturerManagementIndexRoute
   '/mod/reports-management': typeof ModReportsManagementIndexRoute
   '/mod/users': typeof ModUsersIndexRoute
+  '/roadmap/$roadmapId': typeof RoadmapRoadmapIdIndexRoute
   '/settings/payment': typeof SettingsPaymentIndexRoute
   '/settings/profile': typeof SettingsProfileIndexRoute
   '/settings/request-history': typeof SettingsRequestHistoryIndexRoute
@@ -622,6 +652,7 @@ export interface FileRoutesById {
   '/learn': typeof LearnRouteRouteWithChildren
   '/lecturing-tool': typeof LecturingToolRouteRouteWithChildren
   '/mod': typeof ModRouteRouteWithChildren
+  '/roadmap': typeof RoadmapRouteRouteWithChildren
   '/settings': typeof SettingsRouteRouteWithChildren
   '/users': typeof UsersRouteRouteWithChildren
   '/your-courses': typeof YourCoursesRouteRouteWithChildren
@@ -639,6 +670,7 @@ export interface FileRoutesById {
   '/mod/lecturer-management': typeof ModLecturerManagementRouteRouteWithChildren
   '/mod/reports-management': typeof ModReportsManagementRouteRouteWithChildren
   '/mod/users': typeof ModUsersRouteRouteWithChildren
+  '/roadmap/$roadmapId': typeof RoadmapRoadmapIdRouteRouteWithChildren
   '/settings/payment': typeof SettingsPaymentRouteRouteWithChildren
   '/settings/profile': typeof SettingsProfileRouteRouteWithChildren
   '/settings/request-history': typeof SettingsRequestHistoryRouteRouteWithChildren
@@ -651,6 +683,7 @@ export interface FileRoutesById {
   '/course/': typeof CourseIndexRoute
   '/lecturing-tool/': typeof LecturingToolIndexRoute
   '/mod/': typeof ModIndexRoute
+  '/roadmap/': typeof RoadmapIndexRoute
   '/settings/': typeof SettingsIndexRoute
   '/users/': typeof UsersIndexRoute
   '/your-courses/': typeof YourCoursesIndexRoute
@@ -670,6 +703,7 @@ export interface FileRoutesById {
   '/mod/lecturer-management/': typeof ModLecturerManagementIndexRoute
   '/mod/reports-management/': typeof ModReportsManagementIndexRoute
   '/mod/users/': typeof ModUsersIndexRoute
+  '/roadmap/$roadmapId/': typeof RoadmapRoadmapIdIndexRoute
   '/settings/payment/': typeof SettingsPaymentIndexRoute
   '/settings/profile/': typeof SettingsProfileIndexRoute
   '/settings/request-history/': typeof SettingsRequestHistoryIndexRoute
@@ -701,6 +735,7 @@ export interface FileRouteTypes {
     | '/learn'
     | '/lecturing-tool'
     | '/mod'
+    | '/roadmap'
     | '/settings'
     | '/users'
     | '/your-courses'
@@ -717,6 +752,7 @@ export interface FileRouteTypes {
     | '/mod/lecturer-management'
     | '/mod/reports-management'
     | '/mod/users'
+    | '/roadmap/$roadmapId'
     | '/settings/payment'
     | '/settings/profile'
     | '/settings/request-history'
@@ -729,6 +765,7 @@ export interface FileRouteTypes {
     | '/course/'
     | '/lecturing-tool/'
     | '/mod/'
+    | '/roadmap/'
     | '/settings/'
     | '/users/'
     | '/your-courses/'
@@ -748,6 +785,7 @@ export interface FileRouteTypes {
     | '/mod/lecturer-management/'
     | '/mod/reports-management/'
     | '/mod/users/'
+    | '/roadmap/$roadmapId/'
     | '/settings/payment/'
     | '/settings/profile/'
     | '/settings/request-history/'
@@ -783,6 +821,7 @@ export interface FileRouteTypes {
     | '/course'
     | '/lecturing-tool'
     | '/mod'
+    | '/roadmap'
     | '/settings'
     | '/users'
     | '/your-courses'
@@ -801,6 +840,7 @@ export interface FileRouteTypes {
     | '/mod/lecturer-management'
     | '/mod/reports-management'
     | '/mod/users'
+    | '/roadmap/$roadmapId'
     | '/settings/payment'
     | '/settings/profile'
     | '/settings/request-history'
@@ -827,6 +867,7 @@ export interface FileRouteTypes {
     | '/learn'
     | '/lecturing-tool'
     | '/mod'
+    | '/roadmap'
     | '/settings'
     | '/users'
     | '/your-courses'
@@ -844,6 +885,7 @@ export interface FileRouteTypes {
     | '/mod/lecturer-management'
     | '/mod/reports-management'
     | '/mod/users'
+    | '/roadmap/$roadmapId'
     | '/settings/payment'
     | '/settings/profile'
     | '/settings/request-history'
@@ -856,6 +898,7 @@ export interface FileRouteTypes {
     | '/course/'
     | '/lecturing-tool/'
     | '/mod/'
+    | '/roadmap/'
     | '/settings/'
     | '/users/'
     | '/your-courses/'
@@ -875,6 +918,7 @@ export interface FileRouteTypes {
     | '/mod/lecturer-management/'
     | '/mod/reports-management/'
     | '/mod/users/'
+    | '/roadmap/$roadmapId/'
     | '/settings/payment/'
     | '/settings/profile/'
     | '/settings/request-history/'
@@ -905,6 +949,7 @@ export interface RootRouteChildren {
   LearnRouteRoute: typeof LearnRouteRouteWithChildren
   LecturingToolRouteRoute: typeof LecturingToolRouteRouteWithChildren
   ModRouteRoute: typeof ModRouteRouteWithChildren
+  RoadmapRouteRoute: typeof RoadmapRouteRouteWithChildren
   SettingsRouteRoute: typeof SettingsRouteRouteWithChildren
   UsersRouteRoute: typeof UsersRouteRouteWithChildren
   YourCoursesRouteRoute: typeof YourCoursesRouteRouteWithChildren
@@ -957,6 +1002,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/roadmap': {
+      id: '/roadmap'
+      path: '/roadmap'
+      fullPath: '/roadmap'
+      preLoaderRoute: typeof RoadmapRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mod': {
@@ -1043,6 +1095,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsIndexRouteImport
       parentRoute: typeof SettingsRouteRoute
     }
+    '/roadmap/': {
+      id: '/roadmap/'
+      path: '/'
+      fullPath: '/roadmap/'
+      preLoaderRoute: typeof RoadmapIndexRouteImport
+      parentRoute: typeof RoadmapRouteRoute
+    }
     '/mod/': {
       id: '/mod/'
       path: '/'
@@ -1126,6 +1185,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/settings/payment'
       preLoaderRoute: typeof SettingsPaymentRouteRouteImport
       parentRoute: typeof SettingsRouteRoute
+    }
+    '/roadmap/$roadmapId': {
+      id: '/roadmap/$roadmapId'
+      path: '/$roadmapId'
+      fullPath: '/roadmap/$roadmapId'
+      preLoaderRoute: typeof RoadmapRoadmapIdRouteRouteImport
+      parentRoute: typeof RoadmapRouteRoute
     }
     '/mod/users': {
       id: '/mod/users'
@@ -1224,6 +1290,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/settings/payment/'
       preLoaderRoute: typeof SettingsPaymentIndexRouteImport
       parentRoute: typeof SettingsPaymentRouteRoute
+    }
+    '/roadmap/$roadmapId/': {
+      id: '/roadmap/$roadmapId/'
+      path: '/'
+      fullPath: '/roadmap/$roadmapId/'
+      preLoaderRoute: typeof RoadmapRoadmapIdIndexRouteImport
+      parentRoute: typeof RoadmapRoadmapIdRouteRoute
     }
     '/mod/users/': {
       id: '/mod/users/'
@@ -1792,6 +1865,33 @@ const ModRouteRouteWithChildren = ModRouteRoute._addFileChildren(
   ModRouteRouteChildren,
 )
 
+interface RoadmapRoadmapIdRouteRouteChildren {
+  RoadmapRoadmapIdIndexRoute: typeof RoadmapRoadmapIdIndexRoute
+}
+
+const RoadmapRoadmapIdRouteRouteChildren: RoadmapRoadmapIdRouteRouteChildren = {
+  RoadmapRoadmapIdIndexRoute: RoadmapRoadmapIdIndexRoute,
+}
+
+const RoadmapRoadmapIdRouteRouteWithChildren =
+  RoadmapRoadmapIdRouteRoute._addFileChildren(
+    RoadmapRoadmapIdRouteRouteChildren,
+  )
+
+interface RoadmapRouteRouteChildren {
+  RoadmapRoadmapIdRouteRoute: typeof RoadmapRoadmapIdRouteRouteWithChildren
+  RoadmapIndexRoute: typeof RoadmapIndexRoute
+}
+
+const RoadmapRouteRouteChildren: RoadmapRouteRouteChildren = {
+  RoadmapRoadmapIdRouteRoute: RoadmapRoadmapIdRouteRouteWithChildren,
+  RoadmapIndexRoute: RoadmapIndexRoute,
+}
+
+const RoadmapRouteRouteWithChildren = RoadmapRouteRoute._addFileChildren(
+  RoadmapRouteRouteChildren,
+)
+
 interface SettingsPaymentRouteRouteChildren {
   SettingsPaymentIndexRoute: typeof SettingsPaymentIndexRoute
 }
@@ -1882,6 +1982,7 @@ const rootRouteChildren: RootRouteChildren = {
   LearnRouteRoute: LearnRouteRouteWithChildren,
   LecturingToolRouteRoute: LecturingToolRouteRouteWithChildren,
   ModRouteRoute: ModRouteRouteWithChildren,
+  RoadmapRouteRoute: RoadmapRouteRouteWithChildren,
   SettingsRouteRoute: SettingsRouteRouteWithChildren,
   UsersRouteRoute: UsersRouteRouteWithChildren,
   YourCoursesRouteRoute: YourCoursesRouteRouteWithChildren,
