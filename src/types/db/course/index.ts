@@ -1,5 +1,5 @@
 import type { Base, UUID } from "@/types/core";
-import type { Module, ModuleReq } from "./module";
+import type { Module } from "./module";
 import type { ApiResponse } from "@/types/core/api";
 
 export const Level = {
@@ -73,15 +73,6 @@ export type GetCoursesFilterReq = {
   SortBy?: "price" | "rating";
   Page?: number;
   PageSize?: number;
-};
-
-//mock
-export type CourseEditReq = {
-  id?: UUID;
-  title?: string;
-  description?: string;
-  thumbnail?: string | null;
-  modules?: ModuleReq[];
 };
 
 export type ValidateCourseReq = {

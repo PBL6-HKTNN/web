@@ -13,68 +13,61 @@ interface WishlistCourseCardProps {
 export function WishlistCourseCard({
   wishlistItem,
   onRemove,
-  isRemoving = false
+  isRemoving = false,
 }: WishlistCourseCardProps) {
   const navigate = useNavigate();
   return (
-    <Card className="group cursor-pointer py-0 transition-all duration-300 hover:shadow-xl hover:-translate-y-2 border-0 bg-gradient-to-br from-white to-gray-50/50 overflow-hidden">
-      <div className="flex relative">
-        {/* Course Thumbnail */}
-        <div className="w-36 h-28 flex-shrink-0 relative overflow-hidden rounded-l-lg">
-          <img
-            src={wishlistItem.thumbnail || "/placeholder-course.jpg"}
-            alt={wishlistItem.title}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        </div>
-
-        {/* Course Content */}
-        <CardContent className="flex-1 p-5">
-          <div className="flex items-start justify-between h-full">
-            <div className="flex-1 pr-4">
-              <h3 className="font-semibold text-lg mb-2 group-hover:text-primary transition-colors duration-200 leading-tight">
-                {wishlistItem.title}
-              </h3>
-
-              <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
-                {wishlistItem.description}
-              </p>
-            </div>
-
-            {/* Actions */}
-            <div className="flex flex-col gap-3 ml-6">
-              <Button
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate({ to: `/course/${wishlistItem.courseId}` });
-                }}
-                className="bg-primary hover:bg-primary/90 shadow-md hover:shadow-lg transition-all duration-200 font-medium"
-              >
-                View Course
-              </Button>
-
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onRemove?.(wishlistItem.courseId);
-                }}
-                disabled={isRemoving}
-                className="border-red-200 text-red-600 hover:text-red-700 hover:bg-red-50 hover:border-red-300 shadow-sm hover:shadow-md transition-all duration-200 font-medium"
-              >
-                <Trash2 className="w-4 h-4 mr-2" />
-                {isRemoving ? "Removing..." : "Remove"}
-              </Button>
-            </div>
-          </div>
-        </CardContent>
+    <Card
+      className="group relative cursor-pointer overflow-hidden border-none transition-all duration-500 hover:shadow-2xl hover:ring-1 hover:ring-primary/50 min-h-[180px]"
+      onClick={() => navigate({ to: `/course/${wishlistItem.courseId}` })}
+    >
+      {/* Background Image with Blending */}
+      <div className="absolute inset-0 z-0">
+        <img
+          src={wishlistItem.thumbnail || "/placeholder-course.jpg"}
+          alt={wishlistItem.title}
+          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+        />
+        {/* Gradient Overlays for readability */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/70 to-black/30 dark:from-slate-950 dark:via-slate-900/90 dark:to-slate-900/40" />
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-500 bg-primary" />
       </div>
 
-      {/* Subtle bottom gradient */}
-      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary/20 via-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      {/* Course Content */}
+      <CardContent className="relative z-10 flex h-full flex-col p-6 text-white">
+        <div className="flex flex-1 flex-col">
+          <h3 className="mb-2 line-clamp-1 text-2xl font-extrabold tracking-tight group-hover:text-primary-foreground transition-colors">
+            {wishlistItem.title}
+          </h3>
+
+          <p className="mb-6 line-clamp-2 text-sm text-gray-300 leading-relaxed max-w-2xl font-medium">
+            {wishlistItem.description}
+          </p>
+
+          <div className="mt-auto flex items-center justify-end gap-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                onRemove?.(wishlistItem.courseId);
+              }}
+              disabled={isRemoving}
+              className="text-gray-300 hover:bg-white/10 hover:text-white font-bold transition-colors"
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              {isRemoving ? "Removing..." : "Remove"}
+            </Button>
+
+            <Button
+              size="sm"
+              className="font-bold shadow-2xl bg-white text-black hover:bg-primary hover:text-white transition-all duration-300 transform group-hover:translate-x-1"
+            >
+              View Course
+            </Button>
+          </div>
+        </div>
+      </CardContent>
     </Card>
   );
 }

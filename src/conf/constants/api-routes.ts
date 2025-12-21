@@ -118,6 +118,15 @@ const API_ROUTES = {
       `/Enrollment/total-enrollments/${courseId}`,
     addCalendar: (courseId: UUID) => `/Enrollment/add-calendar/${courseId}`,
   },
+  CERTIFICATE: {
+    generateCert: (enrollmentId: UUID) =>
+      `/Certificate/${enrollmentId}/generate`,
+    getMyCerts: "/Certificate/my",
+    getCertStatus: (enrollmentId: UUID) =>
+      `/Certificate/${enrollmentId}/status`,
+    downloadCert: (enrollmentId: UUID) =>
+      `/Certificate/${enrollmentId}/download`,
+  },
   REVIEW: {
     createReview: "/Review",
     getReviewsByCourse: (courseId: UUID) => `/Review/course/${courseId}`,
@@ -155,6 +164,18 @@ const API_ROUTES = {
     updateRequest: (requestId: UUID) => `/Request/update/${requestId}`,
     deleteRequest: (requestId: UUID) => `/Request/delete/${requestId}`,
     resolveRequest: "/Request/resolve",
+  },
+  ROADMAP: {
+    create: "/Roadmap",
+    getMy: "/Roadmap/my",
+    getDetail: (id: UUID) => `/Roadmap/${id}`,
+    join: (id: UUID) => `/Roadmap/${id}/join`,
+    update: (id: UUID) => `/Roadmap/${id}`,
+    addCourse: (id: UUID) => `/Roadmap/${id}/courses`,
+    reorderCourses: (id: UUID) => `/Roadmap/${id}/courses/reorder`,
+    removeCourse: (id: UUID, courseId: UUID) => `/Roadmap/${id}/courses/${courseId}`,
+    syncProgress: (id: UUID) => `/Roadmap/${id}/sync-progress`,
+    delete: (id: UUID) => `/Roadmap/${id}`,
   },
 };
 

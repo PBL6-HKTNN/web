@@ -1,12 +1,18 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileText, Video, Brain } from "lucide-react";
-import { LessonType, type LessonReq } from "@/types/db/course/lesson";
+import { LessonType, type Lesson } from "@/types/db/course/lesson";
 
 interface EmptyLessonRenderProps {
-  onSelectType: (type: LessonReq["lessonType"]) => void;
+  onSelectType: (type: Lesson["lessonType"]) => void;
 }
 
 export function EmptyLessonRender({ onSelectType }: EmptyLessonRenderProps) {

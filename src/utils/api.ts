@@ -5,6 +5,7 @@ import {
   apiServiceUrlsKey,
   apiUrl,
   automationApiUrl,
+  certificateApiUrl,
   reviewApiUrl,
   separatedServiceFlag,
   storageApiUrl,
@@ -263,7 +264,12 @@ export function createServiceApi(baseURL: string): AxiosInstance {
   // If separated services are disabled, return the global api instance
   if (
     separatedServiceFlag === 0 &&
-    ![storageApiUrl, reviewApiUrl, automationApiUrl].includes(baseURL)
+    ![
+      storageApiUrl,
+      reviewApiUrl,
+      automationApiUrl,
+      certificateApiUrl,
+    ].includes(baseURL)
   ) {
     return api;
   }
