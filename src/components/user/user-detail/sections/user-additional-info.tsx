@@ -27,7 +27,8 @@ export function UserAdditionalInfo({ user }: UserAdditionalInfoProps) {
               </span>
             </div>
             <p className="text-sm font-mono font-bold bg-muted p-2 rounded-md break-all">
-              {user.id}
+              {user.id.substring(0, 8)}...
+              {user.id.substring(user.id.length - 8, user.id.length)}
             </p>
           </div>
 

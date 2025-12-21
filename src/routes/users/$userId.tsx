@@ -52,7 +52,7 @@ function RouteComponent() {
       <NavBar />
       <div className="w-full min-h-screen bg-gray-50 dark:bg-gray-900">
         <div className="space-y-4 pt-12">
-          <div className="container mx-auto max-lg:px-4">
+          <div className="max-w-7xl container mx-auto max-lg:px-4">
             <UserDetail user={viewedUser as User} isOwner={isOwner} />
           </div>
         </div>
