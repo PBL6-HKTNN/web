@@ -7,6 +7,7 @@ import {
 import {
   useEnroll,
   useIsEnrolled,
+  useGetTotalEnrollmentsByCourse,
 } from "@/hooks/queries/course/enrollment-hooks";
 import {
   useGetReviewsByCourse,
@@ -42,6 +43,9 @@ export const useCourseDetail = (courseId: string) => {
     useGetAverageRatingByCourse(courseId);
   // Report hook
   const reportForm = useCourseReportForm(courseId);
+
+  // Total enrollments (API)
+  const { data: totalEnrollments } = useGetTotalEnrollmentsByCourse(courseId);
 
   // Check if course is in cart
   const isInCart =
@@ -93,6 +97,8 @@ export const useCourseDetail = (courseId: string) => {
     // Enrollment
     enrollMutation,
     isEnrolled,
+    // Totals
+    totalEnrollments,
     // Reviews
     reviews: reviewsData?.data || [],
     averageRating: averageData?.data?.averageRating || 0,

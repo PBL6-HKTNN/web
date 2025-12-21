@@ -67,7 +67,7 @@ export function EnrolledCourseCard({ course }: EnrolledCourseCardProps) {
           )}
 
           <div className="mt-auto flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
+            {/* <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 text-white font-bold text-sm shadow-inner">
                 {course.instructorId.substring(0, 2).toUpperCase()}
               </div>
@@ -79,7 +79,7 @@ export function EnrolledCourseCard({ course }: EnrolledCourseCardProps) {
                   {course.instructorId}
                 </span>
               </div>
-            </div>
+            </div> */}
 
             <Button
               size="lg"

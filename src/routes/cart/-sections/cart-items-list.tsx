@@ -1,5 +1,4 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { CartItemComponent } from "@/components/payment/cart/cart-item";
 import type { CartItem } from "@/types/db/payment";
 

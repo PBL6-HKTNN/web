@@ -55,7 +55,10 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
     averageRating,
     reviewsLoading,
     averageLoading,
+    // Totals
+    totalEnrollments,
     formatPrice,
+    formatNumber,
   } = useCourseDetail(courseId);
 
   const { data: instructorData } = useUser(course?.instructorId as string);
@@ -278,7 +281,7 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent" />
         </div>
 
-        <div className="container relative z-10 mx-auto px-4">
+        <div className="container relative z-10 mx-auto px-4 max-w-7xl">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-center">
             {/* Hero Content */}
             <div className="lg:col-span-2 space-y-6 text-white">
@@ -329,7 +332,12 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
 
                 <div className="flex items-center gap-2 text-gray-300">
                   <Users className="w-5 h-5 text-primary" />
-                  <span className="font-bold">1,234 students</span>
+                  <span className="font-bold">
+                    {formatNumber(
+                      totalEnrollments ?? course.totalEnrollments ?? 0
+                    )}{" "}
+                    students
+                  </span>
                 </div>
 
                 <div className="flex items-center gap-2 text-gray-300">
@@ -381,7 +389,7 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
       </div>
 
       {/* Main Content Grid */}
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto px-4 py-12 max-w-7xl">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* Left Column: Tabs and Details */}
           <div className="lg:col-span-2 space-y-12">
@@ -413,6 +421,7 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
               averageRating={averageRating}
               reviewsLoading={reviewsLoading}
               averageRatingLoading={averageLoading}
+              totalEnrollments={totalEnrollments}
             />
           </div>
 

@@ -17,6 +17,7 @@ interface CourseTabsProps {
   averageRating: number;
   reviewsLoading: boolean;
   averageRatingLoading: boolean;
+  totalEnrollments?: number;
 }
 
 export default function CourseTabs({
@@ -27,6 +28,7 @@ export default function CourseTabs({
   averageRating,
   reviewsLoading,
   averageRatingLoading,
+  totalEnrollments,
 }: CourseTabsProps) {
   return (
     <Tabs defaultValue="overview" className="w-full">
@@ -62,7 +64,7 @@ export default function CourseTabs({
       </TabsList>
 
       <TabsContent value="overview" className="space-y-6 mt-6">
-        <OverviewTab course={course} />
+        <OverviewTab course={course} totalEnrollments={totalEnrollments} />
       </TabsContent>
 
       <TabsContent value="curriculum" className="mt-6">

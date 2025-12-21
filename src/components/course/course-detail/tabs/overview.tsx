@@ -3,9 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface OverviewProps {
   course: Course;
+  totalEnrollments?: number;
 }
 
-export default function OverviewTab({ course }: OverviewProps) {
+export default function OverviewTab({
+  course,
+  totalEnrollments,
+}: OverviewProps) {
+  const students = totalEnrollments ?? course.totalEnrollments ?? 0;
   return (
     <div className="space-y-8">
       <section className="space-y-4">
@@ -35,9 +40,7 @@ export default function OverviewTab({ course }: OverviewProps) {
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Total Students</span>
-              <span className="font-bold">
-                {course.totalEnrollments.toLocaleString()}
-              </span>
+              <span className="font-bold">{students.toLocaleString()}</span>
             </div>
           </CardContent>
         </Card>
